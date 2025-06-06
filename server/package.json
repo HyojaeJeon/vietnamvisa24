@@ -1,11 +1,24 @@
+
 {
-  "name": "ln-visa-server",
+  "name": "vietnam-visa-server",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "dev": "node index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "apollo-server-express": "^3.12.1",
+    "graphql": "^16.8.1",
+    "mysql2": "^3.6.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
   },
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "Vietnam Visa Service Backend Server"
 }
