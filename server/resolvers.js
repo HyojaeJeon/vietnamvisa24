@@ -20,7 +20,6 @@ const getUserFromToken = async (token) => {
   }
 };
 
-const { getDB } = require('./database');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
