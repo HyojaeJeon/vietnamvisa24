@@ -1,4 +1,3 @@
-
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { getDB } = require('./database');
@@ -8,11 +7,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 // Helper function to get user from token
 const getUserFromToken = async (token) => {
   if (!token) return null;
-  
+
   try {
     const cleanToken = token.replace('Bearer ', '');
     const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET || 'your-secret-key');
-    
+
     const db = getDB();
     return new Promise((resolve, reject) => {
       db.get('SELECT * FROM users WHERE id = ?', [decoded.userId], (err, row) => {
@@ -79,9 +78,9 @@ const resolvers = {
   Mutation: {
     register: async (_, { input }) => {
       const { email, password, name, phone } = input;
-      
+
       const db = getDB();
-      
+
       // Check if user already exists
       const existingUser = await new Promise((resolve, reject) => {
         db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
@@ -89,14 +88,14 @@ const resolvers = {
           else resolve(row);
         });
       });
-      
+
       if (existingUser) {
         throw new Error('User with this email already exists');
       }
-      
+
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
-      
+
       // Create user
       return new Promise((resolve, reject) => {
         db.run(
@@ -146,7 +145,7 @@ const resolvers = {
 
     login: async (_, { input }) => {
       const { email, password } = input;
-      
+
       const db = getDB();
       const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
       const user = users[0];
@@ -167,7 +166,7 @@ const resolvers = {
 
     submitVisaApplication: async (_, { input }, { token }) => {
       const user = await getUserFromToken(token);
-      
+
       const db = getDB();
       const [result] = await db.execute(`
         INSERT INTO visa_applications 
@@ -212,6 +211,21 @@ const resolvers = {
       );
 
       return applications[0];
+    },
+    createUser: async (_, { name, email, password }) => {
+      const hashedPassword = await bcrypt.hash(password, 12);
+
+      // Create user logic here
+      return {
+        id: '1',
+        name,
+        email,
+        createdAt: new Date().toISOString()
+      };
+    },
+
+    loginUser: async (_, { email, password }) => {
+      const userHashedPassword = await bcrypt.hash(password, 12);
     }
   }
 };
