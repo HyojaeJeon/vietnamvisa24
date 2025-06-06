@@ -20,9 +20,6 @@ const getUserFromToken = async (token) => {
   }
 };
 
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-
 // Helper function to get user from token
 const getUserFromToken = async (token) => {
   if (!token) return null;
