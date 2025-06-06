@@ -20,6 +20,30 @@ const getUserFromToken = async (token) => {
   }
 };
 
+const { getDB } = require('./database');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+
+// Helper function to get user from token
+const getUserFromToken = async (token) => {
+  if (!token) return null;
+  
+  try {
+    const cleanToken = token.replace('Bearer ', '');
+    const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET || 'your-secret-key');
+    
+    const db = getDB();
+    return new Promise((resolve, reject) => {
+      db.get('SELECT * FROM users WHERE id = ?', [decoded.userId], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+  } catch (error) {
+    return null;
+  }
+};
+
 const resolvers = {
   Query: {
     me: async (_, __, { token }) => {
@@ -31,11 +55,16 @@ const resolvers = {
       if (!user) throw new Error('Authentication required');
 
       const db = getDB();
-      const [rows] = await db.execute(
-        'SELECT * FROM visa_applications WHERE user_id = ? ORDER BY created_at DESC',
-        [user.id]
-      );
-      return rows;
+      return new Promise((resolve, reject) => {
+        db.all(
+          'SELECT * FROM visa_applications WHERE user_id = ? ORDER BY created_at DESC',
+          [user.id],
+          (err, rows) => {
+            if (err) reject(err);
+            else resolve(rows);
+          }
+        );
+      });
     },
 
     getVisaApplication: async (_, { id }, { token }) => {
@@ -43,11 +72,16 @@ const resolvers = {
       if (!user) throw new Error('Authentication required');
 
       const db = getDB();
-      const [rows] = await db.execute(
-        'SELECT * FROM visa_applications WHERE id = ? AND user_id = ?',
-        [id, user.id]
-      );
-      return rows[0] || null;
+      return new Promise((resolve, reject) => {
+        db.get(
+          'SELECT * FROM visa_applications WHERE id = ? AND user_id = ?',
+          [id, user.id],
+          (err, row) => {
+            if (err) reject(err);
+            else resolve(row || null);
+          }
+        );
+      });
     },
 
     getVisaTypes: () => {
@@ -68,10 +102,47 @@ const resolvers = {
       const db = getDB();
       
       // Check if user already exists
-      const [existingUsers] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
-      if (existingUsers.length > 0) {
+      const existingUser = await new Promise((resolve, reject) => {
+        db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        });
+      });
+      
+      if (existingUser) {
         throw new Error('User with this email already exists');
       }
+      
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      // Create user
+      return new Promise((resolve, reject) => {
+        db.run(
+          'INSERT INTO users (email, password, name, phone) VALUES (?, ?, ?, ?)',
+          [email, hashedPassword, name, phone],
+          function(err) {
+            if (err) {
+              reject(err);
+            } else {
+              const token = jwt.sign(
+                { userId: this.lastID }, 
+                process.env.JWT_SECRET || 'your-secret-key',
+                { expiresIn: '7d' }
+              );
+              resolve({
+                token,
+                user: {
+                  id: this.lastID,
+                  email,
+                  name,
+                  phone
+                }
+              });
+            }
+          }
+        );
+      });
 
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 12);

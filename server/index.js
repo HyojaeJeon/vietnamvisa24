@@ -38,12 +38,12 @@ async function startServer() {
   // Apply Apollo GraphQL middleware
   server.applyMiddleware({ 
     app, 
-    path: '/api/graphql',
+    path: '/graphql',
     cors: false 
   });
 
   // Health check endpoint
-  app.get('/api/health', (req, res) => {
+  app.get('/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
   });
 
