@@ -11,21 +11,6 @@ const getUserFromToken = async (token) => {
   
   try {
     const cleanToken = token.replace('Bearer ', '');
-    const decoded = jwt.verify(cleanToken, JWT_SECRET);
-    const db = getDB();
-    const [rows] = await db.execute('SELECT * FROM users WHERE id = ?', [decoded.userId]);
-    return rows[0] || null;
-  } catch (error) {
-    return null;
-  }
-};
-
-// Helper function to get user from token
-const getUserFromToken = async (token) => {
-  if (!token) return null;
-  
-  try {
-    const cleanToken = token.replace('Bearer ', '');
     const decoded = jwt.verify(cleanToken, process.env.JWT_SECRET || 'your-secret-key');
     
     const db = getDB();
