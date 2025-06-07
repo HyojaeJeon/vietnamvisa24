@@ -124,14 +124,14 @@ const resolvers = {
         );
       });
 
-      
+
     },
 
     login: async (_, { input }) => {
       const { email, password } = input;
 
       const db = getDB();
-      
+
       const user = await new Promise((resolve, reject) => {
         db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
           if (err) reject(err);
@@ -218,18 +218,6 @@ const resolvers = {
         );
       });
     },
-    createUser: async (_, { name, email, password }) => {
-      const hashedPassword = await bcrypt.hash(password, 12);
-
-      // Create user logic here
-      return {
-        id: '1',
-        name,
-        email,
-        createdAt: new Date().toISOString()
-      };
-    },
-
     loginUser: async (_, { email, password }) => {
       const userHashedPassword = await bcrypt.hash(password, 12);
     }

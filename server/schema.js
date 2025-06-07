@@ -1,4 +1,3 @@
-
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
@@ -68,11 +67,11 @@ const typeDefs = gql`
   type Query {
     # User queries
     me: User
-    
+
     # Visa application queries
     getVisaApplications: [VisaApplication!]!
     getVisaApplication(id: ID!): VisaApplication
-    
+
     # Public queries
     getVisaTypes: [String!]!
   }
@@ -81,7 +80,7 @@ const typeDefs = gql`
     # Authentication
     register(input: UserRegistrationInput!): AuthPayload!
     login(input: UserLoginInput!): AuthPayload!
-    
+
     # Visa applications
     submitVisaApplication(input: VisaApplicationInput!): VisaApplication!
     updateVisaApplicationStatus(id: ID!, status: ApplicationStatus!): VisaApplication!
