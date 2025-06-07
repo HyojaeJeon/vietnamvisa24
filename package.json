@@ -3,6 +3,7 @@
     "clsx": "^2.1.1",
     "redux-persist": "^6.0.0",
     "sqlite3": "^5.1.7",
+    "swiper": "^11.2.8",
     "tailwind-merge": "^3.3.0",
     "tailwindcss-animate": "^1.0.7"
   }

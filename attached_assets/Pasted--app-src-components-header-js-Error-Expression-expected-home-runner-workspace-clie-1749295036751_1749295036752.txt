@@ -1,0 +1,29 @@
+./app/src/components/header.js
+Error: 
+  × Expression expected
+    ╭─[/home/runner/workspace/client/app/src/components/header.js:89:1]
+ 89 │               <button
+ 90 │                 key={item.href}
+ 91 │                 onClick={() => scrollToSection(item.href)}
+ 92 │                 className="relative px-5 py-3.5 text-sm font-semibold text-slate-700 hover:text-blue-700 transition-all duration-300 group rounded-xl hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-indigo-50/80 hover:shadow-md backdrop-blur-sm border border-transparent hover:border-blue-200/50"</div>
+    ·                                                                                                                                                                                                                                                                                                              ─
+ 93 │                 style={{ animationDelay: `${index * 0.1}s` }}
+ 94 │               >
+ 95 │                 <span className="relative z-10">{item.label}</span>
+    ╰────
+
+  × Unterminated regexp literal
+    ╭─[/home/runner/workspace/client/app/src/components/header.js:89:1]
+ 89 │               <button
+ 90 │                 key={item.href}
+ 91 │                 onClick={() => scrollToSection(item.href)}
+ 92 │                 className="relative px-5 py-3.5 text-sm font-semibold text-slate-700 hover:text-blue-700 transition-all duration-300 group rounded-xl hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-indigo-50/80 hover:shadow-md backdrop-blur-sm border border-transparent hover:border-blue-200/50"</div>
+    ·                                                                                                                                                                                                                                                                                                               ─────
+ 93 │                 style={{ animationDelay: `${index * 0.1}s` }}
+ 94 │               >
+ 95 │                 <span className="relative z-10">{item.label}</span>
+    ╰────
+
+Caused by:
+    Syntax Error
+This error occurred during the build process and can only be dismissed by fi
