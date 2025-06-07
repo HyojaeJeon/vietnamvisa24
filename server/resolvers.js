@@ -217,9 +217,6 @@ const resolvers = {
           }
         );
       });
-    },
-    loginUser: async (_, { email, password }) => {
-      const userHashedPassword = await bcrypt.hash(password, 12);
     }
   }
 };
