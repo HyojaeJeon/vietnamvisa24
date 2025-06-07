@@ -124,31 +124,20 @@ const resolvers = {
         );
       });
 
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 12);
-
-      // Create user
-      const [result] = await db.execute(
-        'INSERT INTO users (email, password, name, phone) VALUES (?, ?, ?, ?)',
-        [email, hashedPassword, name, phone]
-      );
-
-      // Get created user
-      const [users] = await db.execute('SELECT * FROM users WHERE id = ?', [result.insertId]);
-      const user = users[0];
-
-      // Generate token
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
-
-      return { token, user };
+      
     },
 
     login: async (_, { input }) => {
       const { email, password } = input;
 
       const db = getDB();
-      const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
-      const user = users[0];
+      
+      const user = await new Promise((resolve, reject) => {
+        db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
+          if (err) reject(err);
+          else resolve(row);
+        });
+      });
 
       if (!user) {
         throw new Error('Invalid email or password');
@@ -168,31 +157,39 @@ const resolvers = {
       const user = await getUserFromToken(token);
 
       const db = getDB();
-      const [result] = await db.execute(`
-        INSERT INTO visa_applications 
-        (user_id, visa_type, full_name, passport_number, nationality, birth_date, 
-         phone, email, arrival_date, departure_date, purpose) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `, [
-        user?.id || null,
-        input.visa_type,
-        input.full_name,
-        input.passport_number,
-        input.nationality,
-        input.birth_date,
-        input.phone,
-        input.email,
-        input.arrival_date,
-        input.departure_date,
-        input.purpose
-      ]);
-
-      const [applications] = await db.execute(
-        'SELECT * FROM visa_applications WHERE id = ?',
-        [result.insertId]
-      );
-
-      return applications[0];
+      return new Promise((resolve, reject) => {
+        db.run(`
+          INSERT INTO visa_applications 
+          (user_id, visa_type, full_name, passport_number, nationality, birth_date, 
+           phone, email, arrival_date, departure_date, purpose) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `, [
+          user?.id || null,
+          input.visa_type,
+          input.full_name,
+          input.passport_number,
+          input.nationality,
+          input.birth_date,
+          input.phone,
+          input.email,
+          input.arrival_date,
+          input.departure_date,
+          input.purpose
+        ], function(err) {
+          if (err) {
+            reject(err);
+          } else {
+            db.get(
+              'SELECT * FROM visa_applications WHERE id = ?',
+              [this.lastID],
+              (err, row) => {
+                if (err) reject(err);
+                else resolve(row);
+              }
+            );
+          }
+        });
+      });
     },
 
     updateVisaApplicationStatus: async (_, { id, status }, { token }) => {
@@ -200,17 +197,26 @@ const resolvers = {
       if (!user) throw new Error('Authentication required');
 
       const db = getDB();
-      await db.execute(
-        'UPDATE visa_applications SET status = ? WHERE id = ? AND user_id = ?',
-        [status, id, user.id]
-      );
-
-      const [applications] = await db.execute(
-        'SELECT * FROM visa_applications WHERE id = ?',
-        [id]
-      );
-
-      return applications[0];
+      return new Promise((resolve, reject) => {
+        db.run(
+          'UPDATE visa_applications SET status = ? WHERE id = ? AND user_id = ?',
+          [status, id, user.id],
+          function(err) {
+            if (err) {
+              reject(err);
+            } else {
+              db.get(
+                'SELECT * FROM visa_applications WHERE id = ?',
+                [id],
+                (err, row) => {
+                  if (err) reject(err);
+                  else resolve(row);
+                }
+              );
+            }
+          }
+        );
+      });
     },
     createUser: async (_, { name, email, password }) => {
       const hashedPassword = await bcrypt.hash(password, 12);
