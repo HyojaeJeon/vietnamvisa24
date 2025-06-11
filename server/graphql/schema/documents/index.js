@@ -3,14 +3,15 @@ const { gql } = require("graphql-tag");
 
 const documentsTypeDefs = gql`
   extend type Query {
-    getAllDocuments: [Document!]!
-    getDocumentsByApplication(applicationId: ID!): [Document!]!
+    getDocuments: [Document!]!
+    getDocumentsByApplication(applicationId: String!): [Document!]!
+    getDocument(id: ID!): Document
   }
 
   extend type Mutation {
     createDocument(input: DocumentInput!): Document!
     updateDocumentStatus(id: ID!, status: DocumentStatus!, notes: String): Document!
-    deleteDocument(id: ID!): SuccessResponse!
+    deleteDocumentById(id: ID!): SuccessResponse!
   }
 `;
 

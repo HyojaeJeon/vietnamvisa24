@@ -47,7 +47,7 @@ const resolvers = {
       const user = await getUserFromToken(token);
       if (!user) throw new Error('Authentication required');
 
-      return await models.VisaApplication.findOne({
+      const application = await models.VisaApplication.findOne({
         where: { id, user_id: user.id }
       });
     },
@@ -188,8 +188,67 @@ const resolvers = {
       });
 
       return application;
+    },
+
+    deleteDocument: async (_, { id }, { adminToken }) => {
+      const admin = await getAdminFromToken(adminToken);
+      if (!admin) throw new Error('Authentication required');
+
+      const document = await models.Document.findByPk(id);
+      if (!document) throw new Error('Document not found');
+
+      await document.destroy();
+      return { success: true, message: 'Document deleted successfully' };
+    },
+
+    updateConsultationStatus: async (_, { id, status }, { adminToken }) => {
+      const admin = await getAdminFromToken(adminToken);
+      if (!admin) throw new Error('Authentication required');
+
+      const consultation = await models.Consultation.findByPk(id);
+      if (!consultation) throw new Error('Consultation not found');
+
+      await consultation.update({ status });
+      return consultation;
+    },
+  },
+
+  VisaApplication: {
+    applicant: async (visaApplication) => {
+      return await models.User.findByPk(visaApplication.user_id);
+    },
+    assignedAdmin: async (visaApplication) => {
+      return await models.Admin.findByPk(visaApplication.assigned_admin_id);
+    },
+    documents: async (visaApplication) => {
+      return await models.Document.findAll({
+        where: { application_id: visaApplication.id }
+      });
+    },
+    consultations: async (visaApplication) => {
+      return await models.Consultation.findAll({
+        where: { application_id: visaApplication.id },
+        include: [
+          {
+            model: models.User,
+            as: 'applicant'
+          },
+          {
+            model: models.Admin,
+            as: 'assignedAdmin'
+          }
+        ]
+      });
     }
-  }
+  },
+  Consultation: {
+    applicant: async (consultation) => {
+      return await models.User.findByPk(consultation.user_id);
+    },
+    assignedAdmin: async (consultation) => {
+      return await models.Admin.findByPk(consultation.admin_id);
+    }
+  },
 };
 
 module.exports = resolvers;

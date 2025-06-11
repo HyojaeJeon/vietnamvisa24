@@ -37,7 +37,7 @@ const authTypeDefs = gql`
     priority: String
     created_at: String!
     updated_at: String!
-    user: User
+    applicant: User
     assignedAdmin: Admin
   }
 
@@ -48,23 +48,11 @@ const authTypeDefs = gql`
     document_type: String!
     document_name: String!
     file_size: String!
-    status: String!
+    status: DocumentStatus!
     uploaded_at: String!
     reviewed_at: String
     reviewer: String
     notes: String
-  }
-
-  type Notification {
-    id: ID!
-    type: String!
-    title: String!
-    message: String!
-    recipient: String!
-    status: String!
-    priority: String!
-    created_at: String!
-    related_id: String
   }
 
   enum AdminRole {
@@ -79,6 +67,56 @@ const authTypeDefs = gql`
     APPROVED
     REJECTED
     CONSULTATION
+  }
+
+  enum DocumentStatus {
+    UPLOADED
+    PENDING_REVIEW
+    APPROVED
+    REJECTED
+  }
+
+  enum NotificationType {
+      SYSTEM
+      EMAIL
+      SMS
+  }
+
+  enum NotificationPriority {
+      HIGH
+      MEDIUM
+      LOW
+  }
+
+  type Notification {
+      id: ID!
+      type: NotificationType!
+      title: String!
+      message: String!
+      recipient: String!
+      priority: NotificationPriority
+      read: Boolean!
+      related_id: String
+      created_at: String!
+  }
+
+  type SuccessResponse {
+    success: Boolean!
+    message: String
+  }
+
+  type DashboardStats {
+    totalApplications: Int!
+    newApplicationsToday: Int!
+    completedToday: Int!
+    pendingReview: Int!
+  }
+
+  input AdminInput {
+    email: String!
+    password: String!
+    name: String!
+    role: AdminRole!
   }
 
   input RegisterInput {
@@ -100,13 +138,6 @@ const authTypeDefs = gql`
     password: String!
   }
 
-  input AdminInput {
-    email: String!
-    password: String!
-    name: String!
-    role: AdminRole!
-  }
-
   input VisaApplicationInput {
     visa_type: String!
     full_name: String!
@@ -121,12 +152,20 @@ const authTypeDefs = gql`
   }
 
   input NotificationInput {
-    type: String!
+    type: NotificationType!
     title: String!
     message: String!
     recipient: String!
-    priority: String
+    priority: NotificationPriority
     related_id: String
+  }
+
+  input DocumentInput {
+    application_id: String!
+    customer_name: String!
+    document_type: String!
+    document_name: String!
+    file_size: String!
   }
 
   type AuthResponse {
@@ -145,13 +184,6 @@ const authTypeDefs = gql`
     refreshToken: String!
   }
 
-  type DashboardStats {
-    totalApplications: Int!
-    newApplicationsToday: Int!
-    completedToday: Int!
-    pendingReview: Int!
-  }
-
   extend type Query {
     me: User
     adminMe: Admin
@@ -164,26 +196,21 @@ const authTypeDefs = gql`
     getDocumentsByApplication(applicationId: String!): [Document!]!
     getNotifications: [Notification!]!
     getUnreadNotifications: [Notification!]!
-    dashboardStats: DashboardStats!
+    getDashboardStats: DashboardStats!
   }
 
   extend type Mutation {
-    register(input: RegisterInput!): AuthResponse!
-    login(input: LoginInput!): AuthResponse!
-    refreshToken(refreshToken: String!): RefreshTokenResponse!
+    userRegister(input: RegisterInput!): AuthResponse!
+    userLogin(input: LoginInput!): AuthResponse!
     adminLogin(input: AdminLoginInput!): AdminAuthResponse!
-    createAdmin(input: AdminInput!): Admin!
-    updateAdminRole(id: ID!, role: AdminRole!): Admin!
-    deactivateAdmin(id: ID!): Admin!
+    refreshToken(refreshToken: String!): RefreshTokenResponse!
     createVisaApplication(input: VisaApplicationInput!): VisaApplication!
-    updateVisaApplicationStatus(id: ID!, status: ApplicationStatus!): VisaApplication!
     updateApplicationStatus(id: ID!, status: ApplicationStatus!): VisaApplication!
-    updateConsultationStatus(id: ID!, status: String!, notes: String): VisaApplication!
-    updateDocumentStatus(id: ID!, status: String!, notes: String): Document!
-    deleteDocument(id: ID!): Boolean!
-    markNotificationAsRead(id: ID!): Notification!
-    markAllNotificationsAsRead: Boolean!
+    createDocument(input: DocumentInput!): Document!
+    updateDocumentStatus(id: ID!, status: DocumentStatus!, notes: String): Document!
     createNotification(input: NotificationInput!): Notification!
+    markNotificationAsRead(id: ID!): Notification!
+    markAllNotificationsAsRead(userId: String!): SuccessResponse!
   }
 `;
 

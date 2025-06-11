@@ -1,70 +1,104 @@
 
-const { models } = require("../../../models");
-const { getAdminFromToken } = require("../../../utils/auth");
+const { models } = require('../../../models');
+const { AuthenticationError, NotFoundError } = require('../../../utils/errorTypes');
 
-const resolvers = {
+const documentsResolvers = {
   Query: {
-    getAllDocuments: async (_, __, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error('Authentication required');
-
+    getDocuments: async () => {
       return await models.Document.findAll({
-        include: [{ model: models.VisaApplication, as: 'application' }],
-        order: [['uploaded_at', 'DESC']]
+        include: [
+          {
+            model: models.VisaApplication,
+            as: 'application'
+          }
+        ],
+        order: [['created_at', 'DESC']]
       });
     },
 
-    getDocumentsByApplication: async (_, { applicationId }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error('Authentication required');
-
+    getDocumentsByApplication: async (_, { applicationId }) => {
       return await models.Document.findAll({
         where: { application_id: applicationId },
-        order: [['uploaded_at', 'DESC']]
+        include: [
+          {
+            model: models.VisaApplication,
+            as: 'application'
+          }
+        ],
+        order: [['created_at', 'DESC']]
       });
+    },
+
+    getDocument: async (_, { id }) => {
+      const document = await models.Document.findByPk(id, {
+        include: [
+          {
+            model: models.VisaApplication,
+            as: 'application'
+          }
+        ]
+      });
+
+      if (!document) {
+        throw new NotFoundError('Document not found');
+      }
+
+      return document;
     }
   },
 
   Mutation: {
-    createDocument: async (_, { input }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error('Authentication required');
-
+    createDocument: async (_, { input }) => {
       return await models.Document.create({
         ...input,
-        status: 'PENDING',
+        status: 'UPLOADED',
         uploaded_at: new Date()
       });
     },
 
-    updateDocumentStatus: async (_, { id, status, notes }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error('Authentication required');
-
+    updateDocumentStatus: async (_, { id, status, notes }) => {
       const document = await models.Document.findByPk(id);
-      if (!document) throw new Error('Document not found');
+      
+      if (!document) {
+        throw new NotFoundError('Document not found');
+      }
 
-      await document.update({
+      const updateData = { 
         status,
-        notes,
-        reviewed_at: new Date(),
-        reviewer: admin.name
-      });
+        reviewed_at: new Date()
+      };
+      
+      if (notes) {
+        updateData.notes = notes;
+      }
 
-      return document;
+      await document.update(updateData);
+      
+      return await models.Document.findByPk(id, {
+        include: [
+          {
+            model: models.VisaApplication,
+            as: 'application'
+          }
+        ]
+      });
     },
 
-    deleteDocument: async (_, { id }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error('Authentication required');
-
+    deleteDocumentById: async (_, { id }) => {
       const document = await models.Document.findByPk(id);
-      if (!document) throw new Error('Document not found');
+      
+      if (!document) {
+        throw new NotFoundError('Document not found');
+      }
 
       await document.destroy();
-      return { success: true, message: 'Document deleted successfully' };
+
+      return {
+        success: true,
+        message: 'Document deleted successfully'
+      };
     }
   }
 };
 
-module.exports = resolvers;
+module.exports = documentsResolvers;
