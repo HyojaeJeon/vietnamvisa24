@@ -1,4 +1,3 @@
-
 const { models } = require('../../../models');
 const { AuthenticationError, NotFoundError } = require('../../../utils/errorTypes');
 
@@ -58,7 +57,7 @@ const documentsResolvers = {
 
     updateDocumentStatus: async (_, { id, status, notes }) => {
       const document = await models.Document.findByPk(id);
-      
+
       if (!document) {
         throw new NotFoundError('Document not found');
       }
@@ -67,13 +66,13 @@ const documentsResolvers = {
         status,
         reviewed_at: new Date()
       };
-      
+
       if (notes) {
         updateData.notes = notes;
       }
 
       await document.update(updateData);
-      
+
       return await models.Document.findByPk(id, {
         include: [
           {
@@ -84,9 +83,9 @@ const documentsResolvers = {
       });
     },
 
-    deleteDocumentById: async (_, { id }) => {
+    deleteDocument: async (_, { id }) => {
       const document = await models.Document.findByPk(id);
-      
+
       if (!document) {
         throw new NotFoundError('Document not found');
       }

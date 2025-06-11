@@ -1,0 +1,111 @@
+2025-06-10 16:05:01.091 [warning] [server stderr]   server stdio [flags]
+2025-06-10 16:05:01.091 [warning] [server stderr] 
+2025-06-10 16:05:01.091 [warning] [server stderr] Flags:
+2025-06-10 16:05:01.091 [warning] [server stderr]   -h, --help   help for stdio
+2025-06-10 16:05:01.091 [warning] [server stderr] 
+2025-06-10 16:05:01.091 [warning] [server stderr] Global Flags:
+2025-06-10 16:05:01.091 [warning] [server stderr]       --dynamic-toolsets         Enable dynamic toolsets
+2025-06-10 16:05:01.091 [warning] [server stderr]       --enable-command-logging   When enabled, the server will log all command requests and responses to the log file
+2025-06-10 16:05:01.091 [warning] [server stderr]       --export-translations      Save translations to a JSON file
+2025-06-10 16:05:01.091 [warning] [server stderr]       --gh-host string           Specify the GitHub hostname (for GitHub Enterprise etc.)
+2025-06-10 16:05:01.091 [warning] [server stderr]       --log-file string          Path to log file
+2025-06-10 16:05:01.091 [warning] [server stderr]       --read-only                Restrict the server to read-only operations
+2025-06-10 16:05:01.091 [warning] [server stderr]       --toolsets strings         An optional comma separated list of groups of tools to allow, defaults to enabling all (default [all])
+2025-06-10 16:05:01.091 [warning] [server stderr] 
+2025-06-10 16:05:01.091 [warning] [server stderr] GITHUB_PERSONAL_ACCESS_TOKEN not set
+2025-06-10 16:05:01.290 [info] 연결 상태: 오류: Process exited with code 1
+2025-06-10 16:05:01.291 [error] Server exited before responding to initialize request.
+2025-06-10 16:05:03.382 [info] 서버 중지 중 github
+2025-06-10 16:05:03.391 [info] 서버 github 시작하는 중
+2025-06-10 16:05:03.391 [info] 연결 상태: 시작
+2025-06-10 16:05:03.408 [info] Starting server from LocalProcess extension host
+2025-06-10 16:05:03.415 [info] 연결 상태: 시작
+2025-06-10 16:05:03.416 [info] 연결 상태: 실행 중
+2025-06-10 16:05:03.661 [warning] [server stderr] Error: GITHUB_PERSONAL_ACCESS_TOKEN not set
+2025-06-10 16:05:03.661 [warning] [server stderr] Usage:
+2025-06-10 16:05:03.661 [warning] [server stderr]   server stdio [flags]
+2025-06-10 16:05:03.661 [warning] [server stderr] 
+2025-06-10 16:05:03.661 [warning] [server stderr] Flags:
+2025-06-10 16:05:03.661 [warning] [server stderr]   -h, --help   help for stdio
+2025-06-10 16:05:03.661 [warning] [server stderr] 
+2025-06-10 16:05:03.661 [warning] [server stderr] Global Flags:
+2025-06-10 16:05:03.661 [warning] [server stderr]       --dynamic-toolsets         Enable dynamic toolsets
+2025-06-10 16:05:03.662 [warning] [server stderr]       --enable-command-logging   When enabled, the server will log all command requests and responses to the log file
+2025-06-10 16:05:03.662 [warning] [server stderr]       --export-translations      Save translations to a JSON file
+2025-06-10 16:05:03.662 [warning] [server stderr]       --gh-host string           Specify the GitHub hostname (for GitHub Enterprise etc.)
+2025-06-10 16:05:03.662 [warning] [server stderr]       --log-file string          Path to log file
+2025-06-10 16:05:03.662 [warning] [server stderr]       --read-only                Restrict the server to read-only operations
+2025-06-10 16:05:03.662 [warning] [server stderr]       --toolsets strings         An optional comma separated list of groups of tools to allow, defaults to enabling all (default [all])
+2025-06-10 16:05:03.662 [warning] [server stderr] 
+2025-06-10 16:05:03.662 [warning] [server stderr] GITHUB_PERSONAL_ACCESS_TOKEN not set
+2025-06-10 16:05:03.820 [info] 연결 상태: 오류: Process exited with code 1
+2025-06-10 16:05:03.820 [error] Server exited before responding to initialize request.
+
+{
+  "chat.mcp.discovery.enabled": true,
+  "editor.formatOnSave": true,
+  "workbench.settings.useSplitJSON": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Git Bash(login) 프로필 정의
+  "terminal.integrated.profiles.windows": {
+    "Git Bash (login)": {
+      "path": "C:\\Program Files\\Git\\bin\\bash.exe",
+      "args": ["--login", "-i"],
+      "icon": "terminal-bash"
+    }
+  },
+  // 기본 프로필을 Git Bash (login) 으로 설정
+  "terminal.integrated.defaultProfile.windows": "Git Bash (login)",
+
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "prettier.printWidth": 200,
+  "editor.inlineSuggest.enabled": true,
+  "workbench.colorTheme": "Default Dark+",
+
+  // GitHub Copilot
+  "github.copilot.enable": {
+    "*": true,
+    "plaintext": false,
+    "markdown": false,
+    "scminput": false
+  },
+  "github.copilot.editor.enableAutoCompletions": true,
+
+  "editor.fontSize": 14,
+  "workbench.editorAssociations": {
+    "*.keystore": "default"
+  },
+  "python.analysis.typeCheckingMode": "basic",
+  "files.autoSave": "afterDelay",
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "mcp": {
+    "inputs": [
+      {
+        "type": "promptString",
+        "id": "github_token",
+        "description": "GitHub Personal Access Token",
+        "password": true
+      }
+    ],
+    "servers": {
+      "github": {
+        "command": "docker",
+        "args": ["run", "-i", "--rm", "-e", "GITHUB_PERSONAL_ACCESS_TOKEN", "ghcr.io/github/github-mcp-server"],
+        "env": {
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "${input:github_token}"
+        }
+      }
+    }
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
+}
+
+오류를 해결해줘

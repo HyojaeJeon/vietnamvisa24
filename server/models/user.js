@@ -1,5 +1,7 @@
 
-module.exports = (sequelize, DataTypes) => {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   const User = sequelize.define('User', {
     id: {
       type: DataTypes.INTEGER,
@@ -7,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       autoIncrement: true
     },
     email: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: false,
       unique: true,
       validate: {
@@ -15,20 +17,29 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     password: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: false
     },
     name: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING,
       allowNull: false
     },
     phone: {
-      type: DataTypes.STRING(20),
+      type: DataTypes.STRING,
       allowNull: true
     },
-    is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true
+    tokenVersion: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+      allowNull: false
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW
     }
   }, {
     tableName: 'users',
@@ -36,10 +47,10 @@ module.exports = (sequelize, DataTypes) => {
     underscored: true
   });
 
-  User.associate = function(models) {
+  User.associate = (models) => {
     User.hasMany(models.VisaApplication, {
       foreignKey: 'user_id',
-      as: 'applications'
+      as: 'visaApplications'
     });
   };
 

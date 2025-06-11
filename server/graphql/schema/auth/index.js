@@ -200,8 +200,10 @@ const authTypeDefs = gql`
   }
 
   extend type Mutation {
+    register(input: RegisterInput!): AuthResponse!
     userRegister(input: RegisterInput!): AuthResponse!
     userLogin(input: LoginInput!): AuthResponse!
+    login(input: LoginInput!): AuthResponse!
     adminLogin(input: AdminLoginInput!): AdminAuthResponse!
     refreshToken(refreshToken: String!): RefreshTokenResponse!
     createVisaApplication(input: VisaApplicationInput!): VisaApplication!

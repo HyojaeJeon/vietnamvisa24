@@ -1,0 +1,88 @@
+page.js:43 
+            
+            
+           POST http://localhost:5000/graphql net::ERR_FAILED
+eval @ createHttpLink.js:146
+Subscription @ module.js:194
+subscribe @ module.js:268
+eval @ index.js:24
+Promise.then
+eval @ index.js:20
+Subscription @ module.js:194
+subscribe @ module.js:268
+complete @ Concast.js:119
+Concast.start @ Concast.js:160
+Concast @ Concast.js:145
+QueryManager.getObservableFromLink @ QueryManager.js:789
+eval @ QueryManager.js:159
+eval @ QueryManager.js:158
+step @ tslib.es6.mjs:182
+eval @ tslib.es6.mjs:163
+eval @ tslib.es6.mjs:156
+__awaiter @ tslib.es6.mjs:152
+QueryManager.mutate @ QueryManager.js:118
+ApolloClient.mutate @ ApolloClient.js:264
+eval @ useMutation.js:106
+handleSubmit @ page.js:43
+callCallback @ react-dom.development.js:20565
+invokeGuardedCallbackImpl @ react-dom.development.js:20614
+invokeGuardedCallback @ react-dom.development.js:20689
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:20703
+executeDispatch @ react-dom.development.js:32128
+processDispatchQueueItemsInOrder @ react-dom.development.js:32160
+processDispatchQueue @ react-dom.development.js:32173
+dispatchEventsForPlugins @ react-dom.development.js:32184
+eval @ react-dom.development.js:32374
+batchedUpdates$1 @ react-dom.development.js:24953
+batchedUpdates @ react-dom.development.js:28844
+dispatchEventForPluginEventSystem @ react-dom.development.js:32373
+dispatchEvent @ react-dom.development.js:30141
+dispatchDiscreteEvent @ react-dom.development.js:30112이 오류 이해하기
+2hot-reloader-client.js:187 [Fast Refresh] rebuilding
+hot-reloader-client.js:44 [Fast Refresh] done in 2350ms
+login:1 Access to fetch at 'http://localhost:5000/graphql' from origin 'https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.이 오류 이해하기
+page.js:43 
+            
+            
+           POST http://localhost:5000/graphql net::ERR_FAILED
+eval @ createHttpLink.js:146
+Subscription @ module.js:194
+subscribe @ module.js:268
+eval @ index.js:24
+Promise.then
+eval @ index.js:20
+Subscription @ module.js:194
+subscribe @ module.js:268
+complete @ Concast.js:119
+Concast.start @ Concast.js:160
+Concast @ Concast.js:145
+QueryManager.getObservableFromLink @ QueryManager.js:789
+eval @ QueryManager.js:159
+eval @ QueryManager.js:158
+step @ tslib.es6.mjs:182
+eval @ tslib.es6.mjs:163
+eval @ tslib.es6.mjs:156
+__awaiter @ tslib.es6.mjs:152
+QueryManager.mutate @ QueryManager.js:118
+ApolloClient.mutate @ ApolloClient.js:264
+eval @ useMutation.js:106
+handleSubmit @ page.js:43
+callCallback @ react-dom.development.js:20565
+invokeGuardedCallbackImpl @ react-dom.development.js:20614
+invokeGuardedCallback @ react-dom.development.js:20689
+invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:20703
+executeDispatch @ react-dom.development.js:32128
+processDispatchQueueItemsInOrder @ react-dom.development.js:32160
+processDispatchQueue @ react-dom.development.js:32173
+dispatchEventsForPlugins @ react-dom.development.js:32184
+eval @ react-dom.development.js:32374
+batchedUpdates$1 @ react-dom.development.js:24953
+batchedUpdates @ react-dom.development.js:28844
+dispatchEventForPluginEventSystem @ react-dom.development.js:32373
+dispatchEvent @ react-dom.development.js:30141
+dispatchDiscreteEvent @ react-dom.development.js:30112이 오류 이해하기
+login:1 Access to fetch at 'http://localhost:5000/graphql' from origin 'https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:3000' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.이 오류 이해하기
+page.js:43 
+            
+            
+           POST http://localhost:5000/graphql net::ERR_FAILED

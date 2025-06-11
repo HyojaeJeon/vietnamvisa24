@@ -1,0 +1,183 @@
+src/
+├── apollo/
+│   ├── handlers/
+│   │   ├── graphqlErrorHandler.js  // GraphQL 에러 처리 로직
+│   │   └── networkErrorHandler.js    // 네트워크 에러 처리 로직
+│   ├── errorLink.js                // 에러 핸들러들을 조합하여 errorLink를 생성
+│   └── apolloClient.js             // 최종 Apollo Client 인스턴스 생성 (깔끔하게 유지)
+│
+└── utils/
+    └── notifications.js            // UI 알림 관련 유틸리티 함수
+1단계: UI 알림 유틸리티 생성
+먼저 에러 메시지를 사용자에게 보여주는 부분을 별도 유틸리티 함수로 분리합니다. 이렇게 하면 에러 핸들러가 특정 UI 라이브러리에 종속되지 않습니다.
+
+src/utils/notifications.js
+
+JavaScript
+
+// 이 파일에서는 실제 프로젝트에서 사용하는 Toast UI 라이브러리(react-toastify 등)를 호출합니다.
+// import { toast } from 'react-toastify';
+
+/**
+ * 사용자에게 에러 알림을 표시하는 함수
+ * @param {string} message - 표시할 메시지
+ * @param {string} type - 알림 종류 (error, warn, success, info)
+ */
+export const showNotification = (message, type = 'error') => {
+  console.log(`[Notification - ${type}]:`, message);
+  
+  // 실제 구현 예시:
+  // switch (type) {
+  //   case 'error':
+  //     toast.error(message);
+  //     break;
+  //   case 'warn':
+  //     toast.warn(message);
+  //     break;
+  //   default:
+  //     toast.info(message);
+  //     break;
+  // }
+  
+  // 간단한 예시로 alert 사용
+  alert(message);
+};
+2단계: 에러 핸들러 분리
+각 에러 유형에 맞는 핸들러 함수를 handlers 디렉토리 안에 작성합니다.
+
+src/apollo/handlers/graphqlErrorHandler.js
+
+JavaScript
+
+import { showNotification } from '../../utils/notifications';
+
+/**
+ * GraphQL 에러를 중앙에서 처리하는 함수
+ * @param {Array} graphQLErrors - Apollo Link에서 전달된 GraphQL 에러 배열
+ */
+export const handleGraphQLErrors = (graphQLErrors) => {
+  graphQLErrors.forEach(({ message, extensions }) => {
+    const errorCode = extensions?.errorKey;
+    const errorMessage = extensions?.message || message;
+
+    console.error(`[GraphQL Error]: Code: ${errorCode}, Message: ${errorMessage}`);
+
+    switch (errorCode) {
+      case 'UNAUTHENTICATED':
+        showNotification('로그인이 필요합니다. 다시 로그인해주세요.');
+        // 예: window.location.href = '/login';
+        break;
+
+      case 'FORBIDDEN':
+        showNotification('이 작업을 수행할 권한이 없습니다.');
+        break;
+
+      case 'VALIDATION_ERROR':
+        const details = extensions?.details || '입력값이 올바르지 않습니다.';
+        showNotification(`입력값 오류: ${details}`);
+        break;
+      
+      case 'CATEGORY_NOT_FOUND':
+      case 'CATEGORY_CODE_EXISTS':
+      case 'DATABASE_ERROR':
+      case 'CATEGORY_CREATE_FAILED':
+      case 'CATEGORY_UPDATE_FAILED':
+      case 'CATEGORY_DELETE_FAILED':
+        showNotification(errorMessage); // 서버에서 내려준 메시지를 그대로 사용
+        break;
+
+      default:
+        showNotification(errorMessage || '알 수 없는 서버 오류가 발생했습니다.');
+        break;
+    }
+  });
+};
+src/apollo/handlers/networkErrorHandler.js
+
+JavaScript
+
+import { showNotification } from '../../utils/notifications';
+
+/**
+ * 네트워크 에러를 중앙에서 처리하는 함수
+ * @param {Error} networkError - Apollo Link에서 전달된 네트워크 에러 객체
+ */
+export const handleNetworkError = (networkError) => {
+  console.error(`[Network error]: ${networkError}`);
+  showNotification('서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.');
+  // 필요하다면 오프라인 상태 관리 로직 등을 추가할 수 있습니다.
+};
+3단계: errorLink 생성 모듈화
+위에서 만든 핸들러들을 사용하여 errorLink를 생성하는 파일을 만듭니다.
+
+src/apollo/errorLink.js
+
+JavaScript
+
+import { onError } from '@apollo/client/link/error';
+import { handleGraphQLErrors } from './handlers/graphqlErrorHandler';
+import { handleNetworkError } from './handlers/networkErrorHandler';
+
+const errorLink = onError(({ graphQLErrors, networkError }) => {
+  if (graphQLErrors) {
+    handleGraphQLErrors(graphQLErrors);
+  }
+
+  if (networkError) {
+    handleNetworkError(networkError);
+  }
+});
+
+export default errorLink;
+이 파일은 이제 어떤 에러를 어떻게 처리할지에 대한 구체적인 로직은 모르며, 단지 적절한 핸들러에게 에러를 위임하는 역할만 담당합니다.
+
+4단계: 최종 apolloClient.js 리팩토링
+마지막으로, 기존 apolloClient.js를 매우 간결하게 수정합니다.
+
+src/apollo/apolloClient.js
+
+JavaScript
+
+import {
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+  from,
+} from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import errorLink from './errorLink'; // 모듈화된 errorLink를 import
+
+// HTTP 연결을 위한 링크
+const httpLink = createHttpLink({
+  uri: 'YOUR_GRAPHQL_API_ENDPOINT',
+});
+
+// 모든 요청에 인증 토큰을 추가하는 링크
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('token');
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  };
+});
+
+// Apollo Client 인스턴스 생성
+const apolloClient = new ApolloClient({
+  // from을 사용하여 링크를 조합합니다. errorLink가 가장 먼저 오도록 설정합니다.
+  link: from([errorLink, authLink, httpLink]),
+  cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'cache-and-network',
+    },
+  },
+});
+
+export default apolloClient;
+이 구조의 장점
+관심사의 분리 (Separation of Concerns): apolloClient.js는 클라이언트 설정에만 집중하고, 에러 핸들링 로직은 handlers 폴더에서, 링크 조합은 errorLink.js에서 담당합니다.
+유지보수성 향상: 새로운 에러 코드를 추가하거나 기존 로직을 수정할 때, 관련된 핸들러 파일만 수정하면 되므로 전체 코드에 미치는 영향이 적습니다.
+가독성: apolloClient.js 파일이 매우 간결해져서 프로젝트의 전체적인 Apollo 설정을 파악하기 쉬워집니다.
+테스트 용이성: handleGraphQLErrors나 handleNetworkError 같은 순수 함수들은 독립적으로 가져와 단위 테스트를 작성하기가 매우 용이합니다.

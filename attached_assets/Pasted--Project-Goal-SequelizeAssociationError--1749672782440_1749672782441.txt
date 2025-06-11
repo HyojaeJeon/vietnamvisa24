@@ -1,0 +1,65 @@
+## 프로젝트 목표 (Project Goal)
+
+서버 실행을 방해하는 지속적인 SequelizeAssociationError를 근본적으로 해결하여, 데이터베이스 관계 설정 로직을 명확하고 중복 없이 만듭니다.
+
+## 문제 진단 (Problem Diagnosis)
+
+에러 메시지: AssociationError [SequelizeAssociationError]: You have used the alias assignedAdmin in two separate associations.
+
+근본 원인: 현재 프로젝트는 데이터베이스 모델 관계를 두 번 정의하고 있습니다.
+
+1차 정의 (개별 모델 파일): models/index.js 파일의 Object.keys(db).forEach(...) 루프는 각 모델 파일(예: visaApplication.js, user.js) 내부에 있는 associate 함수를 호출하여 관계를 설정합니다.
+2차 정의 (index.js): 바로 그 아래에 있는 // MODEL ASSOCIATIONS (관계 설정) 주석 밑에서 모든 관계 설정을 다시 한번 수동으로 정의하고 있습니다.
+이러한 중복 정의 때문에, models/index.js 파일의 코드를 수정해도 개별 모델 파일에 남아있는 이전의 잘못된 관계 설정 코드가 계속 에러를 유발하는 것입니다.
+
+## 해결 방안 및 구현 가이드 (Solution & Implementation Guide)
+
+관계 설정을 단 한 곳에서만 하도록 구조를 정리하여 문제의 근원을 제거합니다. 개별 모델 파일에서 각자의 관계를 정의하는 것이 더 일반적인 패턴이므로, 그 방식을 따르겠습니다.
+
+1. models/index.js의 중복 코드 제거
+models/index.js 파일을 엽니다.
+파일 하단에 있는 주석 // ==================== 부터 // MODEL ASSOCIATIONS (관계 설정) 그리고 그 아래에 나열된 모든 models.User.hasMany(...), models.VisaApplication.belongsTo(...) 등의 관계 설정 코드를 전부 삭제합니다.
+아래의 루프 코드는 남겨둬야 합니다. 이 코드가 각 모델 파일의 associate 함수를 호출하는 역할을 합니다.
+JavaScript
+
+// 이 코드는 반드시 남겨둡니다.
+Object.keys(db).forEach((modelName) => {
+  if (db[modelName].associate) {
+    db[modelName].associate(db);
+  }
+});
+2. visaApplication.js 모델 파일의 관계 설정 수정 (오류의 진짜 원인)
+models/visaApplication.js 파일을 엽니다. (또는 VisaApplication 모델이 정의된 다른 파일)
+
+파일 내에서 static associate(models) 함수를 찾습니다. 이 함수 안에 assignedAdmin 별칭을 중복으로 사용하는 코드가 있을 것입니다.
+
+아래 가이드에 따라 associate 함수 내부의 코드를 올바르게 수정합니다. VisaApplication 모델이 다른 모델과 관계를 맺는 (belongsTo) 부분의 별칭이 서로 겹치지 않도록 고유한 이름으로 설정합니다.
+
+models/visaApplication.js 파일 수정 예시:
+JavaScript
+
+// ... (모델 정의 상단)
+class VisaApplication extends Model {
+  static associate(models) {
+    // User 모델과의 관계 설정 (신청자)
+    this.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      as: 'applicant' // 'user' 또는 'applicant' 등 고유한 별칭
+    });
+
+    // Admin 모델과의 관계 설정 (담당자)
+    this.belongsTo(models.Admin, {
+      foreignKey: 'assigned_to',
+      as: 'assignedAdmin' // 'assignedAdmin' 이라는 고유한 별칭
+    });
+
+    // 다른 모델들과의 관계 설정 (hasMany 등)
+    this.hasMany(models.Document, { foreignKey: 'application_id', as: 'documents' });
+    this.hasMany(models.ApplicationStatusHistory, { foreignKey: 'application_id', as: 'statusHistory' });
+    // ... 기타 필요한 관계 설정
+  }
+}
+// ... (모델 정의 하단)
+## 최종 요청 (Final Request)
+
+위에 명시된 가이드에 따라, models/index.js에 있는 중복된 관계 설정 코드를 모두 제거하고, 실제 에러의 원인이 되는 models/visaApplication.js 파일의 associate 함수 내에서 관계 별칭(alias) 충돌을 해결하여 SequelizeAssociationError를 완전히 수정해 주세요.

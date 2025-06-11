@@ -1,4 +1,3 @@
-
 const { models } = require('../../../models');
 const { AuthenticationError, NotFoundError } = require('../../../utils/errorTypes');
 
@@ -29,30 +28,25 @@ const consultationsResolvers = {
       });
     },
 
-    updateConsultationStatusById: async (_, { id, status, notes }) => {
+    updateConsultationStatus: async (_, { id, status, notes }) => {
       const consultation = await models.Consultation.findByPk(id);
-      
+
       if (!consultation) {
         throw new NotFoundError('Consultation not found');
       }
 
-      const updateData = { 
+      await consultation.update({
         status,
+        notes: notes || consultation.notes,
         updated_at: new Date()
-      };
-      
-      if (notes) {
-        updateData.notes = notes;
-      }
+      });
 
-      await consultation.update(updateData);
-      
       return consultation;
     },
 
     deleteConsultation: async (_, { id }) => {
       const consultation = await models.Consultation.findByPk(id);
-      
+
       if (!consultation) {
         throw new NotFoundError('Consultation not found');
       }

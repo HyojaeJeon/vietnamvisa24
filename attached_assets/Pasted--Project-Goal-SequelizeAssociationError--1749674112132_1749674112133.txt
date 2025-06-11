@@ -1,0 +1,59 @@
+## 프로젝트 목표 (Project Goal)
+
+서버 실행 오류 해결 (최우선): 서버 실행을 막고 있는 SequelizeAssociationError를 근본적으로 해결합니다.
+코드 일관성 확보: 리졸버에만 존재하거나, 이름이 일치하지 않거나, 중복으로 정의된 GraphQL 스키마를 모두 찾아 리졸버와 완벽하게 동기화시킵니다.
+## 문제 진단 (Problem Diagnosis)
+
+문제 1: Sequelize AssociationError (서버 실행 불가 원인)
+에러 메시지: AssociationError: You have used the alias assignedAdmin in two separate associations.
+근본 원인: 이전 프롬프트에서 진단한 바와 같이, 데이터베이스 모델 관계 설정이 두 군데 이상에서 중복으로 정의되고 있기 때문입니다. models/index.js에서 모든 관계를 수동으로 정의하는 코드 블록과, 각 개별 모델 파일(예: visaApplication.js) 내의 associate 함수가 충돌하고 있습니다. 이 중복을 제거하지 않으면 오류는 절대 해결되지 않습니다.
+문제 2: GraphQL 스키마와 리졸버의 불일치
+코드 전반을 검토한 결과, 여러 리졸버 함수들이 스키마에 정의되지 않았거나, 다른 이름으로 정의되어 있는 등 다수의 불일치가 발견되었습니다. 이는 잠재적인 런타임 오류의 원인이 되며 코드 유지보수를 어렵게 만듭니다.
+## 해결 방안 및 구현 가이드 (Solution & Implementation Guide)
+
+해결 방안 1: SequelizeAssociationError 근본 해결 (최우선 과제)
+이전 프롬프트의 지시사항을 다시 한번 명확하게 실행해야 합니다.
+
+models/index.js의 중복 코드 제거: models/index.js 파일 하단의 // MODEL ASSOCIATIONS (관계 설정) 주석과 그 아래의 모든 수동 관계 설정 코드(models.User.hasMany(...) 등)를 반드시 전부 삭제합니다. Object.keys(db).forEach(...) 루프만 남겨야 합니다.
+
+models/visaApplication.js 파일 수정: visaApplication.js 모델 파일의 associate 함수 내부에 있는 관계 설정 코드를 열어, belongsTo 관계의 별칭(alias)이 중복되지 않도록 아래와 같이 고유한 이름으로 설정되었는지 다시 한번 확인하고 수정합니다.
+
+JavaScript
+
+// 파일 경로: models/visaApplication.js
+static associate(models) {
+  // User 모델과의 관계 (별칭: applicant)
+  this.belongsTo(models.User, {
+    foreignKey: 'user_id',
+    as: 'applicant'
+  });
+  // Admin 모델과의 관계 (별칭: assignedAdmin)
+  this.belongsTo(models.Admin, {
+    foreignKey: 'assigned_to',
+    as: 'assignedAdmin'
+  });
+  // ... 기타 hasMany 관계 설정
+}
+해결 방안 2: GraphQL 스키마 및 리졸버 동기화 (코드 품질 개선)
+documents 스키마/리졸버 정리:
+
+documentsResolvers.js 파일에는 deleteDocument와 deleteDocumentById 두 개의 삭제 리졸버가 있지만, documentsTypeDefs.js 스키마에는 deleteDocument만 정의되어 있습니다.
+지시: documentsResolvers.js에서 불필요한 deleteDocumentById 리졸버 함수를 삭제하여 스키마와 일치시킵니다.
+consultations 스키마/리졸버 정리:
+
+authResolvers.js에는 updateConsultationStatus가 있고, consultationsResolvers.js에는 updateConsultationStatusById가 있습니다. 반면 consultationsTypeDefs.js 스키마에는 두 개가 모두 정의되어 있어 혼란을 유발합니다.
+지시: updateConsultationStatus로 통일합니다.
+consultationsTypeDefs.js에서 updateConsultationStatusById(...) 라인을 삭제합니다.
+consultationsResolvers.js의 updateConsultationStatusById 리졸버 함수의 이름을 updateConsultationStatus로 변경합니다.
+authResolvers.js에 있는 중복된 updateConsultationStatus 리졸버는 삭제하여 consultationsResolvers.js에만 있도록 합니다.
+auth 스키마/리졸버 정리:
+
+authTypeDefs.js 스키마의 Mutation 타입에 register와 userRegister, login과 userLogin이 중복으로 정의되어 있습니다.
+지시: authTypeDefs.js에서 userRegister(...)와 userLogin(...) 라인을 삭제하여 register와 login만 남도록 정리합니다. authResolvers.js의 리졸버 이름과 일치시킵니다.
+VisaApplication 타입의 applicant 필드 수정:
+
+authTypeDefs.js의 VisaApplication 타입에 user: User 필드가 있는데, models/index.js에서 User와의 관계 별칭을 applicant로 설정했습니다. 일관성을 위해 스키마도 수정해야 합니다.
+지시: authTypeDefs.js 파일의 VisaApplication 타입 정의에서 user: User를 applicant: User로 수정합니다.
+## 최종 요청 (Final Request)
+
+위에 명시된 가이드에 따라, 먼저 SequelizeAssociationError를 해결하기 위해 models/index.js의 중복 코드를 삭제하고 개별 모델 파일의 관계 설정을 정확히 수정해 주세요. 그 후, 코드의 일관성과 안정성을 위해 documents, consultations, auth 관련 스키마와 리졸버의 불일치 사항들을 모두 수정해 주세요.

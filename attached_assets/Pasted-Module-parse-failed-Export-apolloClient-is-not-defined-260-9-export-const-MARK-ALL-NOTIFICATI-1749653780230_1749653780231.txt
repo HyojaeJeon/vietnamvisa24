@@ -1,0 +1,88 @@
+Module parse failed: Export 'apolloClient' is not defined (260:9)
+| export const MARK_ALL_NOTIFICATIONS_AS_READ = gql(_templateObject23());
+| export const CREATE_NOTIFICATION = gql(_templateObject24());
+> export { apolloClient };
+| 
+| 
+
+Import trace for requested module:
+./lib/graphql.js
+./app/dashboard/login/page.js
+ ⨯ ./lib/graphql.js
+Module parse failed: Export 'apolloClient' is not defined (260:9)
+| export const MARK_ALL_NOTIFICATIONS_AS_READ = gql(_templateObject23());
+| export const CREATE_NOTIFICATION = gql(_templateObject24());
+> export { apolloClient };
+| 
+| 
+
+Import trace for requested module:
+./lib/graphql.js
+./app/dashboard/login/page.js
+ ⨯ ./lib/graphql.js
+Module parse failed: Export 'apolloClient' is not defined (260:9)
+| export const MARK_ALL_NOTIFICATIONS_AS_READ = gql(_templateObject23());
+| export const CREATE_NOTIFICATION = gql(_templateObject24());
+> export { apolloClient };
+| 
+| 
+
+Import trace for requested module:
+./lib/graphql.js
+./app/dashboard/login/page.js
+ GET /dashboard/login 500 in 3217ms
+ GET / 500 in 56ms
+ ⨯ ./lib/graphql.js
+Module parse failed: Export 'apolloClient' is not defined (260:9)
+| export const MARK_ALL_NOTIFICATIONS_AS_READ = gql(_templateObject23());
+| export const CREATE_NOTIFICATION = gql(_templateObject24());
+> export { apolloClient };
+| 
+| 
+
+Import trace for requested module:
+./lib/graphql.js
+./app/dashboard/login/page.js
+ ⨯ ./lib/graphql.js
+Module parse failed: Export 'apolloClient' is not defined (260:9)
+| export const MARK_ALL_NOTIFICATIONS_AS_READ = gql(_templateObject23());
+| export const CREATE_NOTIFICATION = gql(_templateObject24());
+> export { apolloClient };
+| 
+| 
+
+Import trace for requested module:
+./lib/graphql.js
+./app/dashboard/login/page.js
+ ⨯ ./lib/graphql.js
+Module parse failed: Export 'apolloClient' is not defined (260:9)
+| export const MARK_ALL_NOTIFICATIONS_AS_READ = gql(_templateObject23());
+| export const CREATE_NOTIFICATION = gql(_templateObject24());
+> export { apolloClient };
+| 
+| 
+
+Import trace for requested module:
+./lib/graphql.js
+./app/dashboard/login/page.js
+ ⨯ ./lib/graphql.js
+Module parse failed: Export 'apolloClient' is not defined (260:9)
+| export const MARK_ALL_NOTIFICATIONS_AS_READ = gql(_templateObject23());
+| export const CREATE_NOTIFICATION = gql(_templateObject24());
+> export { apolloClient };
+| 
+| 
+
+Import trace for requested module:
+./lib/graphql.js
+./app/dashboard/login/page.js
+ ⨯ ./lib/graphql.js
+Module parse failed: Export 'apolloClient' is not defined (260:9)
+| export const MARK_ALL_NOTIFICATIONS_AS_READ = gql(_templateObject23());
+| export const CREATE_NOTIFICATION = gql(_templateObject24());
+> export { apolloClient };
+| 
+| 
+
+Import trace for requested module:
+./lib/graphql.js

@@ -11,7 +11,7 @@ const documentsTypeDefs = gql`
   extend type Mutation {
     createDocument(input: DocumentInput!): Document!
     updateDocumentStatus(id: ID!, status: DocumentStatus!, notes: String): Document!
-    deleteDocumentById(id: ID!): SuccessResponse!
+    deleteDocument(id: ID!): SuccessResponse!
   }
 `;
 

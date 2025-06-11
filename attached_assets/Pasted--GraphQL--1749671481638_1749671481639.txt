@@ -1,0 +1,119 @@
+네, 두 가지 에러 로그와 코드 잘 확인했습니다. 여전히 문제가 해결되지 않은 것은 각 에러의 근본적인 원인이 다른 곳에 있기 때문입니다.
+
+첫 번째는 서버 측 GraphQL 스키마 충돌 문제이고, 두 번째는 Next.js App Router 환경에서의 클라이언트 컴포넌트 설정 문제입니다.
+
+두 문제를 모두 해결하기 위한 Replit AI 프롬프트를 생성해 드리겠습니다.
+
+Replit AI 프롬프트: Next.js + GraphQL 풀스택 에러 해결
+## 프로젝트 목표 (Project Goal)
+
+현재 발생하고 있는 두 가지 핵심 에러를 모두 해결하여 애플리케이션이 정상적으로 실행되도록 합니다.
+
+서버 시작 시 발생하는 GraphQL 스키마 병합(merge) 에러를 해결합니다.
+클라이언트 측에서 발생하는 React Context 렌더링 에러를 해결합니다.
+## 문제 진단 (Problem Diagnosis)
+
+문제 1: 서버 측 GraphQL 스키마 병합 오류 (Server-Side GraphQL Schema Merge Error)
+에러 메시지: Error: Unable to merge GraphQL type "Mutation": Field "deleteDocument" already defined with a different type. Declared as "Boolean", but you tried to override with "SuccessResponse"
+원인 분석: GraphQL 스키마를 정의하는 여러 파일(.graphql, .js 등)에서 Mutation 타입의 deleteDocument 필드가 두 번 정의되었습니다. 한 곳에서는 반환 타입을 Boolean으로, 다른 곳에서는 SuccessResponse로 다르게 정의하여 스키마를 하나로 합치는 과정에서 충돌이 발생하고 서버 실행이 실패하는 것입니다.
+문제 2: 클라이언트 측 React Context 렌더링 오류 (Client-Side React Context Rendering Error)
+에러 메시지: Error: React functionality 'useContext' is not available in this environment.
+원인 분석: Next.js App Router의 app/layout.js는 기본적으로 서버 컴포넌트입니다. ApolloProvider는 내부적으로 useContext 훅을 사용하는 클라이언트 전용 기능이므로 서버 컴포넌트 내에서 직접 렌더링할 수 없습니다. 이 문제를 해결하기 위해 프로바이더들을 별도의 클라이언트 컴포넌트로 분리해야 합니다. 사용자가 만든 CustomApolloProvider는 올바른 시도였으나, 적용 방식과 위치를 수정해야 합니다.
+## 해결 방안 및 구현 가이드 (Solution & Implementation Guide)
+
+해결 방안 1: GraphQL 'deleteDocument' 뮤테이션 충돌 해결
+프로젝트 전체에서 deleteDocument 검색: 서버 측 코드(일반적으로 graphql/ 또는 src/graphql/ 폴더) 내의 모든 파일에서 deleteDocument 문자열을 검색하여 중복 정의된 위치를 모두 찾습니다.
+
+반환 타입 통일: 두 개의 deleteDocument 뮤테이션 중, 애플리케이션의 로직에 맞는 하나의 반환 타입을 결정하고 다른 하나의 정의를 수정하여 타입을 통일합니다. 일반적으로 더 많은 정보를 담을 수 있는 SuccessResponse 타입을 사용하는 것이 좋습니다.
+
+예시 (수정 전):
+
+GraphQL
+
+# file1.graphql
+type Mutation {
+  deleteDocument(id: ID!): Boolean
+}
+
+# file2.graphql
+type Mutation {
+  deleteDocument(id: ID!): SuccessResponse
+}
+예시 (수정 후):
+
+GraphQL
+
+# file1.graphql 에서 아래와 같이 수정하거나 해당 라인을 삭제합니다.
+type Mutation {
+  # deleteDocument(id: ID!): Boolean  <- 이 라인을 삭제하거나 file2와 같이 수정
+}
+
+# file2.graphql (유지)
+type Mutation {
+  deleteDocument(id: ID!): SuccessResponse
+}
+해결 방안 2: Next.js App Router에서 프로바이더 올바르게 설정
+app/providers.js 클라이언트 컴포넌트 생성: 모든 클라이언트 사이드 프로바이더를 한 곳에서 관리하는 새로운 컴포넌트를 생성합니다.
+
+app 디렉토리 안에 providers.js 파일을 새로 만듭니다.
+파일 최상단에 "use client"; 지시어를 반드시 추가합니다.
+providers.js 파일 코드 작성:
+
+JavaScript
+
+"use client";
+
+import { ApolloProvider } from "@apollo/client";
+import apolloClient from "./src/lib/apolloClient"; // apolloClient 경로 확인
+import StoreProvider from "./storeProvider"; // StoreProvider 경로 확인
+import { Toaster } from "react-hot-toast";
+
+export default function Providers({ children }) {
+  return (
+    <StoreProvider>
+      <ApolloProvider client={apolloClient}>
+        {children}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: '#363636',
+              color: '#fff',
+            },
+          }}
+        />
+      </ApolloProvider>
+    </StoreProvider>
+  );
+}
+app/layout.js (RootLayout) 수정: 기존의 프로바이더들을 모두 제거하고, 새로 만든 Providers 컴포넌트로 자식 컴포넌트를 감싸줍니다.
+
+수정 후 app/layout.js 코드:
+JavaScript
+
+import "./globals.css";
+import Providers from "./providers"; // 새로 만든 Providers 컴포넌트 import
+
+export const metadata = {
+  title: "베트남 비자 센터 | Vietnam Visa Center",
+  description: "신뢰할 수 있는 베트남 비자 전문 서비스",
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="ko">
+      <body className="antialiased">
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  );
+}
+불필요한 파일 정리: 이전에 시도했던 CustomApolloProvider.js 파일은 더 이상 필요 없으므로 삭제합니다.
+
+## 최종 요청 (Final Request)
+
+위 두 가지 해결 방안을 모두 적용하여 코드를 수정해 주세요.
+
+GraphQL 스키마에서 deleteDocument 뮤테이션의 중복 정의를 찾아 반환 타입을 하나로 통일하여 서버 실행 오류를 해결해 주세요.
+Next.js App Router의 layout.js에서 프로바이더들을 별도의 providers.js 클라이언트 컴포넌트로 분리하여 React Context 렌더링 오류를 해결해 주세요.

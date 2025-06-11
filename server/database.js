@@ -12,7 +12,10 @@ const connectDB = async () => {
     await models.sequelize.sync({ force: true });
     console.log("✅ Database tables synchronized successfully");
 
-    // Create default admin
+    // Wait a bit to ensure tables are fully created
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Create default admin after tables are created
     await createDefaultAdmin();
 
     return models.sequelize;
@@ -24,6 +27,12 @@ const connectDB = async () => {
 
 const createDefaultAdmin = async () => {
   try {
+    // Check if Admin model exists and is ready
+    if (!models.Admin) {
+      console.error("❌ Admin model not found");
+      return;
+    }
+
     const existingAdmin = await models.Admin.findOne({
       where: { email: "admin@vietnamvisa.com" },
     });
@@ -35,13 +44,17 @@ const createDefaultAdmin = async () => {
         password: hashedPassword,
         name: "Super Admin",
         role: "SUPER_ADMIN",
+        is_active: true
       });
       console.log(
         "✅ Default admin created - Email: admin@vietnamvisa.com, Password: admin123!",
       );
+    } else {
+      console.log("✅ Default admin already exists");
     }
   } catch (error) {
-    console.error("Error creating default admin:", error);
+    console.error("❌ Error creating default admin:", error.message);
+    // Don't throw the error to prevent server startup failure
   }
 };
 

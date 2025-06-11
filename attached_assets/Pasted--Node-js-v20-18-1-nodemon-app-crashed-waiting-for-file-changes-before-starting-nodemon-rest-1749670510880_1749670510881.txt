@@ -1,0 +1,164 @@
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26
+            throw new Error(`Unable to merge GraphQL type "${node.name.value}": ${e.message}`);
+            ^
+
+Error: Unable to merge GraphQL type "VisaApplication": Field "status" already defined with a different type. Declared as "ApplicationStatus", but you tried to override with "String"
+    at mergeType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26:19)
+    at mergeGraphQLNodes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-nodes.js:38:73)
+    at mergeGraphQLTypes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:72:64)
+    at mergeTypeDefs (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:14:22)
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:20:18)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26
+            throw new Error(`Unable to merge GraphQL type "${node.name.value}": ${e.message}`);
+            ^
+
+Error: Unable to merge GraphQL type "VisaApplication": Field "status" already defined with a different type. Declared as "ApplicationStatus", but you tried to override with "String"
+    at mergeType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26:19)
+    at mergeGraphQLNodes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-nodes.js:38:73)
+    at mergeGraphQLTypes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:72:64)
+    at mergeTypeDefs (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:14:22)
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:20:18)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26
+            throw new Error(`Unable to merge GraphQL type "${node.name.value}": ${e.message}`);
+            ^
+
+Error: Unable to merge GraphQL type "VisaApplication": Field "status" already defined with a different type. Declared as "ApplicationStatus", but you tried to override with "String"
+    at mergeType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26:19)
+    at mergeGraphQLNodes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-nodes.js:38:73)
+    at mergeGraphQLTypes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:72:64)
+    at mergeTypeDefs (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:14:22)
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:20:18)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26
+            throw new Error(`Unable to merge GraphQL type "${node.name.value}": ${e.message}`);
+            ^
+
+Error: Unable to merge GraphQL type "VisaApplication": Field "status" already defined with a different type. Declared as "ApplicationStatus", but you tried to override with "String"
+    at mergeType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26:19)
+    at mergeGraphQLNodes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-nodes.js:38:73)
+    at mergeGraphQLTypes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:72:64)
+    at mergeTypeDefs (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:14:22)
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:20:18)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26
+            throw new Error(`Unable to merge GraphQL type "${node.name.value}": ${e.message}`);
+            ^
+
+Error: Unable to merge GraphQL type "VisaApplication": Field "status" already defined with a different type. Declared as "ApplicationStatus", but you tried to override with "String"
+    at mergeType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26:19)
+    at mergeGraphQLNodes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-nodes.js:38:73)
+    at mergeGraphQLTypes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:72:64)
+    at mergeTypeDefs (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:14:22)
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:20:18)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26
+            throw new Error(`Unable to merge GraphQL type "${node.name.value}": ${e.message}`);
+            ^
+
+Error: Unable to merge GraphQL type "VisaApplication": Field "status" already defined with a different type. Declared as "ApplicationStatus", but you tried to override with "String"
+    at mergeType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26:19)
+    at mergeGraphQLNodes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-nodes.js:38:73)
+    at mergeGraphQLTypes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:72:64)
+    at mergeTypeDefs (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:14:22)
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:20:18)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26
+            throw new Error(`Unable to merge GraphQL type "${node.name.value}": ${e.message}`);
+            ^
+
+Error: Unable to merge GraphQL type "VisaApplication": Field "status" already defined with a different type. Declared as "ApplicationStatus", but you tried to override with "String"
+    at mergeType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26:19)
+    at mergeGraphQLNodes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-nodes.js:38:73)
+    at mergeGraphQLTypes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:72:64)
+    at mergeTypeDefs (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:14:22)
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:20:18)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26
+            throw new Error(`Unable to merge GraphQL type "${node.name.value}": ${e.message}`);
+            ^
+
+Error: Unable to merge GraphQL type "VisaApplication": Field "status" already defined with a different type. Declared as "ApplicationStatus", but you tried to override with "String"
+    at mergeType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26:19)
+    at mergeGraphQLNodes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-nodes.js:38:73)
+    at mergeGraphQLTypes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:72:64)
+    at mergeTypeDefs (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:14:22)
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:20:18)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+
+Node.js v20.18.1

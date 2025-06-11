@@ -1,0 +1,51 @@
+## 프로젝트 목표 (Project Goal)
+
+현재 서버 시작을 방해하는 두 종류의 핵심 오류를 해결하여 애플리케이션이 정상적으로 실행되도록 합니다.
+
+가장 시급한 문제: 데이터베이스 모델 설정에서 발생하는 SequelizeAssociationError를 해결합니다.
+잠재적 문제: 로그에 나타난 GraphQL 스키마 병합(merge) 오류를 해결하여 코드의 일관성을 확보합니다.
+## 제약 조건 (Constraints)
+
+기존에 구현된 로직, 컴포넌트 구조, 상태 관리 방식, CSS 스타일 등은 절대 변경하지 않습니다.
+오류를 발생시키는 코드의 불일치와 충돌을 최소한의 수정으로 해결하는 데 집중합니다.
+## 문제 진단 (Problem Diagnosis)
+
+문제 1: Sequelize AssociationError (현재 서버를 멈추는 원인)
+에러 메시지: AssociationError [SequelizeAssociationError]: You have used the alias user in two separate associations. Aliased associations must have unique aliases.
+원인 분석: Sequelize(데이터베이스 ORM) 모델 정의 파일(예: models/index.js 또는 개별 모델 파일)에서 하나의 모델(스택 트레이스상 VisaApplication 모델로 추정)이 관계를 맺을 때, 서로 다른 두 개의 관계에 대해 동일한 별칭(alias)인 'user'를 사용했습니다. Sequelize에서 모델 간의 관계 별칭은 고유해야 합니다.
+근거: 제공된 authTypeDefs.js GraphQL 스키마를 보면 VisaApplication 타입은 user: User 와 assignedAdmin: Admin 두 개의 관계를 가집니다. 이는 데이터베이스 모델에도 'user'와 'assignedAdmin'이라는 두 개의 고유한 별칭이 있어야 함을 의미합니다. 현재 코드에는 assignedAdmin 관계를 설정하면서 별칭을 실수로 'user'로 설정했을 가능성이 매우 높습니다.
+문제 2: GraphQL 스키마 병합 오류 (과거 로그)
+에러 메시지: Unable to merge GraphQL type "Mutation": Field "deleteDocument" already defined... 등
+원인 분석: 여러 typeDefs 파일에서 동일한 Query 또는 Mutation 필드를 중복으로, 혹은 서로 다른 반환 타입으로 정의하여 발생했습니다. _empty 플레이스홀더를 사용한 기본 typeDefs와 다른 파일들의 extend type 정의가 여러 번 중복되거나 충돌하는 것으로 보입니다.
+## 해결 방안 및 구현 가이드 (Solution & Implementation Guide)
+
+해결 방안 1: Sequelize AssociationError 수정 (최우선)
+모델 정의 파일 찾기: models/index.js 파일을 엽니다. 만약 모델별로 파일이 분리되어 있다면 models/visaapplication.js 와 같이 관련된 모델 파일을 찾습니다.
+
+충돌하는 관계 설정 식별: VisaApplication 모델의 관계 설정(associate 함수 내부)에서 as: 'user'를 사용하는 코드를 모두 찾습니다. 아래와 같이 두 개의 충돌하는 코드가 있을 것입니다.
+
+JavaScript
+
+// 예시: models/index.js 또는 visaapplication.js 내부
+VisaApplication.belongsTo(models.User, { as: 'user', foreignKey: 'user_id' });
+VisaApplication.belongsTo(models.Admin, { as: 'user', foreignKey: 'assigned_admin_id' }); // <-- 문제의 코드!
+별칭(Alias) 수정: Admin 모델과 관계를 맺는 부분의 별칭을 GraphQL 스키마와 일치하도록 'assignedAdmin'으로 수정합니다.
+
+수정 후:
+JavaScript
+
+// 예시: models/index.js 또는 visaapplication.js 내부
+VisaApplication.belongsTo(models.User, { as: 'user', foreignKey: 'user_id' });
+VisaApplication.belongsTo(models.Admin, { as: 'assignedAdmin', foreignKey: 'assigned_admin_id' }); // <-- 올바르게 수정됨
+해결 방안 2: GraphQL 스키마 충돌 정리
+중복 타입 및 Enum 정리: 여러 typeDefs 파일에 동일한 타입(예: User, Admin, VisaApplication 등)이나 enum이 중복으로 정의되어 있습니다. 가장 완전한 정의를 담고 있는 authTypeDefs.js 또는 typeDefs.js 하나를 기준으로 삼고, 다른 파일들에서는 해당 타입/Enum 정의를 제거하여 중복을 없애주세요. 다른 파일에서는 extend type을 사용해 필드를 추가하는 것만으로 충분합니다.
+
+예시: paymentTypeDefs.js에 정의된 PaymentStatus Enum은 typeDefs.js에 이미 있으므로, paymentTypeDefs.js의 enum PaymentStatus 정의는 삭제합니다.
+deleteDocument 뮤테이션 이름 통일: 로그에 나타난 deleteDocument 오류를 해결하기 위해, documentsTypeDefs.js에 있는 removeDocument를 deleteDocument로 변경하여 다른 스키마(notificationsTypeDefs.js의 deleteNotification 예시)와의 명명 규칙 일관성을 맞춰줍니다.
+
+documentsTypeDefs.js 수정:
+수정 전: removeDocument(id: ID!): SuccessResponse!
+수정 후: deleteDocument(id: ID!): SuccessResponse!
+## 최종 요청 (Final Request)
+
+위에 명시된 가이드에 따라, 먼저 SequelizeAssociationError를 해결하기 위해 데이터베이스 모델의 관계 설정 별칭(alias)을 수정해 주세요. 그 후, 코드의 일관성을 위해 중복 정의된 GraphQL 타입과 Enum을 정리하고 뮤테이션 이름을 통일하여 잠재적인 스키마 충돌 오류를 해결해 주세요. 모든 수정은 기존 로직 변경 없이 오류를 해결하는 데에만 집중해야 합니다.

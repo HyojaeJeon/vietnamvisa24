@@ -1,0 +1,127 @@
+ ⚠ ./app/apply/page.js
+Attempted import error: 'Passport' is not exported from '__barrel_optimize__?names=AlertCircle,ArrowRight,Award,Briefcase,Calendar,Camera,CheckCircle,Clock,CreditCard,FileText,Globe,Mail,MapPin,Passport,Phone,Send,Shield,Smartphone,Star,Upload,User,Zap!=!lucide-react' (imported as 'Passport').
+
+Import trace for requested module:
+./app/apply/page.js
+
+./app/apply/page.js
+Attempted import error: 'Passport' is not exported from '__barrel_optimize__?names=AlertCircle,ArrowRight,Award,Briefcase,Calendar,Camera,CheckCircle,Clock,CreditCard,FileText,Globe,Mail,MapPin,Passport,Phone,Send,Shield,Smartphone,Star,Upload,User,Zap!=!lucide-react' (imported as 'Passport').
+
+Import trace for requested module:
+./app/apply/page.js
+
+./app/apply/page.js
+Attempted import error: 'Passport' is not exported from '__barrel_optimize__?names=AlertCircle,ArrowRight,Award,Briefcase,Calendar,Camera,CheckCircle,Clock,CreditCard,FileText,Globe,Mail,MapPin,Passport,Phone,Send,Shield,Smartphone,Star,Upload,User,Zap!=!lucide-react' (imported as 'Passport').
+
+Import trace for requested module:
+./app/apply/page.js
+
+./app/apply/page.js
+Attempted import error: 'Passport' is not exported from '__barrel_optimize__?names=AlertCircle,ArrowRight,Award,Briefcase,Calendar,Camera,CheckCircle,Clock,CreditCard,FileText,Globe,Mail,MapPin,Passport,Phone,Send,Shield,Smartphone,Star,Upload,User,Zap!=!lucide-react' (imported as 'Passport').
+
+Import trace for requested module:
+./app/apply/page.js
+redux-persist failed to create sync storage. falling back to noop storage.
+Warning: React.jsx: type is invalid -- expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.
+    at VisaApplication (webpack-internal:///(ssr)/./app/apply/page.js:48:90)
+    at ClientPageRoot (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/client-page.js:14:11)
+    at Lazy
+    at InnerLayoutRouter (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:242:11)
+    at RedirectErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/redirect-boundary.js:73:9)
+    at RedirectBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/redirect-boundary.js:81:11)
+    at NotFoundBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:347:11)
+    at ErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/error-boundary.js:158:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at Lazy
+    at OuterLayoutRouter (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:367:11)
+    at Lazy
+    at InnerLayoutRouter (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:242:11)
+    at RedirectErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/redirect-boundary.js:73:9)
+    at RedirectBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/redirect-boundary.js:81:11)
+    at NotFoundErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/not-found-boundary.js:76:9)
+    at NotFoundBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/not-found-boundary.js:84:11)
+    at LoadingBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:347:11)
+    at ErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/error-boundary.js:158:11)
+    at InnerScrollAndFocusHandler (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:153:9)
+    at ScrollAndFocusHandler (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:228:11)
+    at RenderFromTemplateContext (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/render-from-template-context.js:16:44)
+    at Lazy
+    at OuterLayoutRouter (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/layout-router.js:367:11)
+    at Lazy
+    at ApolloProvider (webpack-internal:///(ssr)/./node_modules/@apollo/client/react/context/ApolloProvider.js:14:21)
+    at ApolloClientProvider (webpack-internal:///(ssr)/./app/apolloProvider.js:12:33)
+    at Provider (webpack-internal:///(ssr)/./node_modules/react-redux/dist/react-redux.mjs:891:11)
+    at StoreProvider (webpack-internal:///(ssr)/./app/storeProvider.js:12:26)
+    at QueryClientProvider (webpack-internal:///(ssr)/./node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js:23:30)
+    at body
+    at html
+    at RootLayout (webpack-internal:///(ssr)/./app/layout.js:29:23)
+    at Lazy
+    at RedirectErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/redirect-boundary.js:73:9)
+    at RedirectBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/redirect-boundary.js:81:11)
+    at ReactDevOverlay (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/react-dev-overlay/app/ReactDevOverlay.js:87:9)
+    at HotReload (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/react-dev-overlay/app/hot-reloader-client.js:322:11)
+    at Router (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/app-router.js:202:11)
+    at ErrorBoundaryHandler (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/error-boundary.js:112:9)
+    at ErrorBoundary (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/error-boundary.js:158:11)
+    at AppRouter (webpack-internal:///(ssr)/./node_modules/next/dist/client/components/app-router.js:564:13)
+    at Lazy
+    at r6 (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:39:19179)
+    at r6 (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:39:19179)
+    at ServerInsertedHTMLProvider (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:39:24963)
+ ⨯ Internal error: Error: Element type is invalid: expected a string (for built-in components) or a class/function (for composite components) but got: undefined. You likely forgot to export your component from the file it's defined in, or you might have mixed up default and named imports.
+    at aw (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:46775)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:49776)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at aC (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:52874)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:50095)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at /home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42336
+    at aw (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42822)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:49776)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at aC (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:52874)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:50095)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at /home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42336
+    at aw (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42822)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:49776)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at aC (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:52874)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:50095)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at /home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42336
+    at aw (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42822)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:49776)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at aC (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:52874)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:50095)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at /home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42336
+    at aw (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42822)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:49776)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at /home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42336
+    at aw (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42822)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:49776)
+    at ab (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:11808)
+    at aw (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:44769)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:49776)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at /home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42336
+    at aw (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42822)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:49776)
+    at ab (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:11808)
+    at aw (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:44769)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:49776)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at aC (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:52874)
+    at a_ (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:50095)
+    at aj (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:53793)
+    at /home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42336
+    at aw (/home/runner/workspace/client/node_modules/next/dist/compiled/next-server/app-page.runtime.dev.js:35:42822)
+digest: "1773031715"
+ GET /apply 500 in 2444ms

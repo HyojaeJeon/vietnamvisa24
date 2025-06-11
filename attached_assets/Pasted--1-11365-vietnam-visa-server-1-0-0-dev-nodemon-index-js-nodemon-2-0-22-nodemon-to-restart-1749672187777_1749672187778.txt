@@ -1,0 +1,107 @@
+[1] 11365
+
+> vietnam-visa-server@1.0.0 dev
+> nodemon index.js
+
+[nodemon] 2.0.22
+[nodemon] to restart at any time, enter `rs`
+[nodemon] watching path(s): *.*
+[nodemon] watching extensions: js,mjs,json
+[nodemon] starting `node index.js`
+/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26
+            throw new Error(`Unable to merge GraphQL type "${node.name.value}": ${e.message}`);
+            ^
+
+Error: Unable to merge GraphQL type "Mutation": Field "deleteDocument" already defined with a different type. Declared as "Boolean", but you tried to override with "SuccessResponse"
+    at mergeType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26:19)
+    at mergeGraphQLNodes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-nodes.js:38:73)
+    at mergeGraphQLTypes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:72:64)
+    at mergeTypeDefs (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:14:22)
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:54:18)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26
+            throw new Error(`Unable to merge GraphQL type "${node.name.value}": ${e.message}`);
+            ^
+
+Error: Unable to merge GraphQL type "Mutation": Field "updateConsultationStatus" already defined with a different type. Declared as "VisaApplication", but you tried to override with "Consultation"
+    at mergeType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/type.js:26:19)
+    at mergeGraphQLNodes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-nodes.js:38:73)
+    at mergeGraphQLTypes (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:72:64)
+    at mergeTypeDefs (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/merge-typedefs.js:14:22)
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:54:18)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+🔧 Config - Environment: Replit
+🔧 Config - Database: SQLite
+🔧 Config - Selected config: SQLite
+/home/runner/workspace/server/node_modules/sequelize/lib/associations/base.js:13
+      throw new AssociationError(`You have used the alias ${options.as} in two separate associations. Aliased associations must have unique aliases.`);
+      ^
+
+AssociationError [SequelizeAssociationError]: You have used the alias user in two separate associations. Aliased associations must have unique aliases.
+    at new Association (/home/runner/workspace/server/node_modules/sequelize/lib/associations/base.js:13:13)
+    at new BelongsTo (/home/runner/workspace/server/node_modules/sequelize/lib/associations/belongs-to.js:25:5)
+    at VisaApplication.<anonymous> (/home/runner/workspace/server/node_modules/sequelize/lib/associations/mixin.js:70:25)
+    at Object.<anonymous> (/home/runner/workspace/server/models/index.js:55:24)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+
+Node.js v20.18.1
+[nodemon] app crashed - waiting for file changes before starting...
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+[nodemon] restarting due to changes...
+[nodemon] starting `node index.js`
+🔧 Config - Environment: Replit
+🔧 Config - Database: SQLite
+🔧 Config - Selected config: SQLite
+/home/runner/workspace/server/node_modules/sequelize/lib/associations/base.js:13
+      throw new AssociationError(`You have used the alias ${options.as} in two separate associations. Aliased associations must have unique aliases.`);
+      ^
+
+AssociationError [SequelizeAssociationError]: You have used the alias user in two separate associations. Aliased associations must have unique aliases.
+    at new Association (/home/runner/workspace/server/node_modules/sequelize/lib/associations/base.js:13:13)
+    at new BelongsTo (/home/runner/workspace/server/node_modules/sequelize/lib/associations/belongs-to.js:25:5)
+    at VisaApplication.<anonymous> (/home/runner/workspace/server/node_modules/sequelize/lib/associations/mixin.js:70:25)
+    at Object.<anonymous> (/home/runner/workspace/server/models/index.js:55:24)
+    at Module._compile (node:internal/modules/cjs/loader:1469:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1548:10)
+    at Module.load (node:internal/modules/cjs/loader:1288:32)
+    at Module._load (node:internal/modules/cjs/loader:1104:12)
+    at Module.require (node:internal/modules/cjs/loader:1311:19)
+    at require (node:internal/modules/helpers:179:18)
+
+Node.js v20.18.1

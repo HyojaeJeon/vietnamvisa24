@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const VisaApplication = sequelize.define('VisaApplication', {
     id: {
@@ -81,24 +80,40 @@ module.exports = (sequelize, DataTypes) => {
   });
 
   VisaApplication.associate = function(models) {
+    // User와의 관계 (신청자)
     VisaApplication.belongsTo(models.User, {
       foreignKey: 'user_id',
-      as: 'user'
+      as: 'applicant'
     });
-    
+
+    // Admin과의 관계 (담당자)
     VisaApplication.belongsTo(models.Admin, {
       foreignKey: 'assigned_to',
       as: 'assignedAdmin'
     });
 
+    // Documents와의 관계
     VisaApplication.hasMany(models.Document, {
       foreignKey: 'application_id',
       as: 'documents'
     });
 
+    // Status History와의 관계
     VisaApplication.hasMany(models.ApplicationStatusHistory, {
       foreignKey: 'application_id',
       as: 'statusHistory'
+    });
+
+    // Payments와의 관계
+    VisaApplication.hasMany(models.Payment, {
+      foreignKey: 'application_id',
+      as: 'payments'
+    });
+
+    // Workflows와의 관계
+    VisaApplication.hasMany(models.ApplicationWorkflow, {
+      foreignKey: 'application_id',
+      as: 'workflows'
     });
   };
 

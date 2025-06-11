@@ -3,14 +3,14 @@ const { gql } = require("graphql-tag");
 
 const notificationsTypeDefs = gql`
   extend type Query {
-    getNotifications: [Notification!]!
-    getUnreadNotifications: [Notification!]!
+    getAllNotifications: [Notification!]!
+    getNotificationsByUser(userId: String!): [Notification!]!
+    getNotificationsByStatus(status: NotificationStatus!): [Notification!]!
   }
 
   extend type Mutation {
-    createNotification(input: NotificationInput!): Notification!
-    markNotificationRead(id: ID!): Notification!
-    markAllNotificationsRead: SuccessResponse!
+    sendNotification(input: NotificationInput!): Notification!
+    adminMarkNotificationAsRead(id: ID!): Notification!
     deleteNotification(id: ID!): SuccessResponse!
   }
 `;

@@ -1,0 +1,256 @@
+⚠ ./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+redux-persist failed to create sync storage. falling back to noop storage.
+ GET /dashboard/documents 200 in 178ms
+ GET /dashboard/documents 200 in 32ms
+ ⚠ ./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+ ⚠ ./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'CREATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'CREATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'UPDATE_ADMIN_ROLE_MUTATION' is not exported from '../../../lib/graphql' (imported as 'UPDATE_ADMIN_ROLE_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'DEACTIVATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'DEACTIVATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'CREATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'CREATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'UPDATE_ADMIN_ROLE_MUTATION' is not exported from '../../../lib/graphql' (imported as 'UPDATE_ADMIN_ROLE_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'DEACTIVATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'DEACTIVATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+redux-persist failed to create sync storage. falling back to noop storage.
+ GET /dashboard/documents 200 in 152ms
+ ⚠ ./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'CREATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'CREATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'UPDATE_ADMIN_ROLE_MUTATION' is not exported from '../../../lib/graphql' (imported as 'UPDATE_ADMIN_ROLE_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'DEACTIVATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'DEACTIVATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'CREATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'CREATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'UPDATE_ADMIN_ROLE_MUTATION' is not exported from '../../../lib/graphql' (imported as 'UPDATE_ADMIN_ROLE_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'DEACTIVATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'DEACTIVATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+ ⚠ ./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'CREATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'CREATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'UPDATE_ADMIN_ROLE_MUTATION' is not exported from '../../../lib/graphql' (imported as 'UPDATE_ADMIN_ROLE_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'DEACTIVATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'DEACTIVATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'CREATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'CREATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'UPDATE_ADMIN_ROLE_MUTATION' is not exported from '../../../lib/graphql' (imported as 'UPDATE_ADMIN_ROLE_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'DEACTIVATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'DEACTIVATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+ ⚠ ./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'CREATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'CREATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'UPDATE_ADMIN_ROLE_MUTATION' is not exported from '../../../lib/graphql' (imported as 'UPDATE_ADMIN_ROLE_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'DEACTIVATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'DEACTIVATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'CREATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'CREATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'UPDATE_ADMIN_ROLE_MUTATION' is not exported from '../../../lib/graphql' (imported as 'UPDATE_ADMIN_ROLE_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'DEACTIVATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'DEACTIVATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+ ⚠ ./app/dashboard/notifications/page.js
+Attempted import error: 'MarkAsRead' is not exported from '__barrel_optimize__?names=AlertTriangle,Bell,Calendar,CheckCircle,Clock,Eye,Filter,Mail,MarkAsRead,MessageSquare,MoreHorizontal,Search,Trash2,User!=!lucide-react' (imported as 'MarkAsRead').
+
+Import trace for requested module:
+./app/dashboard/notifications/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'CREATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'CREATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'UPDATE_ADMIN_ROLE_MUTATION' is not exported from '../../../lib/graphql' (imported as 'UPDATE_ADMIN_ROLE_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'DEACTIVATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'DEACTIVATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'CREATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'CREATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'UPDATE_ADMIN_ROLE_MUTATION' is not exported from '../../../lib/graphql' (imported as 'UPDATE_ADMIN_ROLE_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js
+
+./app/dashboard/users/page.js
+Attempted import error: 'DEACTIVATE_ADMIN_MUTATION' is not exported from '../../../lib/graphql' (imported as 'DEACTIVATE_ADMIN_MUTATION').
+
+Import trace for requested module:
+./app/dashboard/users/page.js

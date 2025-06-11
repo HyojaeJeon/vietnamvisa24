@@ -1,0 +1,62 @@
+1. Persona (AI의 역할 정의)
+You are an expert front-end developer specializing in creating engaging and interactive landing pages with HTML, CSS, and JavaScript. You have a keen eye for clean design, smooth animations, and user experience.
+
+2. Objective (작업 목표)
+Create the complete code for a hero section of a landing page for a premium "Vietnam Visa Agency for Koreans." The section must be visually impressive, build trust, and clearly communicate the value proposition based on the provided image and business concept. The final output should be a single, runnable index.html file with inline or internal CSS and JavaScript.
+
+3. Core Concept & Visuals (핵심 콘셉트 및 비주얼)
+The design is based on the provided image showing a simple 3-step visa process:
+
+서류 제출 (Document Submission)
+AI+비자 전문가 검증 (AI + Visa Expert Verification)
+비자 발급 (Visa Issuance)
+The overall aesthetic should be modern, professional, trustworthy, and technologically advanced, using a color palette of blues, whites, and greys, accented with a touch of green for success/approval. Use a clean, legible sans-serif font like 'Pretendard' or 'Noto Sans KR'.
+
+4. Text Content (섹션에 포함될 문구)
+Main Headline (H1):
+
+복잡한 베트남 비자, 10년 경력 전문가가&lt;br>가장 빠르고 투명하게 해결해 드립니다.
+
+Sub-headline (p):
+
+E-visa 오류, 까다로운 서류 준비, 기약 없는 기다림은 이제 그만.  실시간 진행 상황 확인으로 안심할 수 있는 최고의 비자 파트너가 되겠습니다. 
+
+
+
+
+
+Call-to-Action (CTA) Button:
+
+5분 만에 내 비자 알아보기
+
+Key Value Propositions (카드 형태로 배치):
+
+투명한 진행 과정: "내 서류가 어디까지 처리됐을까? 실시간 대시보드로 직접 확인하세요." 
+압도적인 전문성: "노동허가서/거주증 등 복잡한 장기 비자, 한국인 전문가가 책임집니다." 
+
+
+1:1 맞춤 상담: "내 상황에 딱 맞는 비자는? 고민 없이 바로 문의하세요." 
+5. Animation Sequence (애니메이션 순서)
+The animation should tell a story of a seamless and efficient process. It should trigger once the page loads.
+
+Initial State: The background and text (Headline, Sub-headline) fade in smoothly.
+Step 1: 서류 제출 (Document Submission):
+The "서류 제출" icon/element slides in from the left.
+A subtle "swoosh" or digital line animation flows from this element towards the center.
+Step 2: AI+비자 전문가 검증 (AI + Expert Verification):
+The central "AI + 비자 전문가" element receives the animated line.
+The robot's eyes or antenna could blink. A subtle "processing" glow pulsates around the central element for 1-2 seconds.
+A green checkmark icon (✓) appears emphatically on top of the "서류" icon, indicating successful verification.
+Step 3: 비자 발급 (Visa Issuance):
+Another animated line flows from the center to the "비자 발급" passport element on the right.
+The passport element scales up slightly and glows for a moment to signify completion.
+Final Polish:
+The CTA button fades in last, drawing the user's attention.
+The three key value proposition cards fade in sequentially at the bottom.
+The entire animation sequence should feel fluid, connected, and professional.
+6. Technical Specifications (기술 요구사항)
+Use HTML5 for the structure.
+Use CSS for styling and animations (CSS Keyframes). JavaScript can be used to control the timing and sequence of the animations.
+The layout must be responsive and look great on both desktop and mobile devices. On mobile, the 3-step visual might need to be stacked vertically.
+The code should be well-commented to explain the structure and animation logic.
+Provide the entire solution in a single index.html file.

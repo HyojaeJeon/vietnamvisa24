@@ -16,7 +16,7 @@ externalPort = 3000
 
 [[ports]]
 localPort = 5000
-externalPort = 80
+externalPort = 5000
 
 [workflows]
 runButton = "Run Full Stack Safe"
@@ -40,37 +40,6 @@ args = "npm run dev"
 waitForPort = 5000
 
 [[workflows.workflow]]
-name = "Run Server"
-author = 43113446
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd server && npm run dev"
-
-[[workflows.workflow]]
-name = "Run Client"
-author = 43113446
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd client && npm run dev"
-
-[[workflows.workflow]]
-name = "Run Full Stack"
-author = 43113446
-mode = "parallel"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd server && npm run dev"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd client && npm run dev"
-
-[[workflows.workflow]]
 name = "Run Full Stack Safe"
 author = 43113446
 mode = "sequential"
@@ -85,11 +54,19 @@ args = "pkill -f \"npm run dev\" || true"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "sleep 2"
+args = "pkill -f \"next-server\" || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "sleep 3"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd server && npm run dev &"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "sleep 1"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"

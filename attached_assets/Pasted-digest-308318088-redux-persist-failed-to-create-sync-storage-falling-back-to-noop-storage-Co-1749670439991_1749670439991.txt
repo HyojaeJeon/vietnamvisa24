@@ -1,0 +1,108 @@
+digest: "308318088"
+redux-persist failed to create sync storage. falling back to noop storage.
+ ✓ Compiled in 1247ms (2127 modules)
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ ⨯ app/src/lib/graphql/mutation/applications/index.js (3:1) @ e
+ ⨯ ReferenceError: e is not defined
+    at eval (./app/src/lib/graphql/mutation/applications/index.js:8:1)
+    at (ssr)/./app/src/lib/graphql/mutation/applications/index.js (/home/runner/workspace/client/.next/server/app/dashboard/payments/page.js:248:1)
+    at __webpack_require__ (/home/runner/workspace/client/.next/server/webpack-runtime.js:33:42)
+    at eval (./app/src/lib/graphql/index.js:64:80)
+    at (ssr)/./app/src/lib/graphql/index.js (/home/runner/workspace/client/.next/server/app/dashboard/payments/page.js:226:1)
+    at __webpack_require__ (/home/runner/workspace/client/.next/server/webpack-runtime.js:33:42)
+    at eval (./app/dashboard/payments/page.js:12:74)
+    at (ssr)/./app/dashboard/payments/page.js (/home/runner/workspace/client/.next/server/app/dashboard/payments/page.js:138:1)
+    at Object.__webpack_require__ [as require] (/home/runner/workspace/client/.next/server/webpack-runtime.js:33:42)
+digest: "3993244912"
+  1 | import { gql } from "@apollo/client";
+  2 |
+> 3 | e;
+    | ^
+  4 | export const CREATE_VISA_APPLICATION_MUTATION = gql`
+  5 |   mutation CreateVisaApplication($input: VisaApplicationInput!) {
+  6 |     createVisaApplication(input: $input) {
+ GET /dashboard/payments 500 in 151ms
+ ✓ Compiled in 2.8s (2127 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+redux-persist failed to create sync storage. falling back to noop storage.
+ GET / 200 in 218ms
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ GET /dashboard/payments 200 in 84ms
+ ✓ Compiled in 4s (2126 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+redux-persist failed to create sync storage. falling back to noop storage.
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ GET /dashboard/payments 200 in 347ms
+ GET / 200 in 327ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 5.1s (2126 modules)
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+redux-persist failed to create sync storage. falling back to noop storage.
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ GET / 500 in 2339ms
+ GET /dashboard/payments 500 in 2359ms
+ ✓ Compiled in 1899ms (2126 modules)
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+redux-persist failed to create sync storage. falling back to noop storage.
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ GET / 500 in 217ms
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ GET /dashboard/payments 500 in 158ms
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ ⨯ Error: React functionality 'useContext' is not available in this environment.
+    at stringify (<anonymous>)
+    at stringify (<anonymous>)
+digest: "308318088"
+ GET /dashboard/payments 500 in 54ms

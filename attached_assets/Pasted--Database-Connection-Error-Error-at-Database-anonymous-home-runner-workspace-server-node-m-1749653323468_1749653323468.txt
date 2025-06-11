@@ -1,0 +1,51 @@
+❌ Database Connection Error: Error
+    at Database.<anonymous> (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:185:27)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:50
+    at new Promise (<anonymous>)
+    at Query.run (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:12)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at async SQLiteQueryInterface.changeColumn (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query-interface.js:43:7)
+    at async User.sync (/home/runner/workspace/server/node_modules/sequelize/lib/model.js:984:11)
+    at async Sequelize.sync (/home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:377:9)
+    at async connectDB (/home/runner/workspace/server/database.js:11:5)
+    at async startServer (/home/runner/workspace/server/index.js:28:3) {
+  name: 'SequelizeDatabaseError',
+  parent: [Error: SQLITE_ERROR: no such table: users_backup] {
+    errno: 1,
+    code: 'SQLITE_ERROR',
+    sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `is_active`, `created_at`, `updated_at` FROM `users`;'
+  },
+  original: [Error: SQLITE_ERROR: no such table: users_backup] {
+    errno: 1,
+    code: 'SQLITE_ERROR',
+    sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `is_active`, `created_at`, `updated_at` FROM `users`;'
+  },
+  sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `is_active`, `created_at`, `updated_at` FROM `users`;',
+  parameters: {}
+}
+Error starting server: Error
+    at Database.<anonymous> (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:185:27)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:50
+    at new Promise (<anonymous>)
+    at Query.run (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:12)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at async SQLiteQueryInterface.changeColumn (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query-interface.js:43:7)
+    at async User.sync (/home/runner/workspace/server/node_modules/sequelize/lib/model.js:984:11)
+    at async Sequelize.sync (/home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:377:9)
+    at async connectDB (/home/runner/workspace/server/database.js:11:5)
+    at async startServer (/home/runner/workspace/server/index.js:28:3) {
+  name: 'SequelizeDatabaseError',
+  parent: [Error: SQLITE_ERROR: no such table: users_backup] {
+    errno: 1,
+    code: 'SQLITE_ERROR',
+    sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `is_active`, `created_at`, `updated_at` FROM `users`;'
+  },
+  original: [Error: SQLITE_ERROR: no such table: users_backup] {
+    errno: 1,
+    code: 'SQLITE_ERROR',
+    sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `is_active`, `created_at`, `updated_at` FROM `users`;'
+  },
+  sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `is_active`, `created_at`, `updated_at` FROM `users`;',
+  parameters: {}
+}
+[nodemon] clean exit - waiting for changes before restart

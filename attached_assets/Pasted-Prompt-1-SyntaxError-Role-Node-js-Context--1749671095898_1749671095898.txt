@@ -1,0 +1,70 @@
+Prompt 1: SyntaxError 해결 요청
+# Role:
+당신은 Node.js 런타임 환경과 모듈 시스템을 완벽하게 이해하는 백엔드 개발 전문가입니다.
+
+# Context:
+서버를 시작할 때 [nodemon] starting node index.js 직후 SyntaxError: Identifier 'gql' has already been declared 오류가 발생하며 앱이 즉시 중단됩니다. 이 오류는 server/graphql/schema/types.js 파일에서 gql 상수가 중복 선언되었기 때문에 발생한 것으로 보입니다.
+
+# Error Log:
+
+/home/runner/workspace/server/graphql/schema/types.js:4
+const { gql } = require("graphql-tag");
+                ^
+
+SyntaxError: Identifier 'gql' has already been declared
+    at Module._compile (node:internal/modules/cjs/loader:1428:41)
+    ...
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:7:15)
+# Task:
+이 SyntaxError를 해결하여 서버가 다음 단계로 넘어갈 수 있도록 수정해 주세요.
+
+# Action:
+
+파일 server/graphql/schema/types.js를 열어주세요.
+해당 파일 내에 const { gql } = require("graphql-tag"); 구문이 중복으로 선언되어 있는지 확인하고, 중복된 선언 중 하나를 삭제해 주세요. 만약 다른 파일에서 이미 gql을 import 하고 있다면 이 파일에서는 선언을 제거해야 할 수도 있습니다.
+Prompt 2: GraphQL 스키마 병합 오류 해결 요청
+# Role:
+당신은 @graphql-tools/merge를 포함한 GraphQL 스키마 설계 및 통합 전문가입니다.
+
+# Context:
+이전 SyntaxError가 해결되면, 서버는 스키마를 병합하는 과정에서 다음 오류를 발생시킵니다. Error: Unable to merge GraphQL input type "NotificationInput": Field "type" already defined with a different type. 메시지를 통해, 여러 스키마 파일에 정의된 NotificationInput 타입의 type 필드가 서로 다른 타입(NotificationType vs String)으로 선언되어 충돌이 발생했음을 알 수 있습니다.
+
+# Error Log:
+
+Error: Unable to merge GraphQL input type "NotificationInput": Field "type" already defined with a different type. Declared as "NotificationType", but you tried to override with "String"
+    at mergeInputType (/home/runner/workspace/server/node_modules/@graphql-tools/merge/cjs/typedefs-mergers/input-type.js:24:19)
+    ...
+    at Object.<anonymous> (/home/runner/workspace/server/graphql/schema/index.js:54:18)
+# Task:
+NotificationInput의 타입 충돌을 해결하여 GraphQL 스키마가 성공적으로 병합되도록 수정해 주세요.
+
+# Action:
+
+프로젝트 전체에서 input NotificationInput이 정의된 모든 GraphQL 스키마 파일(.graphql 또는 gql 태그가 사용된 .js 파일)을 찾아주세요.
+각 파일에서 NotificationInput의 type 필드가 어떻게 선언되었는지 확인하세요.
+type 필드의 데이터 타입을 NotificationType 또는 String 중 올바른 타입 하나로 통일하여 충돌을 해결해 주세요. (대부분의 경우, String 보다는 직접 정의한 NotificationType Enum을 사용하는 것이 올바른 설계입니다.)
+Prompt 3: Next.js 클라이언트 런타임 오류 해결 요청
+# Role:
+당신은 Next.js App Router와 React Server Components(RSC) 환경에 대한 깊은 이해를 가진 프론트엔드 개발 전문가입니다.
+
+# Context:
+서버가 성공적으로 실행된 후, 클라이언트에서 런타임 오류가 발생합니다. Error: React functionality 'useContext' is not available in this environment. 메시지와 콜스택을 보면, ApolloProvider 컴포넌트가 서버 환경에서 렌더링되려 하면서 내부적으로 사용하는 useContext 훅을 실행할 수 없어 오류가 발생하고 있습니다.
+
+# Error Log:
+
+Unhandled Runtime Error
+Error: React functionality 'useContext' is not available in this environment.
+
+Call Stack
+Object.nonExistingExport__useContext [as useContext]
+node_modules/rehackt/rsc.js (75:1)
+ApolloProvider
+node_modules/@apollo/client/react/context/ApolloProvider.js (8:25)
+# Task:
+ApolloProvider가 클라이언트 환경에서만 렌더링되도록 하여 이 런타임 오류를 해결해 주세요.
+
+# Action:
+
+ApolloProvider 컴포넌트를 사용하는 파일을 찾아주세요. (보통 애플리케이션의 최상위 레이아웃 파일인 layout.js 또는 프로바이더들을 모아놓은 components/Providers.js 같은 파일일 가능성이 높습니다.)
+해당 파일의 가장 첫 줄에 "use client"; 지시어를 추가해 주세요.
+이렇게 하면 해당 컴포넌트와 그 모든 하위 컴포넌트들이 클라이언트 컴포넌트로 전환되어, useContext와 같은 클라이언트 전용 훅을 문제없이 사용할 수 있게 됩니다.
