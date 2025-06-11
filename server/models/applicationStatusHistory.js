@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const ApplicationStatusHistory = sequelize.define('ApplicationStatusHistory', {
     id: {
@@ -37,8 +36,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'application_status_history',
     timestamps: true,
-    createdAt: 'changed_at',
-    updatedAt: false
+    underscored: true
   });
 
   ApplicationStatusHistory.associate = function(models) {

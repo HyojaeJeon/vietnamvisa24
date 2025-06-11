@@ -77,8 +77,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'visa_applications',
     timestamps: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    underscored: true
   });
 
   VisaApplication.associate = function(models) {

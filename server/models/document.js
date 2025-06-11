@@ -1,4 +1,3 @@
-
 module.exports = (sequelize, DataTypes) => {
   const Document = sequelize.define('Document', {
     id: {
@@ -53,8 +52,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     tableName: 'documents',
     timestamps: true,
-    createdAt: 'uploaded_at',
-    updatedAt: 'updated_at'
+    underscored: true
   });
 
   Document.associate = function(models) {
