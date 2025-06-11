@@ -2,6 +2,8 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "redux-persist": "^6.0.0",
+    "sequelize": "^6.37.7",
+    "sequelize-cli": "^6.6.3",
     "sqlite3": "^5.1.7",
     "swiper": "^11.2.8",
     "tailwind-merge": "^3.3.0",
