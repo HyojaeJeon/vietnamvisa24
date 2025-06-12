@@ -1,0 +1,91 @@
+{
+  "name": "베트남 비자 센터 - Vietnam Visa Center",
+  "short_name": "VN비자센터",
+  "description": "베트남 비자 신청, 공항 픽업, 부동산 컨설팅 등 베트남 관련 종합 서비스",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e40af",
+  "orientation": "portrait-primary",
+  "categories": ["travel", "business", "government"],
+  "lang": "ko",
+  "dir": "ltr",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "비자 신청",
+      "short_name": "신청",
+      "description": "베트남 비자 온라인 신청",
+      "url": "/apply",
+      "icons": [
+        {
+          "src": "/images/shortcut-apply.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "E-비자 안내",
+      "short_name": "E-비자",
+      "description": "베트남 전자비자 정보",
+      "url": "/e-visa",
+      "icons": [
+        {
+          "src": "/images/shortcut-evisa.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "공항 픽업",
+      "short_name": "픽업",
+      "description": "베트남 공항 픽업 서비스",
+      "url": "/airport-pickup",
+      "icons": [
+        {
+          "src": "/images/shortcut-pickup.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    },
+    {
+      "name": "고객 센터",
+      "short_name": "고객센터",
+      "description": "문의 및 지원",
+      "url": "/aboutUs",
+      "icons": [
+        {
+          "src": "/images/shortcut-support.svg",
+          "sizes": "96x96",
+          "type": "image/svg+xml"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
+  },
+  "handle_links": "preferred"
+}

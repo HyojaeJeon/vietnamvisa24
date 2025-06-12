@@ -77,27 +77,27 @@ const authTypeDefs = gql`
   }
 
   enum NotificationType {
-      SYSTEM
-      EMAIL
-      SMS
+    SYSTEM
+    EMAIL
+    SMS
   }
 
   enum NotificationPriority {
-      HIGH
-      MEDIUM
-      LOW
+    HIGH
+    MEDIUM
+    LOW
   }
 
   type Notification {
-      id: ID!
-      type: NotificationType!
-      title: String!
-      message: String!
-      recipient: String!
-      priority: NotificationPriority
-      read: Boolean!
-      related_id: String
-      created_at: String!
+    id: ID!
+    type: NotificationType!
+    title: String!
+    message: String!
+    recipient: String!
+    priority: NotificationPriority
+    read: Boolean!
+    related_id: String
+    created_at: String!
   }
 
   type SuccessResponse {
@@ -183,31 +183,19 @@ const authTypeDefs = gql`
     token: String!
     refreshToken: String!
   }
-
   extend type Query {
-    me: User
-    adminMe: Admin
-    getAllAdmins: [Admin!]!
-    getVisaApplications: [VisaApplication!]!
-    getVisaApplication(id: ID!): VisaApplication
+    getMe: User
     getVisaTypes: [String!]!
-    getAllApplications: [VisaApplication!]!
     getDocuments: [Document!]!
     getDocumentsByApplication(applicationId: String!): [Document!]!
     getNotifications: [Notification!]!
     getUnreadNotifications: [Notification!]!
-    getDashboardStats: DashboardStats!
   }
-
   extend type Mutation {
-    register(input: RegisterInput!): AuthResponse!
     userRegister(input: RegisterInput!): AuthResponse!
     userLogin(input: LoginInput!): AuthResponse!
-    login(input: LoginInput!): AuthResponse!
     adminLogin(input: AdminLoginInput!): AdminAuthResponse!
     refreshToken(refreshToken: String!): RefreshTokenResponse!
-    createVisaApplication(input: VisaApplicationInput!): VisaApplication!
-    updateApplicationStatus(id: ID!, status: ApplicationStatus!): VisaApplication!
     createDocument(input: DocumentInput!): Document!
     updateDocumentStatus(id: ID!, status: DocumentStatus!, notes: String): Document!
     createNotification(input: NotificationInput!): Notification!

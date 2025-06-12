@@ -1,4 +1,4 @@
-// File: /home/runner/workspace/client/app/dashboard/layout.js
+// File: D:\projects\vietnamvisa24\client\app\dashboard\layout.js
 import * as entry from '../../../../app/dashboard/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

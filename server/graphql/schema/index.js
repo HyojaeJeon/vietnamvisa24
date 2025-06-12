@@ -1,4 +1,3 @@
-
 const { mergeTypeDefs } = require("@graphql-tools/merge");
 
 // ====================
@@ -13,6 +12,7 @@ const authSchema = require("./auth");
 const adminSchema = require("./admin");
 const paymentSchema = require("./payment");
 const workflowSchema = require("./workflow");
+const pricingSchema = require("./pricing");
 
 // Import additional schemas if they exist
 let documentsSchema, notificationsSchema, consultationsSchema, reportsSchema;
@@ -44,7 +44,7 @@ try {
 // ====================
 // MERGE ALL SCHEMAS
 // ====================
-const schemas = [types, authSchema, adminSchema, paymentSchema, workflowSchema];
+const schemas = [types, authSchema, adminSchema, paymentSchema, workflowSchema, pricingSchema];
 
 if (documentsSchema) schemas.push(documentsSchema);
 if (notificationsSchema) schemas.push(notificationsSchema);

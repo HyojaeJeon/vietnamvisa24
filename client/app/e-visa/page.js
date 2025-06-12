@@ -1,20 +1,21 @@
+"use client";
 
-'use client'
-
-import React, { useState } from 'react';
-import Header from '../src/components/header';
-import Footer from '../src/components/footer';
-import { Card, CardContent, CardHeader, CardTitle } from '../src/components/ui/card';
-import { Button } from '../src/components/ui/button';
-import { 
-  FileText, 
-  Clock, 
-  Shield, 
-  CheckCircle, 
+import React, { useState } from "react";
+import { useTracking } from "../../hooks/useTracking";
+import { ServiceStructuredData } from "../../components/seo/StructuredData";
+import Header from "../src/components/header";
+import Footer from "../src/components/footer";
+import { Card, CardContent, CardHeader, CardTitle } from "../src/components/ui/card";
+import { Button } from "../src/components/ui/button";
+import {
+  FileText,
+  Clock,
+  Shield,
+  CheckCircle,
   X,
-  Plane, 
-  Building, 
-  Heart, 
+  Plane,
+  Building,
+  Heart,
   Briefcase,
   Users,
   Camera,
@@ -37,8 +38,8 @@ import {
   Headphones,
   Award,
   Timer,
-  BadgeCheck
-} from 'lucide-react';
+  BadgeCheck,
+} from "lucide-react";
 
 export default function EVisa() {
   const [expandedFaq, setExpandedFaq] = useState(null);
@@ -71,7 +72,7 @@ export default function EVisa() {
             </div>
           </div>
         </div>
-      `
+      `,
     },
     {
       question: "E-VISA(90일) 만료 후 더 체류하려면 어떻게 해야 하나요?",
@@ -99,7 +100,7 @@ export default function EVisa() {
             </div>
           </div>
         </div>
-      `
+      `,
     },
     {
       question: "E-VISA 신청 시 가장 흔한 실수는 무엇인가요?",
@@ -119,7 +120,7 @@ export default function EVisa() {
             <p class="text-sm text-green-700">✓ 사전 서류 검토로 오류 방지 ✓ 정확한 양식 작성 ✓ 안전한 결제 처리 ✓ 99.8% 승인률 보장</p>
           </div>
         </div>
-      `
+      `,
     },
     {
       question: "여권 유효기간은 얼마나 남아야 하나요?",
@@ -137,8 +138,8 @@ export default function EVisa() {
             <p class="text-sm text-amber-700"><strong>주의:</strong> 여권 유효기간이 부족할 경우 입국이 거부될 수 있습니다.</p>
           </div>
         </div>
-      `
-    }
+      `,
+    },
   ];
 
   const testimonials = [
@@ -146,37 +147,37 @@ export default function EVisa() {
       name: "김민수",
       location: "서울",
       comment: "급하게 필요했는데 1일 만에 처리해주셔서 감사합니다! 덕분에 출장 일정에 차질 없이 다녀올 수 있었어요.",
-      rating: 5
+      rating: 5,
     },
     {
       name: "박지영",
       location: "부산",
       comment: "혼자 하다가 계속 오류 나서 맡겼는데 바로 해결됐어요. 사진 규격도 맞춰주시고 너무 편했습니다.",
-      rating: 5
+      rating: 5,
     },
     {
       name: "이준호",
       location: "대구",
       comment: "복잡한 절차 없이 한국어로 간편하게 신청할 수 있어서 좋았어요. 전문가 서비스 추천합니다!",
-      rating: 5
-    }
+      rating: 5,
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       <Header />
-      
+
       <main className="pt-20">
         {/* Hero Section - 문제 제기 및 해결책 제시 */}
         <section className="py-16 md:py-24 bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white relative overflow-hidden">
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="absolute inset-0 bg-gradient-to-r from-blue-600/50 to-transparent"></div>
-          
+
           {/* 배경 애니메이션 */}
           <div className="absolute inset-0">
-            <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-ping" style={{animationDelay: '0s'}}></div>
-            <div className="absolute top-32 right-20 w-16 h-16 bg-white/5 rounded-full animate-ping" style={{animationDelay: '2s'}}></div>
-            <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-white/10 rounded-full animate-ping" style={{animationDelay: '4s'}}></div>
+            <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full animate-ping" style={{ animationDelay: "0s" }}></div>
+            <div className="absolute top-32 right-20 w-16 h-16 bg-white/5 rounded-full animate-ping" style={{ animationDelay: "2s" }}></div>
+            <div className="absolute bottom-20 left-1/4 w-12 h-12 bg-white/10 rounded-full animate-ping" style={{ animationDelay: "4s" }}></div>
           </div>
 
           <div className="container mx-auto px-4 text-center relative z-10">
@@ -184,29 +185,31 @@ export default function EVisa() {
               <BadgeCheck className="h-5 w-5" />
               <span>99.8% 승인률 보장 서비스</span>
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent leading-tight">
-              베트남 E-VISA,<br />
+              베트남 E-VISA,
+              <br />
               <span className="text-yellow-300">5분 만에 실수 없이</span> 신청하세요
             </h1>
             <p className="text-xl md:text-2xl mb-12 max-w-4xl mx-auto leading-relaxed text-blue-100">
-              복잡한 신청 절차, 잦은 오류, 반려될까 불안하셨나요?<br />
+              복잡한 신청 절차, 잦은 오류, 반려될까 불안하셨나요?
+              <br />
               <span className="font-semibold text-white">전문가가 처음부터 끝까지 확인하여 99.8%의 승인률로 안전하게 발급해 드립니다.</span>
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black px-8 py-4 text-xl font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
               >
                 <CreditCard className="h-6 w-6 mr-3" />
                 지금 바로 E-VISA 신청하기
               </Button>
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 variant="outline"
                 className="w-full sm:w-auto border-white/50 text-white hover:bg-white/10 px-8 py-4 text-xl backdrop-blur-sm"
-                onClick={() => document.getElementById('why-agency').scrollIntoView({ behavior: 'smooth' })}
+                onClick={() => document.getElementById("why-agency").scrollIntoView({ behavior: "smooth" })}
               >
                 <ArrowRight className="h-5 w-5 mr-2" />
                 대행 서비스 장점 보기
@@ -223,12 +226,8 @@ export default function EVisa() {
                 <AlertCircle className="h-4 w-4" />
                 <span>혼자 신청하면 이런 문제가...</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-                왜 전문가에게 맡겨야 할까요?
-              </h2>
-              <p className="text-gray-600 text-xl max-w-3xl mx-auto">
-                복잡한 E-VISA 신청, 작은 실수 하나로 반려될 수 있습니다
-              </p>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">왜 전문가에게 맡겨야 할까요?</h2>
+              <p className="text-gray-600 text-xl max-w-3xl mx-auto">복잡한 E-VISA 신청, 작은 실수 하나로 반려될 수 있습니다</p>
             </div>
 
             <div className="max-w-6xl mx-auto">
@@ -346,12 +345,11 @@ export default function EVisa() {
                 <span>간단한 3단계 프로세스</span>
               </div>
               <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-                단 3단계로 끝내는<br />
+                단 3단계로 끝내는
+                <br />
                 <span className="text-blue-600">E-VISA 신청 프로세스</span>
               </h2>
-              <p className="text-gray-600 text-xl max-w-3xl mx-auto">
-                복잡한 절차는 저희가, 고객님은 편리하게
-              </p>
+              <p className="text-gray-600 text-xl max-w-3xl mx-auto">복잡한 절차는 저희가, 고객님은 편리하게</p>
             </div>
 
             <div className="max-w-6xl mx-auto">
@@ -362,14 +360,10 @@ export default function EVisa() {
                     <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
                       <FileText className="h-10 w-10 text-white" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-sm">
-                      1
-                    </div>
+                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-sm">1</div>
                   </div>
                   <h3 className="text-2xl font-bold text-gray-800 mb-4">신청 정보 제출</h3>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    고객님이 간편한 한글 양식으로 정보를 입력하고 서류를 업로드합니다
-                  </p>
+                  <p className="text-gray-600 leading-relaxed mb-6">고객님이 간편한 한글 양식으로 정보를 입력하고 서류를 업로드합니다</p>
                   <div className="space-y-2 text-sm text-gray-500">
                     <div className="flex items-center justify-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
@@ -388,14 +382,10 @@ export default function EVisa() {
                     <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
                       <UserCheck className="h-10 w-10 text-white" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-sm">
-                      2
-                    </div>
+                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-sm">2</div>
                   </div>
                   <h3 className="text-2xl font-bold text-gray-800 mb-4">전문가 검토 및 대행</h3>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    담당 전문가가 제출된 서류를 규정에 맞게 완벽히 검토 후, 공식 시스템에 오류 없이 대행 신청합니다
-                  </p>
+                  <p className="text-gray-600 leading-relaxed mb-6">담당 전문가가 제출된 서류를 규정에 맞게 완벽히 검토 후, 공식 시스템에 오류 없이 대행 신청합니다</p>
                   <div className="space-y-2 text-sm text-gray-500">
                     <div className="flex items-center justify-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
@@ -414,14 +404,10 @@ export default function EVisa() {
                     <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto shadow-xl group-hover:shadow-2xl transition-all duration-300 group-hover:scale-110">
                       <Mail className="h-10 w-10 text-white" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-sm">
-                      3
-                    </div>
+                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center text-black font-bold text-sm">3</div>
                   </div>
                   <h3 className="text-2xl font-bold text-gray-800 mb-4">이메일로 비자 수령</h3>
-                  <p className="text-gray-600 leading-relaxed mb-6">
-                    발급이 완료된 E-VISA를 고객님의 이메일로 즉시 발송해 드립니다
-                  </p>
+                  <p className="text-gray-600 leading-relaxed mb-6">발급이 완료된 E-VISA를 고객님의 이메일로 즉시 발송해 드립니다</p>
                   <div className="space-y-2 text-sm text-gray-500">
                     <div className="flex items-center justify-center space-x-2">
                       <CheckCircle className="h-4 w-4 text-green-500" />
@@ -456,12 +442,8 @@ export default function EVisa() {
                 <CreditCard className="h-4 w-4" />
                 <span>투명한 가격 정책</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-                서비스 플랜 및 가격
-              </h2>
-              <p className="text-gray-600 text-xl max-w-3xl mx-auto">
-                필요에 맞는 최적의 플랜을 선택하세요
-              </p>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">서비스 플랜 및 가격</h2>
+              <p className="text-gray-600 text-xl max-w-3xl mx-auto">필요에 맞는 최적의 플랜을 선택하세요</p>
             </div>
 
             <div className="max-w-5xl mx-auto">
@@ -518,9 +500,7 @@ export default function EVisa() {
                 {/* 긴급 신청 */}
                 <Card className="shadow-xl border-0 relative overflow-hidden ring-2 ring-orange-400">
                   <div className="h-2 bg-gradient-to-r from-orange-500 to-red-500"></div>
-                  <div className="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                    급행 서비스
-                  </div>
+                  <div className="absolute top-4 right-4 bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-full text-sm font-bold">급행 서비스</div>
                   <CardHeader className="p-8 bg-gradient-to-br from-orange-50 to-red-50">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
@@ -561,9 +541,7 @@ export default function EVisa() {
                         <span className="text-gray-700">24시간 고객 지원</span>
                       </div>
                     </div>
-                    <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-4 text-lg font-semibold shadow-xl">
-                      긴급 신청하기
-                    </Button>
+                    <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white py-4 text-lg font-semibold shadow-xl">긴급 신청하기</Button>
                   </CardContent>
                 </Card>
               </div>
@@ -579,37 +557,23 @@ export default function EVisa() {
                 <FileCheck className="h-4 w-4" />
                 <span>자주 묻는 질문</span>
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-                E-VISA 핵심 정보 & FAQ
-              </h2>
-              <p className="text-gray-600 text-xl max-w-3xl mx-auto">
-                궁금한 점들을 미리 확인해보세요
-              </p>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">E-VISA 핵심 정보 & FAQ</h2>
+              <p className="text-gray-600 text-xl max-w-3xl mx-auto">궁금한 점들을 미리 확인해보세요</p>
             </div>
 
             <div className="max-w-4xl mx-auto">
               <div className="space-y-4">
                 {faqData.map((faq, index) => (
                   <Card key={index} className="shadow-lg border-0">
-                    <CardHeader 
-                      className="cursor-pointer hover:bg-blue-50 transition-colors p-6"
-                      onClick={() => toggleFaq(index)}
-                    >
+                    <CardHeader className="cursor-pointer hover:bg-blue-50 transition-colors p-6" onClick={() => toggleFaq(index)}>
                       <div className="flex items-center justify-between">
                         <h3 className="text-lg font-semibold text-gray-800">{faq.question}</h3>
-                        {expandedFaq === index ? (
-                          <ChevronUp className="h-5 w-5 text-blue-500" />
-                        ) : (
-                          <ChevronDown className="h-5 w-5 text-blue-500" />
-                        )}
+                        {expandedFaq === index ? <ChevronUp className="h-5 w-5 text-blue-500" /> : <ChevronDown className="h-5 w-5 text-blue-500" />}
                       </div>
                     </CardHeader>
                     {expandedFaq === index && (
                       <CardContent className="p-6 pt-0">
-                        <div 
-                          className="text-gray-700 leading-relaxed"
-                          dangerouslySetInnerHTML={{ __html: faq.answer }}
-                        />
+                        <div className="text-gray-700 leading-relaxed" dangerouslySetInnerHTML={{ __html: faq.answer }} />
                       </CardContent>
                     )}
                   </Card>
@@ -628,9 +592,7 @@ export default function EVisa() {
                 <span>고객 만족도 99.8%</span>
               </div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6">실제 고객 후기</h2>
-              <p className="text-slate-300 text-xl max-w-3xl mx-auto">
-                이미 수많은 고객들이 만족한 서비스를 경험해보세요
-              </p>
+              <p className="text-slate-300 text-xl max-w-3xl mx-auto">이미 수많은 고객들이 만족한 서비스를 경험해보세요</p>
             </div>
 
             {/* 고객 후기 */}
@@ -662,23 +624,20 @@ export default function EVisa() {
             <div className="text-center">
               <h3 className="text-3xl md:text-4xl font-bold mb-6">지금 바로 전문가에게 맡기세요!</h3>
               <p className="text-slate-300 text-xl mb-12 max-w-3xl mx-auto">
-                복잡한 E-VISA 신청, 더 이상 혼자 고민하지 마세요.<br />
+                복잡한 E-VISA 신청, 더 이상 혼자 고민하지 마세요.
+                <br />
                 전문가가 처음부터 끝까지 안전하게 처리해드립니다.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="w-full sm:w-auto bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-black px-8 py-4 text-xl font-bold shadow-xl transform hover:scale-105 transition-all duration-300"
                 >
                   <CreditCard className="h-6 w-6 mr-3" />
                   지금 바로 E-VISA 신청하기
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline"
-                  className="w-full sm:w-auto border-white/50 text-white hover:bg-white/10 px-8 py-4 text-xl backdrop-blur-sm"
-                >
+                <Button size="lg" variant="outline" className="w-full sm:w-auto border-white/50 text-white hover:bg-white/10 px-8 py-4 text-xl backdrop-blur-sm">
                   <Phone className="h-5 w-5 mr-2" />
                   전문가 상담받기
                 </Button>
@@ -691,9 +650,7 @@ export default function EVisa() {
                     <MessageCircle className="h-10 w-10 text-yellow-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">카카오톡</h3>
                     <p className="text-slate-300 mb-4 text-sm">실시간 채팅 상담</p>
-                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold">
-                      hcm2424
-                    </Button>
+                    <Button className="bg-yellow-500 hover:bg-yellow-600 text-black font-semibold">hcm2424</Button>
                   </CardContent>
                 </Card>
 
@@ -702,9 +659,7 @@ export default function EVisa() {
                     <MessageCircle className="h-10 w-10 text-blue-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">잘로 (Zalo)</h3>
                     <p className="text-slate-300 mb-4 text-sm">베트남 현지 상담</p>
-                    <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold">
-                      093 721 7284
-                    </Button>
+                    <Button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold">093 721 7284</Button>
                   </CardContent>
                 </Card>
 
@@ -713,9 +668,7 @@ export default function EVisa() {
                     <Phone className="h-10 w-10 text-green-400 mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">전화 상담</h3>
                     <p className="text-slate-300 mb-4 text-sm">직접 통화 상담</p>
-                    <Button className="bg-green-500 hover:bg-green-600 text-white font-semibold">
-                      +84 93 721 7284
-                    </Button>
+                    <Button className="bg-green-500 hover:bg-green-600 text-white font-semibold">+84 93 721 7284</Button>
                   </CardContent>
                 </Card>
               </div>

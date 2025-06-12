@@ -11,6 +11,7 @@ import CompanyInfo from "./src/components/companyInfo";
 import FaqSection from "./src/components/faqSection";
 import ContactForm from "./src/components/contactForm";
 import Chatbot from "./src/components/chatbot";
+import GraphQLTest from "./src/components/test/GraphQLTest.jsx";
 
 export default function HomePage() {
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -37,20 +38,20 @@ export default function HomePage() {
         <HeroSection />
         <VisaServices onApplyClick={handleVisaApply} />
         <ProcessSteps />
-        <AdditionalServices onApplyClick={handleVisaApply} />
-        <CompanyInfo />
+        <AdditionalServices onApplyClick={handleVisaApply} /> <CompanyInfo />
+        <div className="py-12 bg-gray-50">
+          <div className="max-w-4xl px-4 mx-auto">
+            <GraphQLTest />
+          </div>
+        </div>
         <FaqSection />
         <ContactForm />
       </main>
       <Footer />
-      
+
       {/* Floating Chatbot */}
-      <div className="fixed bottom-6 right-6 z-50">
-        <Chatbot
-          isOpen={isChatbotOpen}
-          onToggle={handleChatbotToggle}
-          applicationData={applicationData}
-        />
+      <div className="fixed z-50 bottom-6 right-6">
+        <Chatbot isOpen={isChatbotOpen} onToggle={handleChatbotToggle} applicationData={applicationData} />
       </div>
     </div>
   );

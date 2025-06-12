@@ -1,31 +1,31 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  createHttpLink,
-  from,
-} from "@apollo/client";
+// apolloClient.js
+
+import { ApolloClient, InMemoryCache, createHttpLink, from } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import errorLink from "../apollo/errorLink";
+import errorLink from "../apollo/errorLink"; // 에러 처리 링크는 그대로 유지
 
-// Next.js의 rewrites를 통해 /graphql 경로로 요청
+// ----------------------------------------------------------------------
+// 개발 환경에서는 직접 서버 URL 사용 (CORS 문제 해결을 위해)
+const GRAPHQL_ENDPOINT = "http://localhost:5002/graphql";
+
+console.log("🔧 Apollo Client - GraphQL Endpoint:", GRAPHQL_ENDPOINT);
+
 const httpLink = createHttpLink({
-  uri: typeof window === 'undefined' 
-    ? 'http://0.0.0.0:5000/graphql'
-    : process.env.NODE_ENV === 'production' 
-      ? 'https://your-production-graphql-endpoint.com/graphql'
-      : 'http://localhost:5000/graphql',
+  uri: GRAPHQL_ENDPOINT,
   credentials: "include",
+  fetch: (uri, options) => {
+    console.log("🚀 GraphQL Request:", uri, options);
+    return fetch(uri, options);
+  },
 });
+// ----------------------------------------------------------------------
 
-// 현재 토큰을 가져오는 함수
-
-// 현재 토큰을 가져오는 함수
+// 현재 토큰을 가져오는 함수 (이전과 동일)
 const getCurrentToken = () => {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
 
   let token = localStorage.getItem("token");
 
-  // Redux store에서도 토큰 확인
   try {
     if (window.__REDUX_STORE__) {
       const state = window.__REDUX_STORE__.getState();
@@ -34,13 +34,13 @@ const getCurrentToken = () => {
       }
     }
   } catch (error) {
-    console.error('Error reading Redux state:', error);
+    console.error("Error reading Redux state:", error);
   }
 
   return token;
 };
 
-// 인증 링크
+// 인증 링크 (이전과 동일)
 const authLink = setContext((_, { headers }) => {
   const token = getCurrentToken();
   const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
@@ -49,12 +49,10 @@ const authLink = setContext((_, { headers }) => {
     headers: {
       ...headers,
       authorization: token ? `Bearer ${token}` : "",
-      'admin-token': adminToken ? adminToken : "",
+      "admin-token": adminToken ? adminToken : "",
     },
   };
 });
-
-// 에러 처리는 별도 모듈에서 관리
 
 const apolloClient = new ApolloClient({
   link: from([errorLink, authLink, httpLink]),
@@ -67,11 +65,11 @@ const apolloClient = new ApolloClient({
       errorPolicy: "all",
     },
   },
-  ssrMode: typeof window === 'undefined',
+  ssrMode: typeof window === "undefined",
 });
 
-// Apollo Client를 전역에서 접근할 수 있도록 설정
-if (typeof window !== 'undefined') {
+// Apollo Client를 전역에서 접근할 수 있도록 설정 (이전과 동일)
+if (typeof window !== "undefined") {
   window.__APOLLO_CLIENT__ = apolloClient;
 }
 

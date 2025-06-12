@@ -1,9 +1,9 @@
 import { gql } from "@apollo/client";
 
-// Authentication mutations
-export const REGISTER_MUTATION = gql`
-  mutation Register($input: UserRegistrationInput!) {
-    register(input: $input) {
+// User authentication mutations
+export const USER_REGISTER_MUTATION = gql`
+  mutation UserRegister($input: RegisterInput!) {
+    userRegister(input: $input) {
       token
       user {
         id
@@ -15,9 +15,9 @@ export const REGISTER_MUTATION = gql`
   }
 `;
 
-export const LOGIN_MUTATION = gql`
-  mutation Login($input: UserLoginInput!) {
-    login(input: $input) {
+export const USER_LOGIN_MUTATION = gql`
+  mutation UserLogin($input: LoginInput!) {
+    userLogin(input: $input) {
       token
       user {
         id
@@ -28,21 +28,11 @@ export const LOGIN_MUTATION = gql`
     }
   }
 `;
+
+// Backward compatibility
+export const LOGIN_MUTATION = USER_LOGIN_MUTATION;
 
 // Admin authentication
-export const USER_LOGIN_MUTATION = gql`
-  mutation UserLogin($email: String!, $password: String!) {
-    userLogin(email: $email, password: $password) {
-      token
-      user {
-        id
-        email
-        name
-      }
-    }
-  }
-`;
-
 export const ADMIN_LOGIN_MUTATION = gql`
   mutation AdminLogin($input: AdminLoginInput!) {
     adminLogin(input: $input) {
@@ -52,7 +42,18 @@ export const ADMIN_LOGIN_MUTATION = gql`
         name
         email
         role
+        is_active
       }
+    }
+  }
+`;
+
+// Token refresh
+export const REFRESH_TOKEN_MUTATION = gql`
+  mutation RefreshToken($refreshToken: String!) {
+    refreshToken(refreshToken: $refreshToken) {
+      token
+      refreshToken
     }
   }
 `;

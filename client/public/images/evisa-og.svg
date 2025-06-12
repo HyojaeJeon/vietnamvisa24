@@ -1,0 +1,36 @@
+<!-- E-visa Open Graph Image 1200x630 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="evisaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#34d399;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#evisaBg)"/>
+  
+  <!-- Decorative elements -->
+  <rect x="50" y="50" width="1100" height="8" fill="#fbbf24" opacity="0.9"/>
+  <rect x="50" y="572" width="1100" height="8" fill="#fbbf24" opacity="0.9"/>
+  
+  <!-- Icon background -->
+  <circle cx="200" cy="315" r="80" fill="white" opacity="0.2"/>
+  
+  <!-- Visa icon -->
+  <rect x="160" y="285" width="80" height="60" rx="8" fill="white"/>
+  <text x="200" y="320" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#059669" text-anchor="middle">E-VISA</text>
+  
+  <!-- Main content -->
+  <text x="650" y="200" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="white" text-anchor="middle">베트남 E-비자</text>
+  <text x="650" y="280" font-family="Arial, sans-serif" font-size="48" fill="#fbbf24" text-anchor="middle">온라인 신청</text>
+  
+  <!-- Features -->
+  <text x="650" y="360" font-family="Arial, sans-serif" font-size="32" fill="white" text-anchor="middle">✓ 빠른 처리 (3-5일)</text>
+  <text x="650" y="410" font-family="Arial, sans-serif" font-size="32" fill="white" text-anchor="middle">✓ 온라인 신청</text>
+  <text x="650" y="460" font-family="Arial, sans-serif" font-size="32" fill="white" text-anchor="middle">✓ 30일 단수 입국</text>
+  
+  <!-- URL -->
+  <text x="650" y="520" font-family="Arial, sans-serif" font-size="28" fill="white" text-anchor="middle">vietnamvisa24.com/e-visa</text>
+</svg>

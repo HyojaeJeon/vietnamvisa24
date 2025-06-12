@@ -1,5 +1,4 @@
-
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const GET_ALL_ADMINS_QUERY = gql`
   query GetAllAdmins {
@@ -22,11 +21,9 @@ export const GET_ALL_USERS_QUERY = gql`
       name
       phone
       created_at
-      is_active
     }
   }
 `;
-import { gql } from '@apollo/client';
 
 export const GET_ADMIN_ME_QUERY = gql`
   query GetAdminMe {
@@ -41,9 +38,9 @@ export const GET_ADMIN_ME_QUERY = gql`
   }
 `;
 
-export const GET_ALL_USERS_QUERY = gql`
-  query GetAllUsers {
-    getAllUsers {
+export const GET_USER_BY_ID_QUERY = gql`
+  query GetUserById($id: ID!) {
+    getUserById(id: $id) {
       id
       name
       email
@@ -53,14 +50,54 @@ export const GET_ALL_USERS_QUERY = gql`
   }
 `;
 
-export const GET_USER_QUERY = gql`
-  query GetUser($id: ID!) {
-    getUser(id: $id) {
+export const GET_DASHBOARD_STATS_QUERY = gql`
+  query GetDashboardStats {
+    getDashboardStats {
+      totalApplications
+      newApplicationsToday
+      completedToday
+      pendingReview
+    }
+  }
+`;
+
+export const GET_VISA_APPLICATIONS_QUERY = gql`
+  query GetVisaApplications {
+    getVisaApplications {
       id
-      name
-      email
+      application_number
+      visa_type
+      full_name
+      passport_number
+      nationality
       phone
+      email
+      status
       created_at
+      updated_at
+    }
+  }
+`;
+
+export const GET_APPLICATION_BY_ID_QUERY = gql`
+  query GetApplicationById($id: ID!) {
+    getApplicationById(id: $id) {
+      id
+      application_number
+      visa_type
+      full_name
+      passport_number
+      nationality
+      birth_date
+      phone
+      email
+      arrival_date
+      departure_date
+      purpose
+      status
+      priority
+      created_at
+      updated_at
     }
   }
 `;

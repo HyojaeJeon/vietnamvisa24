@@ -1,10 +1,9 @@
-
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 // User queries
 export const GET_ME_QUERY = gql`
   query GetMe {
-    me {
+    getMe {
       id
       email
       name
@@ -14,22 +13,9 @@ export const GET_ME_QUERY = gql`
   }
 `;
 
-export const GET_ADMIN_ME_QUERY = gql`
-  query GetAdminMe {
-    adminMe {
-      id
-      email
-      name
-      role
-      created_at
-      is_active
-    }
-  }
-`;
-
 export const GET_USER_ME_QUERY = gql`
   query GetUserMe {
-    userMe {
+    getMe {
       id
       email
       name

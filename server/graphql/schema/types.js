@@ -51,6 +51,7 @@ const typeDefs = gql`
     user: User
     assignedAdmin: Admin
     documents: [Document!]!
+    consultations: [Consultation!]!
   }
 
   type Document {
@@ -67,9 +68,9 @@ const typeDefs = gql`
     notes: String
     application: VisaApplication
   }
-
   type Consultation {
     id: ID!
+    application_id: ID
     customer_name: String!
     phone: String!
     email: String!
@@ -78,6 +79,9 @@ const typeDefs = gql`
     notes: String
     created_at: String!
     updated_at: String!
+    application: VisaApplication
+    applicant: User
+    assignedAdmin: Admin
   }
 
   type ApplicationStatusHistory {
@@ -290,6 +294,162 @@ const typeDefs = gql`
     month: String!
     applications: Int!
     revenue: Float!
+  }
+
+  # 가격표 관리 타입들
+  type EVisaPrice {
+    id: ID!
+    type: EVisaType!
+    processingTime: ProcessingTime!
+    sellingPriceUsd: Float!
+    sellingPriceVnd: Float!
+    sellingPriceKrw: Float!
+    marginUsd: Float!
+    marginVnd: Float!
+    marginKrw: Float!
+    isActive: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    createdBy: ID
+    updatedBy: ID
+    creator: Admin
+    updater: Admin
+  }
+
+  type VisaRunPrice {
+    id: ID!
+    visaType: VisaRunType!
+    peopleCount: Int!
+    sellingPriceUsd: Float!
+    sellingPriceVnd: Float!
+    sellingPriceKrw: Float!
+    marginUsd: Float!
+    marginVnd: Float!
+    marginKrw: Float!
+    isActive: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    createdBy: ID
+    updatedBy: ID
+    creator: Admin
+    updater: Admin
+  }
+
+  type FastTrackPrice {
+    id: ID!
+    serviceType: FastTrackServiceType!
+    airport: AirportCode!
+    sellingPriceUsd: Float!
+    sellingPriceVnd: Float!
+    sellingPriceKrw: Float!
+    marginUsd: Float!
+    marginVnd: Float!
+    marginKrw: Float!
+    isActive: Boolean!
+    createdAt: String!
+    updatedAt: String!
+    createdBy: ID
+    updatedBy: ID
+    creator: Admin
+    updater: Admin
+  }
+
+  # 가격표 관련 Enum 타입들
+  enum EVisaType {
+    SINGLE
+    MULTIPLE
+  }
+
+  enum ProcessingTime {
+    NORMAL
+    URGENT
+    SUPER_URGENT
+  }
+
+  enum VisaRunType {
+    TOURIST
+    BUSINESS
+  }
+
+  enum FastTrackServiceType {
+    ARRIVAL
+    DEPARTURE
+    BOTH
+  }
+
+  enum AirportCode {
+    SGN # 호치민 탄손낫 공항
+    HAN # 하노이 노이바이 공항
+    DAD # 다낭 공항
+    CXR # 깜란 공항
+    VCA # 칸토 공항
+  }
+
+  # 가격표 입력 타입들
+  input EVisaPriceInput {
+    type: EVisaType!
+    processingTime: ProcessingTime!
+    sellingPriceUsd: Float!
+    sellingPriceVnd: Float!
+    sellingPriceKrw: Float!
+    marginUsd: Float!
+    marginVnd: Float!
+    marginKrw: Float!
+    isActive: Boolean
+  }
+
+  input VisaRunPriceInput {
+    visaType: VisaRunType!
+    peopleCount: Int!
+    sellingPriceUsd: Float!
+    sellingPriceVnd: Float!
+    sellingPriceKrw: Float!
+    marginUsd: Float!
+    marginVnd: Float!
+    marginKrw: Float!
+    isActive: Boolean
+  }
+
+  input FastTrackPriceInput {
+    serviceType: FastTrackServiceType!
+    airport: AirportCode!
+    sellingPriceUsd: Float!
+    sellingPriceVnd: Float!
+    sellingPriceKrw: Float!
+    marginUsd: Float!
+    marginVnd: Float!
+    marginKrw: Float!
+    isActive: Boolean
+  }
+
+  input EVisaPriceUpdateInput {
+    sellingPriceUsd: Float
+    sellingPriceVnd: Float
+    sellingPriceKrw: Float
+    marginUsd: Float
+    marginVnd: Float
+    marginKrw: Float
+    isActive: Boolean
+  }
+
+  input VisaRunPriceUpdateInput {
+    sellingPriceUsd: Float
+    sellingPriceVnd: Float
+    sellingPriceKrw: Float
+    marginUsd: Float
+    marginVnd: Float
+    marginKrw: Float
+    isActive: Boolean
+  }
+
+  input FastTrackPriceUpdateInput {
+    sellingPriceUsd: Float
+    sellingPriceVnd: Float
+    sellingPriceKrw: Float
+    marginUsd: Float
+    marginVnd: Float
+    marginKrw: Float
+    isActive: Boolean
   }
 `;
 

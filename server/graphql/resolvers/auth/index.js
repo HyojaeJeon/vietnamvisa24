@@ -8,69 +8,70 @@ const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 const resolvers = {
   Query: {
-    me: asyncHandler(async (_, __, { token }) => {
+    getMe: asyncHandler(async (_, __, { token }) => {
       const user = await getUserFromToken(token);
       return user;
     }),
-
-    adminMe: async (_, __, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error('Authentication required');
-      return admin;
+    getVisaTypes: () => {
+      return ["E-visa", "Tourist Visa", "Business Visa", "Transit Visa"];
     },
 
-    getAllAdmins: async (_, __, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin || (admin.role !== 'SUPER_ADMIN' && admin.role !== 'MANAGER')) {
-        throw new Error('Permission denied');
-      }
+    getDocuments: async (_, __, { token }) => {
+      const user = await getUserFromToken(token);
+      if (!user) throw new Error("Authentication required");
 
-      return await models.Admin.findAll({
-        order: [['created_at', 'DESC']]
+      return await models.Document.findAll({
+        where: { application_id: user.id },
+        order: [["uploaded_at", "DESC"]],
       });
     },
 
-    getVisaApplications: asyncHandler(async (_, __, context) => {
-      const { token } = context;
-      console.log('getVisaApplications - Received token:', token);
-
+    getDocumentsByApplication: async (_, { applicationId }, { token }) => {
       const user = await getUserFromToken(token);
-      console.log('getVisaApplications - Found user:', user?.id);
-
-      return await models.VisaApplication.findAll({
-        where: { user_id: user.id },
-        order: [['created_at', 'DESC']]
-      });
-    }),
-
-    getVisaApplication: async (_, { id }, { token }) => {
-      const user = await getUserFromToken(token);
-      if (!user) throw new Error('Authentication required');
+      if (!user) throw new Error("Authentication required");
 
       const application = await models.VisaApplication.findOne({
-        where: { id, user_id: user.id }
+        where: { id: applicationId, user_id: user.id },
+      });
+
+      if (!application) throw new Error("Application not found");
+
+      return await models.Document.findAll({
+        where: { application_id: applicationId },
+        order: [["uploaded_at", "DESC"]],
       });
     },
 
-    getVisaTypes: async () => {
-      return [
-        'E-visa',
-        'Business Visa',
-        'Tourist Visa',
-        'Work Permit',
-        'Residence Card',
-        'Student Visa'
-      ];
-    }
+    getNotifications: async (_, __, { token }) => {
+      const user = await getUserFromToken(token);
+      if (!user) throw new Error("Authentication required");
+
+      return await models.Notification.findAll({
+        where: { recipient: user.email },
+        order: [["created_at", "DESC"]],
+      });
+    },
+
+    getUnreadNotifications: async (_, __, { token }) => {
+      const user = await getUserFromToken(token);
+      if (!user) throw new Error("Authentication required");
+
+      return await models.Notification.findAll({
+        where: {
+          recipient: user.email,
+          read: false,
+        },
+        order: [["created_at", "DESC"]],
+      });
+    },
   },
 
   Mutation: {
-    register: async (_, { input }) => {
+    userRegister: async (_, { input }) => {
       const { email, password, name, phone } = input;
-
       const existingUser = await models.User.findOne({ where: { email } });
       if (existingUser) {
-        throw new Error('User already exists');
+        throw new Error("User already exists with this email");
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -78,10 +79,10 @@ const resolvers = {
         email,
         password: hashedPassword,
         name,
-        phone
+        phone,
       });
 
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: "30d" });
 
       return {
         token,
@@ -90,25 +91,24 @@ const resolvers = {
           email: user.email,
           name: user.name,
           phone: user.phone,
-          created_at: user.created_at
-        }
+          created_at: user.created_at,
+        },
       };
     },
 
-    login: async (_, { input }) => {
+    userLogin: async (_, { input }) => {
       const { email, password } = input;
 
       const user = await models.User.findOne({ where: { email } });
       if (!user) {
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
-
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
 
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: "30d" });
 
       return {
         token,
@@ -117,8 +117,8 @@ const resolvers = {
           email: user.email,
           name: user.name,
           phone: user.phone,
-          created_at: user.created_at
-        }
+          created_at: user.created_at,
+        },
       };
     },
 
@@ -127,15 +127,15 @@ const resolvers = {
 
       const admin = await models.Admin.findOne({ where: { email } });
       if (!admin) {
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
 
       const isValidPassword = await bcrypt.compare(password, admin.password);
       if (!isValidPassword) {
-        throw new Error('Invalid credentials');
+        throw new Error("Invalid credentials");
       }
 
-      const token = jwt.sign({ adminId: admin.id }, JWT_SECRET, { expiresIn: '7d' });
+      const token = jwt.sign({ adminId: admin.id, email: admin.email, role: admin.role }, JWT_SECRET, { expiresIn: "8h" });
 
       return {
         token,
@@ -145,109 +145,83 @@ const resolvers = {
           name: admin.name,
           role: admin.role,
           created_at: admin.created_at,
-          is_active: admin.is_active
-        }
+          is_active: admin.is_active,
+        },
       };
     },
 
-    createVisaApplication: async (_, { input }, { token }) => {
+    refreshToken: async (_, { refreshToken }) => {
+      try {
+        const decoded = jwt.verify(refreshToken, JWT_SECRET);
+        const newToken = jwt.sign({ userId: decoded.userId, email: decoded.email }, JWT_SECRET, { expiresIn: "30d" });
+
+        return {
+          token: newToken,
+          refreshToken: refreshToken,
+        };
+      } catch (error) {
+        throw new Error("Invalid refresh token");
+      }
+    },
+
+    createDocument: async (_, { input }, { token }) => {
       const user = await getUserFromToken(token);
-      if (!user) throw new Error('Authentication required');
+      if (!user) throw new Error("Authentication required");
 
-      // Generate application number
-      const count = await models.VisaApplication.count();
-      const applicationNumber = `VN-${new Date().getFullYear()}-${String(count + 1).padStart(3, '0')}`;
-
-      const application = await models.VisaApplication.create({
+      return await models.Document.create({
         ...input,
-        user_id: user.id,
-        application_number: applicationNumber,
-        status: 'PENDING_REVIEW'
+        status: "UPLOADED",
+        uploaded_at: new Date(),
       });
-
-      return application;
     },
 
-    updateApplicationStatus: async (_, { id, status }, { adminToken }) => {
+    updateDocumentStatus: async (_, { id, status, notes }, { adminToken }) => {
       const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error('Authentication required');
-
-      const application = await models.VisaApplication.findByPk(id);
-      if (!application) throw new Error('Application not found');
-
-      const previousStatus = application.status;
-      await application.update({ status });
-
-      // Create status history
-      await models.ApplicationStatusHistory.create({
-        application_id: id,
-        previous_status: previousStatus,
-        new_status: status,
-        changed_by: admin.id,
-        change_reason: 'Status updated by admin'
-      });
-
-      return application;
-    },
-
-    deleteDocument: async (_, { id }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error('Authentication required');
+      if (!admin) throw new Error("Authentication required");
 
       const document = await models.Document.findByPk(id);
-      if (!document) throw new Error('Document not found');
+      if (!document) throw new Error("Document not found");
 
-      await document.destroy();
-      return { success: true, message: 'Document deleted successfully' };
+      return await document.update({
+        status,
+        notes,
+        reviewed_at: new Date(),
+        reviewer: admin.name,
+      });
     },
 
-    updateConsultationStatus: async (_, { id, status }, { adminToken }) => {
+    createNotification: async (_, { input }, { adminToken }) => {
       const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error('Authentication required');
+      if (!admin) throw new Error("Authentication required");
 
-      const consultation = await models.Consultation.findByPk(id);
-      if (!consultation) throw new Error('Consultation not found');
-
-      await consultation.update({ status });
-      return consultation;
-    },
-  },
-
-  VisaApplication: {
-    applicant: async (visaApplication) => {
-      return await models.User.findByPk(visaApplication.user_id);
-    },
-    assignedAdmin: async (visaApplication) => {
-      return await models.Admin.findByPk(visaApplication.assigned_admin_id);
-    },
-    documents: async (visaApplication) => {
-      return await models.Document.findAll({
-        where: { application_id: visaApplication.id }
+      return await models.Notification.create({
+        ...input,
+        read: false,
+        created_at: new Date(),
       });
     },
-    consultations: async (visaApplication) => {
-      return await models.Consultation.findAll({
-        where: { application_id: visaApplication.id },
-        include: [
-          {
-            model: models.User,
-            as: 'applicant'
-          },
-          {
-            model: models.Admin,
-            as: 'assignedAdmin'
-          }
-        ]
+
+    markNotificationAsRead: async (_, { id }, { token }) => {
+      const user = await getUserFromToken(token);
+      if (!user) throw new Error("Authentication required");
+
+      const notification = await models.Notification.findOne({
+        where: { id, recipient: user.email },
       });
-    }
-  },
-  Consultation: {
-    applicant: async (consultation) => {
-      return await models.User.findByPk(consultation.user_id);
+
+      if (!notification) throw new Error("Notification not found");
+
+      return await notification.update({ read: true });
     },
-    assignedAdmin: async (consultation) => {
-      return await models.Admin.findByPk(consultation.admin_id);
-    }
+
+    markAllNotificationsAsRead: async (_, { userId }, { token }) => {
+      const user = await getUserFromToken(token);
+      if (!user) throw new Error("Authentication required");
+
+      await models.Notification.update({ read: true }, { where: { recipient: user.email, read: false } });
+
+      return { success: true, message: "All notifications marked as read" };
+    },
   },
 };
 
