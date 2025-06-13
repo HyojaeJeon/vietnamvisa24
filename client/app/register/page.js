@@ -94,18 +94,18 @@ export default function UserRegister() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 p-4">
-      <Card className="w-full max-w-md shadow-2xl border-0">
-        <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mb-4">
-            <UserPlus className="h-8 w-8 text-white" />
+    <div className="flex items-center justify-center min-h-screen p-4 bg-gradient-to-br from-green-50 to-emerald-100">
+      <Card className="w-full max-w-md border-0 shadow-2xl">
+        <CardHeader className="pb-2 text-center">
+          <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 bg-green-600 rounded-full">
+            <UserPlus className="w-8 h-8 text-white" />
           </div>
           <CardTitle className="text-2xl font-bold text-gray-800">회원가입</CardTitle>
-          <p className="text-gray-600 mt-2">새 계정을 만드세요</p>
+          <p className="mt-2 text-gray-600">새 계정을 만드세요</p>
         </CardHeader>
 
         <CardContent className="space-y-6">
-          {error && <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{error}</div>}
+          {error && <div className="px-4 py-3 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">{error}</div>}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -152,10 +152,10 @@ export default function UserRegister() {
                   value={formData.password}
                   onChange={(e) => handleInputChange("password", e.target.value)}
                   placeholder="비밀번호를 입력하세요"
-                  className="h-12 border-2 border-gray-200 focus:border-green-500 pr-12"
+                  className="h-12 pr-12 border-2 border-gray-200 focus:border-green-500"
                   required
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute text-gray-500 transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-700">
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
@@ -169,19 +169,19 @@ export default function UserRegister() {
                   value={formData.confirmPassword}
                   onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                   placeholder="비밀번호를 다시 입력하세요"
-                  className="h-12 border-2 border-gray-200 focus:border-green-500 pr-12"
+                  className="h-12 pr-12 border-2 border-gray-200 focus:border-green-500"
                   required
                 />
-                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700">
+                <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute text-gray-500 transform -translate-y-1/2 right-3 top-1/2 hover:text-gray-700">
                   {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
             </div>
 
-            <Button type="submit" disabled={loading} className="w-full h-12 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+            <Button type="submit" disabled={loading} className="w-full h-12 font-semibold text-white transition-colors bg-green-600 rounded-lg hover:bg-green-700">
               {loading ? (
                 <div className="flex items-center space-x-2">
-                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-white rounded-full border-t-transparent animate-spin"></div>
                   <span>가입 중...</span>
                 </div>
               ) : (
@@ -190,10 +190,10 @@ export default function UserRegister() {
             </Button>
           </form>
 
-          <div className="text-center pt-4 border-t border-gray-200">
+          <div className="pt-4 text-center border-t border-gray-200">
             <p className="text-sm text-gray-600">
               이미 계정이 있으신가요?{" "}
-              <button onClick={() => router.push("/login")} className="text-green-600 hover:text-green-700 font-semibold">
+              <button onClick={() => router.push("/login")} className="font-semibold text-green-600 hover:text-green-700">
                 로그인
               </button>
             </p>

@@ -1,5 +1,4 @@
-
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const GET_VISA_APPLICATION = gql`
   query GetVisaApplication($id: ID!) {
@@ -47,6 +46,17 @@ export const GET_VISA_APPLICATIONS = gql`
       priority
       created_at
       updated_at
+    }
+  }
+`;
+
+export const GET_APPLICATION_MEMOS = gql`
+  query GetApplicationMemos($applicationId: ID!) {
+    getApplicationMemos(applicationId: $applicationId) {
+      id
+      content
+      created_at
+      created_by
     }
   }
 `;

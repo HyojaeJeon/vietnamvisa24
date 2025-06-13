@@ -13,7 +13,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.js"
-  ],
+, "app/dashboard/pricing/PricingModal.js"  ],
   "exclude": [
     "node_modules"
   ]

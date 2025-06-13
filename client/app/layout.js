@@ -3,10 +3,16 @@ import Providers from "./providers";
 import TrackingScripts, { GoogleTagManagerNoScript } from "../components/analytics";
 import { BusinessStructuredData, WebsiteStructuredData } from "../components/seo/StructuredData";
 import WebVitals from "../components/performance/WebVitals";
-import PerformanceMonitor from "../components/performance/PerformanceMonitor";
 import ErrorBoundary from "../components/errors/ErrorBoundary";
 import { SkipLink } from "../components/accessibility/A11yComponents";
 import PropTypes from "prop-types";
+import dynamic from "next/dynamic";
+
+// Dynamic import for PerformanceMonitor to prevent hydration issues
+const PerformanceMonitor = dynamic(() => import("../components/performance/PerformanceMonitor"), {
+  ssr: false,
+  loading: () => null,
+});
 
 export const metadata = {
   title: {
@@ -108,6 +114,10 @@ export default function RootLayout({ children }) {
   const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
   const FACEBOOK_PIXEL_ID = process.env.NEXT_PUBLIC_FACEBOOK_PIXEL_ID;
 
+  // 테스트용 ID는 실제 로드하지 않음
+  const isValidGTM = GTM_ID && GTM_ID !== "GTM-VN24VISA" && !GTM_ID.includes("test");
+  const isValidGA = GA_MEASUREMENT_ID && GA_MEASUREMENT_ID !== "G-VN24VISA123" && !GA_MEASUREMENT_ID.includes("test");
+
   return (
     <html lang="ko">
       <head>
@@ -124,33 +134,32 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="베트남 비자 센터" />
-        <meta name="application-name" content="베트남 비자 센터" />
-        <meta name="msapplication-TileColor" content="#1e40af" />
+        <meta name="application-name" content="베트남 비자 센터" /> <meta name="msapplication-TileColor" content="#1e40af" />
         <meta name="msapplication-config" content="/browserconfig.xml" />
-
         {/* 파비콘 및 아이콘 */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.svg" />
         <link rel="manifest" href="/manifest.json" />
-
         {/* 프리로드 중요 리소스 */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-
-        {/* Analytics 스크립트 프리로드 (조건부) - 실제 사용되는 것만 */}
-        {GTM_ID && <link rel="preload" as="script" href={`https://www.googletagmanager.com/gtag/js?id=${GTM_ID}`} />}
-        {GA_MEASUREMENT_ID && <link rel="preload" as="script" href={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} />}
-
-        {/* DNS 프리페치 */}
-        <link rel="dns-prefetch" href="//www.google-analytics.com" />
-        <link rel="dns-prefetch" href="//www.googletagmanager.com" />
-        {FACEBOOK_PIXEL_ID && <link rel="dns-prefetch" href="//connect.facebook.net" />}
+        {/* Analytics 스크립트 프리로드 - 실제 사용되는 것만 조건부로 */}
+        {isValidGTM && <link rel="preload" as="script" href={`https://www.googletagmanager.com/gtag/js?id=${GTM_ID}`} />}
+        {isValidGA && <link rel="preload" as="script" href={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`} />}
+        {/* DNS 프리페치 - Analytics가 실제로 활성화된 경우에만 */}
+        {(isValidGTM || isValidGA) && (
+          <>
+            <link rel="dns-prefetch" href="//www.google-analytics.com" />
+            <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+          </>
+        )}{" "}
+        {FACEBOOK_PIXEL_ID && FACEBOOK_PIXEL_ID !== "test" && <link rel="dns-prefetch" href="//connect.facebook.net" />}
       </head>
       <body className="antialiased">
         {/* 접근성 스킵 링크 */}
         <SkipLink />
         {/* Google Tag Manager NoScript */}
-        {GTM_ID && <GoogleTagManagerNoScript GTM_ID={GTM_ID} />}
+        {isValidGTM && <GoogleTagManagerNoScript GTM_ID={GTM_ID} />}
         {/* 성능 모니터링 */}
         <WebVitals />
         <PerformanceMonitor />

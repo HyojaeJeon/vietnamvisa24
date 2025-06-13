@@ -9,7 +9,7 @@ export default function PricingPage() {
     <ProtectedRoute requiredRole="ADMIN">
       <div className="min-h-screen bg-gray-50">
         <div className="bg-white shadow">
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="px-4 py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">가격표 관리</h1>
@@ -19,7 +19,7 @@ export default function PricingPage() {
           </div>
         </div>
 
-        <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <main className="py-6 mx-auto max-w-7xl sm:px-6 lg:px-8">
           <PricingManagement />
         </main>
       </div>

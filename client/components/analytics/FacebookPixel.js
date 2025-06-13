@@ -19,8 +19,17 @@ export default function FacebookPixel({ PIXEL_ID }) {
             t.src=v;s=b.getElementsByTagName(e)[0];
             s.parentNode.insertBefore(t,s)}(window, document,'script',
             'https://connect.facebook.net/en_US/fbevents.js');
-            fbq('init', '${PIXEL_ID}');
+            
+            // Standard events only to reduce warnings
+            fbq('init', '${PIXEL_ID}', {
+              'em': 'external_id'
+            });
             fbq('track', 'PageView');
+            
+            // Optional: Advanced Matching for better tracking
+            // fbq('init', '${PIXEL_ID}', {}, {
+            //   "agent": "plnextjs"
+            // });
           `,
         }}
       />

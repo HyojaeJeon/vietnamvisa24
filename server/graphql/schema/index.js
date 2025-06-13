@@ -15,7 +15,13 @@ const workflowSchema = require("./workflow");
 const pricingSchema = require("./pricing");
 
 // Import additional schemas if they exist
-let documentsSchema, notificationsSchema, consultationsSchema, reportsSchema;
+let applicationsSchema, documentsSchema, notificationsSchema, consultationsSchema, reportsSchema;
+
+try {
+  applicationsSchema = require("./applications");
+} catch (e) {
+  applicationsSchema = null;
+}
 
 try {
   documentsSchema = require("./documents");
@@ -46,6 +52,7 @@ try {
 // ====================
 const schemas = [types, authSchema, adminSchema, paymentSchema, workflowSchema, pricingSchema];
 
+if (applicationsSchema) schemas.push(applicationsSchema);
 if (documentsSchema) schemas.push(documentsSchema);
 if (notificationsSchema) schemas.push(notificationsSchema);
 if (consultationsSchema) schemas.push(consultationsSchema);

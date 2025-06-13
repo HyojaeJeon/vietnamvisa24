@@ -2,7 +2,8 @@
   "name": "vietnam-visa-client",
   "version": "1.0.0",
   "description": "Vietnam Visa Service Frontend Client",
-  "private": true,  "scripts": {
+  "private": true,
+  "scripts": {
     "dev": "next dev -p 3002",
     "build": "next build",
     "start": "next start -p 3002",

@@ -136,13 +136,14 @@ const typeDefs = gql`
     MANAGER
     STAFF
   }
-
   enum ApplicationStatus {
     PENDING
     PROCESSING
+    DOCUMENT_REVIEW
+    SUBMITTED_TO_AUTHORITY
     APPROVED
     REJECTED
-    CONSULTATION
+    COMPLETED
   }
 
   enum DocumentStatus {

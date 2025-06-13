@@ -14,22 +14,26 @@ export default function TrackingScripts() {
   const NAVER_ANALYTICS_ID = process.env.NEXT_PUBLIC_NAVER_ANALYTICS_ID;
   const KAKAO_PIXEL_ID = process.env.NEXT_PUBLIC_KAKAO_PIXEL_ID;
 
+  // 테스트용 ID는 실제 로드하지 않음
+  const isValidGTM = GTM_ID && GTM_ID !== "GTM-VN24VISA" && !GTM_ID.includes("test");
+  const isValidGA = GA_MEASUREMENT_ID && GA_MEASUREMENT_ID !== "G-VN24VISA123" && !GA_MEASUREMENT_ID.includes("test");
+
   return (
     <>
-      {/* Google Tag Manager */}
-      {GTM_ID && <GoogleTagManager GTM_ID={GTM_ID} />}
+      {/* Google Tag Manager - 실제 프로덕션 ID만 */}
+      {isValidGTM && <GoogleTagManager GTM_ID={GTM_ID} />}
 
-      {/* Google Analytics */}
-      {GA_MEASUREMENT_ID && <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />}
+      {/* Google Analytics - 실제 프로덕션 ID만 */}
+      {isValidGA && <GoogleAnalytics GA_MEASUREMENT_ID={GA_MEASUREMENT_ID} />}
 
       {/* Facebook Pixel */}
-      {FACEBOOK_PIXEL_ID && <FacebookPixel PIXEL_ID={FACEBOOK_PIXEL_ID} />}
+      {FACEBOOK_PIXEL_ID && FACEBOOK_PIXEL_ID !== "test" && <FacebookPixel PIXEL_ID={FACEBOOK_PIXEL_ID} />}
 
       {/* Naver Analytics */}
-      {NAVER_ANALYTICS_ID && <NaverAnalytics ANALYTICS_ID={NAVER_ANALYTICS_ID} />}
+      {NAVER_ANALYTICS_ID && NAVER_ANALYTICS_ID !== "test" && <NaverAnalytics ANALYTICS_ID={NAVER_ANALYTICS_ID} />}
 
       {/* Kakao Pixel */}
-      {KAKAO_PIXEL_ID && <KakaoPixel PIXEL_ID={KAKAO_PIXEL_ID} />}
+      {KAKAO_PIXEL_ID && KAKAO_PIXEL_ID !== "test" && <KakaoPixel PIXEL_ID={KAKAO_PIXEL_ID} />}
     </>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, gql } from "@apollo/client";
 
 // 실제 서버 스키마에 맞는 테스트 쿼리
@@ -44,7 +44,13 @@ const CREATE_APPLICATION = gql`
 `;
 
 const GraphQLTest = () => {
+  const [mounted, setMounted] = useState(false);
   const [testResult, setTestResult] = useState("");
+
+  // Check if component is mounted (client-side)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const { data, loading, error, refetch } = useQuery(GET_APPLICATIONS, {
     errorPolicy: "all",
