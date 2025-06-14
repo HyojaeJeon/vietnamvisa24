@@ -119,7 +119,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
                 <div
                   key={service.value}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                    data.serviceType === service.value
+                    data?.serviceType === service.value
                       ? "border-blue-500 bg-blue-50 shadow-lg transform scale-105"
                       : "border-gray-200 hover:border-blue-300 hover:shadow-md"
                   }`}
@@ -164,7 +164,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
                 <div
                   key={visa.value}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 relative ${
-                    data.visaType === visa.value
+                    data?.visaType === visa.value
                       ? "border-green-500 bg-green-50 shadow-lg"
                       : "border-gray-200 hover:border-green-300 hover:shadow-md"
                   }`}
@@ -220,7 +220,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
                 <div
                   key={processing.value}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                    data.processing === processing.value
+                    data?.processing === processing.value
                       ? `border-${processing.color}-500 bg-${processing.color}-50 shadow-lg`
                       : "border-gray-200 hover:border-gray-300 hover:shadow-md"
                   }`}
@@ -269,7 +269,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
           <div className="flex justify-end mt-8">
             <Button
               onClick={onNext}
-              disabled={!data.serviceType || !data.visaType || !data.processing}
+              disabled={!data?.serviceType || !data?.visaType || !data?.processing}
               className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="mr-2">
@@ -409,11 +409,11 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
             <Button
               onClick={onNext}
               disabled={
-                !data.fullName ||
-                !data.gender ||
-                !data.birth ||
-                !data.nationality ||
-                !data.email
+                !data?.fullName ||
+                !data?.gender ||
+                !data?.birth ||
+                !data?.nationality ||
+                !data?.email
               }
               className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -1274,14 +1274,33 @@ function Step7Submit({ data, onSubmit, onPrev, language, isSubmitting }) {
 
 function ProgressBar({ step, steps, language }) {
   return (
-    <div className="mb-12">
-      <div className="flex items-center justify-center">
-        <div className="flex items-center space-x-4">
-          {steps.map((key, idx) => (
-            <React.Fragment key={key}>
+    <div className="mb-8 md:mb-12">
+      {/* Mobile Progress Bar */}
+      <div className="block md:hidden">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-sm font-medium text-gray-600">
+            단계 {step + 1} / {steps.length}
+          </span>
+          <span className="text-sm font-medium text-blue-600">
+            {steps[step]}
+          </span>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div 
+            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500"
+            style={{ width: `${((step + 1) / steps.length) * 100}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* Desktop Progress Bar */}
+      <div className="hidden md:flex items-center justify-center">
+        <div className="flex items-center space-x-2 lg:space-x-4">
+          {steps.map((stepTitle, idx) => (
+            <React.Fragment key={idx}>
               <div className="flex items-center">
                 <div
-                  className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-sm transition-all duration-500 ${
+                  className={`flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-full font-bold text-xs lg:text-sm transition-all duration-500 ${
                     idx < step
                       ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg"
                       : idx === step
@@ -1290,24 +1309,24 @@ function ProgressBar({ step, steps, language }) {
                   }`}
                 >
                   {idx < step ? (
-                    <CheckCircle className="w-6 h-6" />
+                    <CheckCircle className="w-4 h-4 lg:w-6 lg:h-6" />
                   ) : (
                     <span>{idx + 1}</span>
                   )}
                 </div>
-                <div className="ml-3 hidden sm:block">
+                <div className="ml-2 lg:ml-3 hidden lg:block">
                   <div
-                    className={`font-semibold text-sm ${
+                    className={`font-semibold text-xs lg:text-sm ${
                       idx <= step ? "text-gray-800" : "text-gray-400"
                     }`}
                   >
-                    {t(key, language)}
+                    {stepTitle}
                   </div>
                 </div>
               </div>
               {idx < steps.length - 1 && (
                 <div
-                  className={`w-16 h-1 rounded-full transition-all duration-500 ${
+                  className={`w-8 lg:w-16 h-1 rounded-full transition-all duration-500 ${
                     idx < step
                       ? "bg-gradient-to-r from-green-500 to-emerald-600"
                       : "bg-gray-200"
@@ -1347,13 +1366,13 @@ export default function ApplyVisaWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const steps = [
-    "apply.step1.title",
-    "apply.step2.title", 
-    "apply.step3.title",
-    "apply.step4.title",
-    "apply.step5.title",
-    "apply.step6.title",
-    "apply.step7.title",
+    "서비스 선택",
+    "신청자 정보", 
+    "서류 업로드",
+    "추가 서비스",
+    "최종 확인",
+    "결제",
+    "신청서 전송",
   ];
 
   useEffect(() => {
@@ -1451,7 +1470,7 @@ export default function ApplyVisaWizard() {
       console.log("Submitting application:", applicationData);
 
       // GraphQL mutation 호출 (임시로 fetch 사용)
-      const response = await fetch('/graphql', {
+      const response = await fetch('http://localhost:5000/graphql', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

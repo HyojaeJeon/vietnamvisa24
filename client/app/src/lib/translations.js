@@ -231,6 +231,28 @@ export const translations = {
         birth: "생년월일",
         nationality: "국적",
         email: "이메일",
+        phone: "연락처",
+      },
+      step3: {
+        title: "서류 업로드",
+      },
+      step4: {
+        title: "추가 서비스",
+      },
+      step5: {
+        title: "최종 확인",
+      },
+      step6: {
+        title: "결제",
+      },
+      step7: {
+        title: "신청서 전송",
+      },
+      next: "다음",
+      prev: "이전",
+      priceSummary: "예상 결제 금액",",
+        nationality: "국적",
+        email: "이메일",
         phone: "베트남 내 연락처",
       },
       step3: {
