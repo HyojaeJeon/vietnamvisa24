@@ -4,6 +4,7 @@ import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import { combineReducers } from "@reduxjs/toolkit";
 import authReducer from "./authSlice";
 import languageReducer from "./languageSlice";
+import applyFormReducer from "./applyFormSlice";
 
 // SSR 환경에서도 동작하는 NoopStorage 생성
 const createNoopStorage = () => {
@@ -26,12 +27,13 @@ const storage = typeof window !== "undefined" ? createWebStorage("local") : crea
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "language"], // auth와 language 상태만 persist
+  whitelist: ["auth", "language", "applyForm"], // auth, language, applyForm 상태만 persist
 };
 
 const rootReducer = combineReducers({
   auth: authReducer,
   language: languageReducer,
+  applyForm: applyFormReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
