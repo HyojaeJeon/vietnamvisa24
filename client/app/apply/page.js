@@ -299,6 +299,253 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
   );
 }
 
+function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applicationId }) {
+  const [uploadedDocuments, setUploadedDocuments] = useState(data.documents || []);
+  const [uploadingFiles, setUploadingFiles] = useState({});
+
+  const documentRequirements = [
+    {
+      type: 'passport',
+      title: '여권 사본',
+      description: '정보가 있는 면 전체가 빛 번짐 없이 선명하게 보여야 합니다',
+      required: true,
+      icon: <FileText className="w-6 h-6" />,
+      guidelines: [
+        '여권 정보면 전체가 한 장에 나와야 합니다',
+        '글자가 선명하고 읽기 쉬워야 합니다',
+        '빛 번짐이나 그림자가 없어야 합니다',
+        '여권 모서리가 모두 보여야 합니다'
+      ]
+    },
+    {
+      type: 'photo',
+      title: '증명사진',
+      description: '흰색 배경, 안경/모자 착용 금지 등의 규격을 준수해야 합니다',
+      required: true,
+      icon: <User className="w-6 h-6" />,
+      guidelines: [
+        '흰색 배경 (다른 색상 불가)',
+        '안경, 모자, 액세서리 착용 금지',
+        '정면을 향한 자연스러운 표정',
+        '크기: 4cm × 6cm (최근 6개월 이내)',
+        '고해상도 (최소 300dpi)'
+      ]
+    }
+  ];
+
+  const handleFileUpload = async (documentType, file) => {
+    if (!applicationId) {
+      alert('신청서를 먼저 생성해주세요.');
+      return;
+    }
+
+    setUploadingFiles(prev => ({ ...prev, [documentType]: true }));
+
+    try {
+      const formData = new FormData();
+      formData.append('document', file);
+      formData.append('document_type', documentType);
+      formData.append('application_id', applicationId);
+
+      const response = await fetch('/api/documents/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const newDocument = result.document;
+        setUploadedDocuments(prev => {
+          const filtered = prev.filter(doc => doc.document_type !== documentType);
+          return [...filtered, newDocument];
+        });
+        
+        onChange({
+          target: {
+            name: 'documents',
+            value: [...uploadedDocuments.filter(doc => doc.document_type !== documentType), newDocument]
+          }
+        });
+      } else {
+        throw new Error(result.message || '업로드 실패');
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      alert(`업로드 오류: ${error.message}`);
+    } finally {
+      setUploadingFiles(prev => ({ ...prev, [documentType]: false }));
+    }
+  };
+
+  const handleFileDrop = (documentType, e) => {
+    e.preventDefault();
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      handleFileUpload(documentType, files[0]);
+    }
+  };
+
+  const handleFileSelect = (documentType, e) => {
+    const file = e.target.files[0];
+    if (file) {
+      handleFileUpload(documentType, file);
+    }
+  };
+
+  const isDocumentUploaded = (documentType) => {
+    return uploadedDocuments.some(doc => doc.document_type === documentType);
+  };
+
+  const getUploadedDocument = (documentType) => {
+    return uploadedDocuments.find(doc => doc.document_type === documentType);
+  };
+
+  const requiredDocumentsUploaded = documentRequirements
+    .filter(req => req.required)
+    .every(req => isDocumentUploaded(req.type));
+
+  return (
+    <div className="space-y-8">
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-purple-50/30 backdrop-blur-sm">
+        <CardHeader className="pb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+              <FileText className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                {t("apply.step3.title", language) || "서류 업로드"}
+              </CardTitle>
+              <p className="text-gray-600 mt-1">필수 서류를 업로드해주세요</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-8">
+          {documentRequirements.map((requirement) => {
+            const isUploaded = isDocumentUploaded(requirement.type);
+            const uploadedDoc = getUploadedDocument(requirement.type);
+            const isUploading = uploadingFiles[requirement.type];
+
+            return (
+              <div key={requirement.type} className="space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`p-2 rounded-lg ${isUploaded ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}`}>
+                    {requirement.icon}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-semibold text-gray-900">{requirement.title}</h3>
+                      {requirement.required && <span className="text-red-500 text-sm">*필수</span>}
+                      {isUploaded && <CheckCircle className="w-5 h-5 text-green-500" />}
+                    </div>
+                    <p className="text-sm text-gray-600 mt-1">{requirement.description}</p>
+                  </div>
+                </div>
+
+                {/* 가이드라인 */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <h4 className="font-semibold text-blue-800 mb-2">📋 업로드 가이드라인</h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    {requirement.guidelines.map((guideline, index) => (
+                      <li key={index} className="flex items-start gap-2">
+                        <span className="text-blue-500 mt-1">•</span>
+                        <span>{guideline}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* 업로드 영역 */}
+                {!isUploaded ? (
+                  <div
+                    className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer transition-all duration-300 hover:border-purple-400 hover:bg-purple-50"
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => handleFileDrop(requirement.type, e)}
+                    onClick={() => document.getElementById(`file-${requirement.type}`).click()}
+                  >
+                    {isUploading ? (
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+                        <p className="text-purple-600 font-medium">업로드 중...</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-3">
+                        <Upload className="w-12 h-12 text-gray-400" />
+                        <div>
+                          <p className="text-lg font-medium text-gray-700 mb-1">
+                            파일을 드래그하거나 클릭하여 업로드
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            JPG, PNG, PDF 파일 (최대 10MB)
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                    <input
+                      id={`file-${requirement.type}`}
+                      type="file"
+                      accept="image/*,.pdf"
+                      className="hidden"
+                      onChange={(e) => handleFileSelect(requirement.type, e)}
+                    />
+                  </div>
+                ) : (
+                  <div className="border-2 border-green-300 bg-green-50 rounded-xl p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <CheckCircle className="w-8 h-8 text-green-600" />
+                        <div>
+                          <p className="font-semibold text-green-800">{uploadedDoc.document_name}</p>
+                          <p className="text-sm text-green-600">업로드 완료</p>
+                        </div>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => document.getElementById(`file-${requirement.type}`).click()}
+                        className="border-green-300 text-green-700 hover:bg-green-100"
+                      >
+                        다시 업로드
+                      </Button>
+                    </div>
+                    <input
+                      id={`file-${requirement.type}`}
+                      type="file"
+                      accept="image/*,.pdf"
+                      className="hidden"
+                      onChange={(e) => handleFileSelect(requirement.type, e)}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
+
+          <div className="flex justify-between mt-8">
+            <Button 
+              variant="outline" 
+              onClick={onPrev}
+              className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold transition-all duration-300"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              {t("apply.prev", language) || "이전"}
+            </Button>
+            <Button 
+              onClick={onNext} 
+              disabled={!requiredDocumentsUploaded || Object.values(uploadingFiles).some(Boolean)}
+              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="mr-2">{t("apply.next", language) || "다음"}</span>
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 function ProgressBar({ step, steps, language }) {
   return (
     <div className="mb-12">
@@ -349,9 +596,11 @@ export default function ApplyVisaWizard() {
   const [form, setForm] = useState({
     step1: {},
     step2: {},
-    // step3~6은 이후 추가
+    step3: {},
+    // step4~6은 이후 추가
   });
   const [price, setPrice] = useState(0);
+  const [applicationId, setApplicationId] = useState(null);
   const steps = ["apply.step1.title", "apply.step2.title", "apply.step3.title", "apply.step4.title", "apply.step5.title", "apply.step6.title"];
 
   useEffect(() => {
@@ -393,6 +642,30 @@ export default function ApplyVisaWizard() {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, step2: { ...prev.step2, [name]: value } }));
   };
+  const handleStep3Change = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, step3: { ...prev.step3, [name]: value } }));
+  };
+
+  // 신청서 생성 및 다음 단계로 이동
+  const createApplicationAndNext = async () => {
+    try {
+      // 임시 신청서 생성 (실제로는 GraphQL mutation 사용)
+      const tempApplicationId = `temp_${Date.now()}`;
+      setApplicationId(tempApplicationId);
+      
+      // 실제 구현시에는 여기서 GraphQL CREATE_APPLICATION mutation을 호출
+      console.log('Creating application with data:', {
+        ...form.step1,
+        ...form.step2
+      });
+      
+      next();
+    } catch (error) {
+      console.error('Application creation failed:', error);
+      alert('신청서 생성에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
 
   // 단계 이동
   const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
@@ -430,8 +703,9 @@ export default function ApplyVisaWizard() {
           
           <div className="relative">
             {step === 0 && <Step1ServiceSelection data={form.step1} onChange={handleStep1Change} price={price} onNext={next} language={currentLanguage} />}
-            {step === 1 && <Step2ApplicantInfo data={form.step2} onChange={handleStep2Change} onNext={next} onPrev={prev} language={currentLanguage} />}
-            {/* 3~6단계는 이후 구현 */}
+            {step === 1 && <Step2ApplicantInfo data={form.step2} onChange={handleStep2Change} onNext={createApplicationAndNext} onPrev={prev} language={currentLanguage} />}
+            {step === 2 && <Step3DocumentUpload data={form.step3} onChange={handleStep3Change} onNext={next} onPrev={prev} language={currentLanguage} applicationId={applicationId} />}
+            {/* 4~6단계는 이후 구현 */}
           </div>
         </div>
       </div>

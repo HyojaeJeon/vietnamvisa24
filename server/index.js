@@ -11,8 +11,8 @@ const { connectDB } = require("./database");
 const { initializeSocket } = require("./utils/socketManager");
 
 // API 라우터 임포트
-const documentsRouter = require("./routes/documents");
-const webhooksRouter = require("./routes/webhooks");
+const webhooksRouter = require('./routes/webhooks');
+const documentsRouter = require('./routes/documents');
 
 async function startServer() {
   // 1) DB 연결

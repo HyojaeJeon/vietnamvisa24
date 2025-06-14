@@ -5,71 +5,97 @@ const { uploadSingle, uploadMultiple, handleUploadError, downloadFile, deleteFil
 const path = require("path");
 const fs = require("fs");
 const archiver = require("archiver");
+const multer = require('multer');
 
-// 문서 업로드 - 단일 파일
-router.post("/upload", uploadSingle, async (req, res) => {
+// 업로드 디렉토리 생성
+const uploadsDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Multer 설정
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadsDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB
+  },
+  fileFilter: function (req, file, cb) {
+    const allowedTypes = /jpeg|jpg|png|pdf|doc|docx/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('지원되지 않는 파일 형식입니다.'));
+    }
+  }
+});
+
+// 단일 파일 업로드
+router.post('/upload', upload.single('document'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "파일이 업로드되지 않았습니다.",
+        message: '파일이 업로드되지 않았습니다.'
       });
     }
 
-    const { application_id, document_type, notes } = req.body;
+    const { application_id, document_type } = req.body;
 
     if (!application_id || !document_type) {
       return res.status(400).json({
         success: false,
-        message: "신청 ID와 문서 타입이 필요합니다.",
+        message: '필수 정보가 누락되었습니다.'
       });
     }
 
-    // 비자 신청이 존재하는지 확인
-    const application = await models.VisaApplication.findByPk(application_id);
-    if (!application) {
-      // 업로드된 파일 삭제
-      deleteFile(req.file.path);
-      return res.status(404).json({
-        success: false,
-        message: "비자 신청을 찾을 수 없습니다.",
-      });
-    }
-
-    // 문서 정보를 데이터베이스에 저장
+    // 파일 정보로 문서 레코드 생성
     const document = await models.Document.create({
-      application_id: parseInt(application_id),
-      document_type,
+      application_id: application_id,
+      document_type: document_type,
       document_name: req.file.originalname,
       file_path: req.file.path,
       file_size: req.file.size,
-      status: "pending",
-      notes: notes || null,
+      status: 'pending'
     });
 
     res.json({
       success: true,
-      message: "파일이 성공적으로 업로드되었습니다.",
+      message: '파일이 성공적으로 업로드되었습니다.',
       document: {
         id: document.id,
-        document_name: document.document_name,
         document_type: document.document_type,
+        document_name: document.document_name,
         file_size: document.file_size,
         status: document.status,
-        uploaded_at: document.created_at,
-      },
+        uploaded_at: document.created_at
+      }
     });
+
   } catch (error) {
-    console.error("문서 업로드 오류:", error);
+    console.error('File upload error:', error);
 
     // 업로드된 파일이 있다면 삭제
-    if (req.file) {
-      deleteFile(req.file.path);
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
     }
 
     res.status(500).json({
       success: false,
-      message: "문서 업로드 중 오류가 발생했습니다.",
+      message: '파일 업로드 중 오류가 발생했습니다.',
+      error: error.message
     });
   }
 });
