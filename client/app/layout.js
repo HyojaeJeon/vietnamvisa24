@@ -324,8 +324,6 @@ export const viewport = {
   ],
 };
 
-import { ToastProvider } from "./src/hooks/useToast";
-import { Toaster } from "./src/components/ui/toaster";
 import StoreProvider from "./storeProvider";
 import ApolloProvider from "./apolloProvider";
 
@@ -345,14 +343,11 @@ export default function RootLayout({ children }) {
 
         <StoreProvider>
           <ApolloProvider>
-            <ToastProvider>
-              <Providers>
-                <ErrorBoundary>
-                  <NoSSR>{children}</NoSSR>
-                </ErrorBoundary>
-              </Providers>
-              <Toaster />
-            </ToastProvider>
+            <Providers>
+              <ErrorBoundary>
+                <NoSSR>{children}</NoSSR>
+              </ErrorBoundary>
+            </Providers>
           </ApolloProvider>
         </StoreProvider>
 

@@ -1,27 +1,16 @@
-
 "use client";
-
-import { ApolloProvider } from "@apollo/client";
-import apolloClient from "./src/lib/apolloClient";
-import StoreProvider from "./storeProvider";
-import { Toaster } from "react-hot-toast";
+import { Provider } from "react-redux";
+import store from "../store";
+import { ToastProvider } from "./src/hooks/useToast";
+import { Toaster } from "./src/components/ui/toaster";
 
 export default function Providers({ children }) {
   return (
-    <StoreProvider>
-      <ApolloProvider client={apolloClient}>
+    <Provider store={store}>
+      <ToastProvider>
         {children}
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-          }}
-        />
-      </ApolloProvider>
-    </StoreProvider>
+        <Toaster />
+      </ToastProvider>
+    </Provider>
   );
 }
