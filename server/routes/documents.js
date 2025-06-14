@@ -36,9 +36,28 @@ router.post('/upload', uploadSingle, async (req, res) => {
       });
     }
 
+    // 임시 application_id인 경우 비자 신청을 먼저 생성
+    let actualApplicationId = application_id;
+    if (application_id.startsWith('temp_')) {
+      const visaApplication = await models.VisaApplication.create({
+        application_number: `APP-${Date.now()}`,
+        visa_type: 'tourist',
+        full_name: '임시 신청자',
+        passport_number: 'TEMP',
+        nationality: 'KR',
+        birth_date: '1990-01-01',
+        phone: '010-0000-0000',
+        email: 'temp@example.com',
+        arrival_date: new Date(),
+        departure_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30일 후
+        status: 'pending'
+      });
+      actualApplicationId = visaApplication.id;
+    }
+
     // 파일 정보로 문서 레코드 생성
     const document = await models.Document.create({
-      application_id: application_id,
+      application_id: actualApplicationId,
       document_type: document_type,
       document_name: req.file.originalname,
       file_path: req.file.path,
