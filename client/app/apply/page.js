@@ -151,6 +151,11 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
     });
   };
 
+  // 선택된 값들을 안전하게 가져오기
+  const selectedServiceType = data?.serviceType || "";
+  const selectedVisaType = data?.visaType || "";
+  const selectedProcessing = data?.processing || "";
+
   return (
     <div className="space-y-8">
       <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-blue-50/30 backdrop-blur-sm">
@@ -199,7 +204,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
                 <div
                   key={service.value}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                    data?.serviceType === service.value
+                    selectedServiceType === service.value
                       ? "border-blue-500 bg-blue-50 shadow-lg transform scale-105"
                       : "border-gray-200 hover:border-blue-300 hover:shadow-md"
                   }`}
@@ -244,7 +249,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
                 <div
                   key={visa.value}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 relative ${
-                    data?.visaType === visa.value
+                    selectedVisaType === visa.value
                       ? "border-green-500 bg-green-50 shadow-lg"
                       : "border-gray-200 hover:border-green-300 hover:shadow-md"
                   }`}
@@ -300,7 +305,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
                 <div
                   key={processing.value}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                    data?.processing === processing.value
+                    selectedProcessing === processing.value
                       ? `border-${processing.color}-500 bg-${processing.color}-50 shadow-lg`
                       : "border-gray-200 hover:border-gray-300 hover:shadow-md"
                   }`}
@@ -351,7 +356,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
           <div className="flex justify-end mt-8">
             <Button
               onClick={onNext}
-              disabled={!data?.serviceType || !data?.visaType || !data?.processing}
+              disabled={!selectedServiceType || !selectedVisaType || !selectedProcessing}
               className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="mr-2">
