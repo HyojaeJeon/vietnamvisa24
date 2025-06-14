@@ -70,10 +70,16 @@ function t(key, language) {
 }
 
 // Custom Select Component
-function CustomSelect({ value, onValueChange, placeholder, options, className = "" }) {
+function CustomSelect({
+  value,
+  onValueChange,
+  placeholder,
+  options,
+  className = "",
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(
-    options.find(opt => opt.value === value) || null
+    options.find((opt) => opt.value === value) || null,
   );
 
   const handleSelect = (option) => {
@@ -92,13 +98,25 @@ function CustomSelect({ value, onValueChange, placeholder, options, className = 
         <span className={selectedOption ? "text-gray-800" : "text-gray-500"}>
           {selectedOption ? selectedOption.label : placeholder}
         </span>
-        <div className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
-          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        <div
+          className={`transform transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+        >
+          <svg
+            className="w-5 h-5 text-gray-400"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         </div>
       </button>
-      
+
       {isOpen && (
         <div className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
           {options.map((option) => (
@@ -118,7 +136,7 @@ function CustomSelect({ value, onValueChange, placeholder, options, className = 
   );
 }
 
-// 단계별 컴포넌트 (1~2단계만 우선 구현)
+// 1단계: 단계별 컴포넌트 (1~2단계만 우선 구현)
 function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
   // 성별 옵션
   const genderOptions = [
@@ -204,7 +222,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
                 <div
                   key={service.value}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                    selectedServiceType === service.value
+                    selectedServiceType == service.value
                       ? "border-blue-500 bg-blue-50 shadow-lg transform scale-105"
                       : "border-gray-200 hover:border-blue-300 hover:shadow-md"
                   }`}
@@ -333,8 +351,6 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
             </div>
           </div>
 
-          
-
           {/* 실시간 가격 요약 */}
           <div className="sticky bottom-0 mt-8 p-6 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-2xl">
             <div className="flex items-center justify-between text-white">
@@ -356,7 +372,9 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
           <div className="flex justify-end mt-8">
             <Button
               onClick={onNext}
-              disabled={!selectedServiceType || !selectedVisaType || !selectedProcessing}
+              disabled={
+                !selectedServiceType || !selectedVisaType || !selectedProcessing
+              }
               className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="mr-2">
@@ -445,7 +463,9 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
               </label>
               <CustomSelect
                 value={data.gender || ""}
-                onValueChange={(value) => handleCustomSelectChange("gender", value)}
+                onValueChange={(value) =>
+                  handleCustomSelectChange("gender", value)
+                }
                 placeholder="성별을 선택해주세요"
                 options={genderOptions}
               />
@@ -472,7 +492,9 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
               </label>
               <CustomSelect
                 value={data.nationality || ""}
-                onValueChange={(value) => handleCustomSelectChange("nationality", value)}
+                onValueChange={(value) =>
+                  handleCustomSelectChange("nationality", value)
+                }
                 placeholder="국적을 선택해주세요"
                 options={countryOptions}
               />
@@ -883,7 +905,14 @@ function Step3DocumentUpload({
 }
 
 // 4단계: 추가 서비스 선택
-function Step4AdditionalServices({ data, onChange, onNext, onPrev, language, price }) {
+function Step4AdditionalServices({
+  data,
+  onChange,
+  onNext,
+  onPrev,
+  language,
+  price,
+}) {
   const additionalServices = [
     {
       id: "airport_pickup",
@@ -924,7 +953,7 @@ function Step4AdditionalServices({ data, onChange, onNext, onPrev, language, pri
     const isSelected = currentServices.includes(serviceId);
 
     const newServices = isSelected
-      ? currentServices.filter(id => id !== serviceId)
+      ? currentServices.filter((id) => id !== serviceId)
       : [...currentServices, serviceId];
 
     onChange({
@@ -935,7 +964,7 @@ function Step4AdditionalServices({ data, onChange, onNext, onPrev, language, pri
   const calculateAdditionalPrice = () => {
     const selectedServices = data.selectedServices || [];
     return additionalServices
-      .filter(service => selectedServices.includes(service.id))
+      .filter((service) => selectedServices.includes(service.id))
       .reduce((total, service) => total + service.price, 0);
   };
 
@@ -951,14 +980,18 @@ function Step4AdditionalServices({ data, onChange, onNext, onPrev, language, pri
               <CardTitle className="text-2xl bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
                 추가 서비스 선택
               </CardTitle>
-              <p className="text-gray-600 mt-1">필요한 서비스를 선택해주세요 (선택사항)</p>
+              <p className="text-gray-600 mt-1">
+                필요한 서비스를 선택해주세요 (선택사항)
+              </p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {additionalServices.map((service) => {
-              const isSelected = (data.selectedServices || []).includes(service.id);
+              const isSelected = (data.selectedServices || []).includes(
+                service.id,
+              );
               return (
                 <div
                   key={service.id}
@@ -975,19 +1008,25 @@ function Step4AdditionalServices({ data, onChange, onNext, onPrev, language, pri
                     </div>
                   )}
                   <div className="flex items-start gap-3">
-                    <div className={`p-2 rounded-lg ${isSelected ? "bg-orange-100 text-orange-600" : "bg-gray-100 text-gray-600"}`}>
+                    <div
+                      className={`p-2 rounded-lg ${isSelected ? "bg-orange-100 text-orange-600" : "bg-gray-100 text-gray-600"}`}
+                    >
                       {service.icon}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
-                        <h3 className="font-semibold text-gray-800">{service.title}</h3>
+                        <h3 className="font-semibold text-gray-800">
+                          {service.title}
+                        </h3>
                         <div className="text-right">
                           <div className="font-bold text-orange-600">
                             +{service.price.toLocaleString()}₩
                           </div>
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+                      <p className="text-sm text-gray-600 mt-1">
+                        {service.description}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -1046,10 +1085,13 @@ function Step5FinalReview({ data, onNext, onPrev, language, price }) {
   ];
 
   const selectedServices = (data.step4?.selectedServices || [])
-    .map(id => additionalServices.find(service => service.id === id))
+    .map((id) => additionalServices.find((service) => service.id === id))
     .filter(Boolean);
 
-  const additionalPrice = selectedServices.reduce((total, service) => total + service.price, 0);
+  const additionalPrice = selectedServices.reduce(
+    (total, service) => total + service.price,
+    0,
+  );
   const totalPrice = price + additionalPrice;
 
   return (
@@ -1075,15 +1117,21 @@ function Step5FinalReview({ data, onNext, onPrev, language, price }) {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-600">서비스 종류:</span>
-                <span className="ml-2 font-medium">{data.step1?.serviceType || "-"}</span>
+                <span className="ml-2 font-medium">
+                  {data.step1?.serviceType || "-"}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">비자 유형:</span>
-                <span className="ml-2 font-medium">{data.step1?.visaType || "-"}</span>
+                <span className="ml-2 font-medium">
+                  {data.step1?.visaType || "-"}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">처리 속도:</span>
-                <span className="ml-2 font-medium">{data.step1?.processing || "-"}</span>
+                <span className="ml-2 font-medium">
+                  {data.step1?.processing || "-"}
+                </span>
               </div>
             </div>
           </div>
@@ -1094,27 +1142,39 @@ function Step5FinalReview({ data, onNext, onPrev, language, price }) {
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-gray-600">성명:</span>
-                <span className="ml-2 font-medium">{data.step2?.fullName || "-"}</span>
+                <span className="ml-2 font-medium">
+                  {data.step2?.fullName || "-"}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">성별:</span>
-                <span className="ml-2 font-medium">{data.step2?.gender || "-"}</span>
+                <span className="ml-2 font-medium">
+                  {data.step2?.gender || "-"}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">생년월일:</span>
-                <span className="ml-2 font-medium">{data.step2?.birth || "-"}</span>
+                <span className="ml-2 font-medium">
+                  {data.step2?.birth || "-"}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">국적:</span>
-                <span className="ml-2 font-medium">{data.step2?.nationality || "-"}</span>
+                <span className="ml-2 font-medium">
+                  {data.step2?.nationality || "-"}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">이메일:</span>
-                <span className="ml-2 font-medium">{data.step2?.email || "-"}</span>
+                <span className="ml-2 font-medium">
+                  {data.step2?.email || "-"}
+                </span>
               </div>
               <div>
                 <span className="text-gray-600">연락처:</span>
-                <span className="ml-2 font-medium">{data.step2?.phone || "-"}</span>
+                <span className="ml-2 font-medium">
+                  {data.step2?.phone || "-"}
+                </span>
               </div>
             </div>
           </div>
@@ -1139,9 +1199,14 @@ function Step5FinalReview({ data, onNext, onPrev, language, price }) {
               <h3 className="font-semibold text-gray-800 mb-3">추가 서비스</h3>
               <div className="space-y-2">
                 {selectedServices.map((service, index) => (
-                  <div key={index} className="flex items-center justify-between text-sm">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between text-sm"
+                  >
                     <span>{service.title}</span>
-                    <span className="font-medium">+{service.price.toLocaleString()}₩</span>
+                    <span className="font-medium">
+                      +{service.price.toLocaleString()}₩
+                    </span>
                   </div>
                 ))}
               </div>
@@ -1156,10 +1221,13 @@ function Step5FinalReview({ data, onNext, onPrev, language, price }) {
                 <div className="text-blue-200 text-sm">부가세 포함</div>
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold">{totalPrice.toLocaleString()}₩</div>
+                <div className="text-3xl font-bold">
+                  {totalPrice.toLocaleString()}₩
+                </div>
                 {additionalPrice > 0 && (
                   <div className="text-sm text-blue-200">
-                    (기본: {price.toLocaleString()}₩ + 추가: {additionalPrice.toLocaleString()}₩)
+                    (기본: {price.toLocaleString()}₩ + 추가:{" "}
+                    {additionalPrice.toLocaleString()}₩)
                   </div>
                 )}
               </div>
@@ -1199,10 +1267,13 @@ function Step6Payment({ data, onChange, onNext, onPrev, language, price }) {
   ];
 
   const selectedServices = (data.step4?.selectedServices || [])
-    .map(id => additionalServices.find(service => service.id === id))
+    .map((id) => additionalServices.find((service) => service.id === id))
     .filter(Boolean);
 
-  const additionalPrice = selectedServices.reduce((total, service) => total + service.price, 0);
+  const additionalPrice = selectedServices.reduce(
+    (total, service) => total + service.price,
+    0,
+  );
   const totalPrice = price + additionalPrice;
 
   const handlePaymentMethodChange = (method) => {
@@ -1230,7 +1301,9 @@ function Step6Payment({ data, onChange, onNext, onPrev, language, price }) {
               <CardTitle className="text-2xl bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                 결제 방법 선택
               </CardTitle>
-              <p className="text-gray-600 mt-1">결제하거나 나중에 결제할 수 있습니다</p>
+              <p className="text-gray-600 mt-1">
+                r��제하거나 나중에 결제할 수 있습니다
+              </p>
             </div>
           </div>
         </CardHeader>
@@ -1239,7 +1312,9 @@ function Step6Payment({ data, onChange, onNext, onPrev, language, price }) {
           <div className="p-6 bg-gradient-to-r from-green-600 to-emerald-700 rounded-xl text-white">
             <div className="text-center">
               <div className="text-sm text-green-200 mb-2">총 결제 금액</div>
-              <div className="text-4xl font-bold mb-2">{totalPrice.toLocaleString()}₩</div>
+              <div className="text-4xl font-bold mb-2">
+                {totalPrice.toLocaleString()}₩
+              </div>
               <div className="text-sm text-green-200">부가세 포함</div>
             </div>
           </div>
@@ -1320,7 +1395,9 @@ function Step7Submit({ data, onSubmit, onPrev, language, isSubmitting }) {
               <CardTitle className="text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                 신청서 전송
               </CardTitle>
-              <p className="text-gray-600 mt-1">모든 정보를 확인하고 신청서를 전송하세요</p>
+              <p className="text-gray-600 mt-1">
+                모든 정보를 확인하고 신청서를 전송하세요
+              </p>
             </div>
           </div>
         </CardHeader>
@@ -1333,12 +1410,14 @@ function Step7Submit({ data, onSubmit, onPrev, language, isSubmitting }) {
               신청서 전송 준비 완료
             </h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              입력하신 모든 정보와 서류를 검토했습니다. 
-              아래 버튼을 클릭하여 베트남 비자 신청서를 전송하세요.
+              입력하신 모든 정보와 서류를 검토했습니다. 아래 버튼을 클릭하여
+              베트남 비자 신청서를 전송하세요.
             </p>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-              <h4 className="font-semibold text-blue-800 mb-2">📋 전송 후 안내사항</h4>
+              <h4 className="font-semibold text-blue-800 mb-2">
+                📋 전송 후 안내사항
+              </h4>
               <ul className="text-sm text-blue-700 space-y-1 text-left">
                 <li>• 신청서 전송 후 수정이 어려우니 신중히 검토해주세요</li>
                 <li>• 처리 현황은 이메일 및 SMS로 안내드립니다</li>
@@ -1397,7 +1476,7 @@ function ProgressBar({ step, steps, language }) {
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
+          <div
             className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500"
             style={{ width: `${((step + 1) / steps.length) * 100}%` }}
           ></div>
@@ -1457,19 +1536,27 @@ export default function ApplyVisaWizard() {
   const { currentLanguage } = useLanguage();
   const { toast } = useToast();
   const dispatch = useDispatch();
-  const applyForm = useSelector((state) => state.applyForm || {
-    step: 0,
-    form: {
-      step1: {},
-      step2: {},
-      step3: { documents: [] },
-      step4: {},
-      step5: {},
-      step6: {},
-    },
-    price: 0,
-    applicationId: null,
-  });
+  const applyForm = useSelector(
+    (state) =>
+      state.applyForm || {
+        step: 0,
+        form: {
+          step1: {},
+          step2: {},
+          step3: { documents: [] },
+          step4: {},
+          step5: {},
+          step6: {},
+        },
+        price: 0,
+        applicationId: null,
+      },
+  );
+  const {
+    form: { step1, step2, step3, step4, step5, step6 },
+  } = applyForm;
+
+  const { serviceType, visaType, processing } = step1;
 
   const { isAuthenticated, user } = useSelector((state) => state.auth || {});
 
@@ -1478,7 +1565,7 @@ export default function ApplyVisaWizard() {
 
   const steps = [
     "서비스 선택",
-    "신청자 정보", 
+    "신청자 정보",
     "서류 업로드",
     "추가 서비스",
     "최종 확인",
@@ -1575,16 +1662,18 @@ export default function ApplyVisaWizard() {
 
         // 가격 정보
         base_price: applyForm?.price || 0,
-        total_price: (applyForm?.price || 0) + ((applyForm?.form?.step4?.selectedServices?.length || 0) * 25000), // 임시 계산
+        total_price:
+          (applyForm?.price || 0) +
+          (applyForm?.form?.step4?.selectedServices?.length || 0) * 25000, // 임시 계산
       };
 
       console.log("Submitting application:", applicationData);
 
       // GraphQL mutation 호출 (임시로 fetch 사용)
-      const response = await fetch('http://localhost:5000/graphql', {
-        method: 'POST',
+      const response = await fetch("http://localhost:5000/graphql", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           query: `
@@ -1599,9 +1688,9 @@ export default function ApplyVisaWizard() {
             }
           `,
           variables: {
-            input: applicationData
-          }
-        })
+            input: applicationData,
+          },
+        }),
       });
 
       const result = await response.json();
@@ -1619,18 +1708,19 @@ export default function ApplyVisaWizard() {
 
         // 성공 페이지로 리다이렉트 또는 다른 처리
         setTimeout(() => {
-          window.location.href = '/dashboard/applications';
+          window.location.href = "/dashboard/applications";
         }, 2000);
-
       } else {
-        throw new Error(result.errors?.[0]?.message || "신청 처리 중 오류가 발생했습니다.");
+        throw new Error(
+          result.errors?.[0]?.message || "신청 처리 중 오류가 발생했습니다.",
+        );
       }
-
     } catch (error) {
       console.error("Application submission failed:", error);
       toast({
         title: "오류",
-        description: error.message || "신청서 전송에 실패했습니다. 다시 시도해주세요.",
+        description:
+          error.message || "신청서 전송에 실패했습니다. 다시 시도해주세요.",
         variant: "destructive",
       });
     } finally {
@@ -1665,7 +1755,11 @@ export default function ApplyVisaWizard() {
             </p>
           </div>
 
-          <ProgressBar step={applyForm?.step || 0} steps={steps} language={currentLanguage} />
+          <ProgressBar
+            step={applyForm?.step || 0}
+            steps={steps}
+            language={currentLanguage}
+          />
 
           <div className="relative">
             {(applyForm?.step || 0) === 0 && (
@@ -1728,7 +1822,7 @@ export default function ApplyVisaWizard() {
             )}
             {(applyForm?.step || 0) === 6 && (
               <Step7Submit
-                data={applyForm?.form|| {}}
+                data={applyForm?.form || {}}
                 onSubmit={handleSubmitApplication}
                 onPrev={prev}
                 language={currentLanguage}
