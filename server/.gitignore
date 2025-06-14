@@ -1,0 +1,58 @@
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+./next
+*.log
+.next
+
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+.next
+out
+build
+
+# Environment variables
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+logs
+
+# Database
+*.db
+*.sql
+*.sqlite
+prisma/migrations
+prisma/dev.db
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+
+# Temporary files
+tmp
+temp
+*.swp
+*.tmp
+*.bak
+*.orig
+
+# Test
+coverage
+test-results
+
+# Cache
+.cache
+*.cache
+.eslintcache
