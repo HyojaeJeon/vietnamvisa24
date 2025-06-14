@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Custom npm wrapper to handle the missing "dev" script
+if [[ "$*" == *"run dev"* ]]; then
+    echo "Starting Vietnam Visa Service Development Environment..."
+    node run-dev.js
+else
+    # Pass through to real npm for other commands
+    /usr/bin/npm "$@"
+fi
