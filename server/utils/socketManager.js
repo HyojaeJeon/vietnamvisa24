@@ -223,6 +223,44 @@ const socketNotifications = {
     }
   },
 
+  // 새로운 상담 요청 알림
+  notifyNewConsultation: (consultationData) => {
+    try {
+      if (io) {
+        io.emit("new_consultation", {
+          id: consultationData.id,
+          name: consultationData.name,
+          email: consultationData.email,
+          phone: consultationData.phone,
+          message: consultationData.message,
+          created_at: consultationData.created_at,
+        });
+        console.log(`📢 New consultation notification sent: ${consultationData.name}`);
+      }
+    } catch (error) {
+      console.error("❌ Failed to send consultation notification:", error);
+    }
+  },
+
+  // 새로운 비자 신청 알림
+  notifyNewApplication: (applicationData) => {
+    try {
+      if (io) {
+        io.emit("new_application", {
+          id: applicationData.id,
+          application_number: applicationData.application_number,
+          full_name: applicationData.full_name,
+          email: applicationData.email,
+          visa_type: applicationData.visa_type,
+          created_at: applicationData.created_at,
+        });
+        console.log(`📢 New application notification sent: ${applicationData.application_number}`);
+      }
+    } catch (error) {
+      console.error("❌ Failed to send application notification:", error);
+    }
+  },
+
   // 일반 알림 전송
   sendNotification: (target, notification) => {
     if (io) {

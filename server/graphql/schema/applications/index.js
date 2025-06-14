@@ -34,6 +34,25 @@ const typeDefs = gql`
     passport_number: String
     purpose: String
   }
+  input VisaApplicationInput {
+    visa_type: String!
+    full_name: String!
+    passport_number: String
+    nationality: String!
+    birth_date: String!
+    phone: String!
+    email: String!
+    gender: String
+    processing_speed: String
+    visa_subtype: String
+    documents: String
+    additional_services: String
+    payment_method: String
+    payment_skipped: Boolean
+    base_price: Float
+    total_price: Float
+  }
+
   extend type Query {
     getVisaApplications: [VisaApplication!]!
     getVisaApplication(id: ID!): VisaApplication

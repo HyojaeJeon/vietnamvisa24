@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Card,
   CardContent,
@@ -12,6 +13,20 @@ import { Input } from "../src/components/ui/input";
 import Header from "../src/components/header";
 import { t as baseT, translations } from "../src/lib/translations";
 import { useLanguage } from "../src/hooks/useLanguage";
+import { useToast } from "../src/hooks/useToast";
+import {
+  setStep,
+  updateStep1,
+  updateStep2,
+  updateStep3,
+  updateStep4,
+  updateStep5,
+  updateStep6,
+  setPrice,
+  setApplicationId,
+  addDocument,
+  resetForm,
+} from "../src/store/applyFormSlice";
 import {
   CheckCircle,
   Star,
@@ -26,6 +41,11 @@ import {
   Phone,
   Calendar,
   Upload,
+  Plus,
+  Zap,
+  Car,
+  Plane,
+  Send,
 } from "lucide-react";
 
 const REPLIT_BACK_END_URL =
@@ -453,22 +473,23 @@ function Step3DocumentUpload({
   ];
 
   const handleFileUpload = async (documentType, file) => {
-    // applicationId가 없으면 자동 생성
-    let currentApplicationId = applicationId;
-    if (!currentApplicationId) {
-      currentApplicationId = `temp_${Date.now()}`;
-      setApplicationId(currentApplicationId);
-    }
-
     // 파일 유효성 검사
     if (!file) {
-      alert("파일을 선택해주세요.");
+      toast({
+        title: "오류",
+        description: "파일을 선택해주세요.",
+        variant: "destructive",
+      });
       return;
     }
 
     // 파일 크기 검사 (10MB)
     if (file.size > 10 * 1024 * 1024) {
-      alert("파일 크기는 10MB를 초과할 수 없습니다.");
+      toast({
+        title: "오류",
+        description: "파일 크기는 10MB를 초과할 수 없습니다.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -480,39 +501,36 @@ function Step3DocumentUpload({
       "application/pdf",
     ];
     if (!allowedTypes.includes(file.type)) {
-      alert("JPG, PNG, PDF 파일만 업로드 가능합니다.");
+      toast({
+        title: "오류",
+        description: "JPG, PNG, PDF 파일만 업로드 가능합니다.",
+        variant: "destructive",
+      });
       return;
     }
 
     setUploadingFiles((prev) => ({ ...prev, [documentType]: true }));
 
     try {
-      const formData = new FormData();
-      formData.append("document", file);
-      formData.append("document_type", documentType);
-      formData.append("application_id", currentApplicationId);
+      // Base64로 변환
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Data = e.target.result;
+        
+        const documentData = {
+          document_type: documentType,
+          document_name: file.name,
+          file_data: base64Data,
+          file_size: file.size,
+          file_type: file.type,
+          uploaded_at: new Date().toISOString(),
+        };
 
-      const response = await fetch(
-        `${REPLIT_BACK_END_URL}/api/documents/upload`,
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const result = await response.json();
-
-      if (result.success) {
-        const newDocument = result.document;
         setUploadedDocuments((prev) => {
           const filtered = prev.filter(
             (doc) => doc.document_type !== documentType,
           );
-          return [...filtered, newDocument];
+          return [...filtered, documentData];
         });
 
         onChange({
@@ -522,19 +540,36 @@ function Step3DocumentUpload({
               ...uploadedDocuments.filter(
                 (doc) => doc.document_type !== documentType,
               ),
-              newDocument,
+              documentData,
             ],
           },
         });
 
-        alert("파일이 성공적으로 업로드되었습니다.");
-      } else {
-        throw new Error(result.message || "업로드 실패");
-      }
+        toast({
+          title: "성공",
+          description: "파일이 성공적으로 업로드되었습니다.",
+        });
+
+        setUploadingFiles((prev) => ({ ...prev, [documentType]: false }));
+      };
+
+      reader.onerror = () => {
+        toast({
+          title: "오류",
+          description: "파일 읽기에 실패했습니다.",
+          variant: "destructive",
+        });
+        setUploadingFiles((prev) => ({ ...prev, [documentType]: false }));
+      };
+
+      reader.readAsDataURL(file);
     } catch (error) {
       console.error("Upload error:", error);
-      alert(`업로드 오류: ${error.message || "파일 업로드에 실패했습니다."}`);
-    } finally {
+      toast({
+        title: "오류",
+        description: "파일 업로드에 실패했습니다.",
+        variant: "destructive",
+      });
       setUploadingFiles((prev) => ({ ...prev, [documentType]: false }));
     }
   };
@@ -736,6 +771,507 @@ function Step3DocumentUpload({
   );
 }
 
+// 4단계: 추가 서비스 선택
+function Step4AdditionalServices({ data, onChange, onNext, onPrev, language, price }) {
+  const additionalServices = [
+    {
+      id: "airport_pickup",
+      title: "공항 픽업 서비스",
+      description: "호치민/하노이 공항에서 호텔까지 픽업",
+      price: 35000,
+      icon: <Car className="w-6 h-6" />,
+      popular: false,
+    },
+    {
+      id: "fast_track",
+      title: "공항 패스트트랙",
+      description: "공항 입출국 대기시간 단축",
+      price: 25000,
+      icon: <Zap className="w-6 h-6" />,
+      popular: true,
+    },
+    {
+      id: "hotel_booking",
+      title: "호텔 예약 대행",
+      description: "베트남 현지 호텔 예약 서비스",
+      price: 15000,
+      icon: <Plane className="w-6 h-6" />,
+      popular: false,
+    },
+    {
+      id: "travel_insurance",
+      title: "여행자 보험",
+      description: "베트남 여행 중 의료비 보장",
+      price: 20000,
+      icon: <Shield className="w-6 h-6" />,
+      popular: false,
+    },
+  ];
+
+  const handleServiceToggle = (serviceId) => {
+    const currentServices = data.selectedServices || [];
+    const isSelected = currentServices.includes(serviceId);
+    
+    const newServices = isSelected
+      ? currentServices.filter(id => id !== serviceId)
+      : [...currentServices, serviceId];
+
+    onChange({
+      target: { name: "selectedServices", value: newServices },
+    });
+  };
+
+  const calculateAdditionalPrice = () => {
+    const selectedServices = data.selectedServices || [];
+    return additionalServices
+      .filter(service => selectedServices.includes(service.id))
+      .reduce((total, service) => total + service.price, 0);
+  };
+
+  return (
+    <div className="space-y-8">
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-orange-50/30 backdrop-blur-sm">
+        <CardHeader className="pb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-full flex items-center justify-center">
+              <Plus className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+                추가 서비스 선택
+              </CardTitle>
+              <p className="text-gray-600 mt-1">필요한 서비스를 선택해주세요 (선택사항)</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {additionalServices.map((service) => {
+              const isSelected = (data.selectedServices || []).includes(service.id);
+              return (
+                <div
+                  key={service.id}
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 relative ${
+                    isSelected
+                      ? "border-orange-500 bg-orange-50 shadow-lg"
+                      : "border-gray-200 hover:border-orange-300 hover:shadow-md"
+                  }`}
+                  onClick={() => handleServiceToggle(service.id)}
+                >
+                  {service.popular && (
+                    <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      인기
+                    </div>
+                  )}
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${isSelected ? "bg-orange-100 text-orange-600" : "bg-gray-100 text-gray-600"}`}>
+                      {service.icon}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <h3 className="font-semibold text-gray-800">{service.title}</h3>
+                        <div className="text-right">
+                          <div className="font-bold text-orange-600">
+                            +{service.price.toLocaleString()}₩
+                          </div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">{service.description}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* 추가 서비스 가격 요약 */}
+          <div className="mt-6 p-4 bg-gradient-to-r from-orange-600 to-red-700 rounded-xl text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-medium">추가 서비스 요금</div>
+                <div className="text-sm text-orange-200">
+                  {(data.selectedServices || []).length}개 서비스 선택됨
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-2xl font-bold">
+                  +{calculateAdditionalPrice().toLocaleString()}₩
+                </div>
+                <div className="text-sm text-orange-200">부가세 포함</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between mt-8">
+            <Button
+              variant="outline"
+              onClick={onPrev}
+              className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold transition-all duration-300"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              이전
+            </Button>
+            <Button
+              onClick={onNext}
+              className="px-8 py-3 bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-700 hover:to-red-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <span className="mr-2">다음</span>
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// 5단계: 최종 확인
+function Step5FinalReview({ data, onNext, onPrev, language, price }) {
+  const additionalServices = [
+    { id: "airport_pickup", title: "공항 픽업 서비스", price: 35000 },
+    { id: "fast_track", title: "공항 패스트트랙", price: 25000 },
+    { id: "hotel_booking", title: "호텔 예약 대행", price: 15000 },
+    { id: "travel_insurance", title: "여행자 보험", price: 20000 },
+  ];
+
+  const selectedServices = (data.step4?.selectedServices || [])
+    .map(id => additionalServices.find(service => service.id === id))
+    .filter(Boolean);
+
+  const additionalPrice = selectedServices.reduce((total, service) => total + service.price, 0);
+  const totalPrice = price + additionalPrice;
+
+  return (
+    <div className="space-y-8">
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-blue-50/30 backdrop-blur-sm">
+        <CardHeader className="pb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                최종 확인
+              </CardTitle>
+              <p className="text-gray-600 mt-1">신청 정보를 확인해주세요</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* 서비스 정보 */}
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <h3 className="font-semibold text-gray-800 mb-3">선택한 서비스</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-600">서비스 종류:</span>
+                <span className="ml-2 font-medium">{data.step1?.serviceType || "-"}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">비자 유형:</span>
+                <span className="ml-2 font-medium">{data.step1?.visaType || "-"}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">처리 속도:</span>
+                <span className="ml-2 font-medium">{data.step1?.processing || "-"}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 신청자 정보 */}
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <h3 className="font-semibold text-gray-800 mb-3">신청자 정보</h3>
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <span className="text-gray-600">성명:</span>
+                <span className="ml-2 font-medium">{data.step2?.fullName || "-"}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">성별:</span>
+                <span className="ml-2 font-medium">{data.step2?.gender || "-"}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">생년월일:</span>
+                <span className="ml-2 font-medium">{data.step2?.birth || "-"}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">국적:</span>
+                <span className="ml-2 font-medium">{data.step2?.nationality || "-"}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">이메일:</span>
+                <span className="ml-2 font-medium">{data.step2?.email || "-"}</span>
+              </div>
+              <div>
+                <span className="text-gray-600">연락처:</span>
+                <span className="ml-2 font-medium">{data.step2?.phone || "-"}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* 업로드된 서류 */}
+          <div className="p-4 bg-gray-50 rounded-lg">
+            <h3 className="font-semibold text-gray-800 mb-3">업로드된 서류</h3>
+            <div className="space-y-2">
+              {(data.step3?.documents || []).map((doc, index) => (
+                <div key={index} className="flex items-center gap-2 text-sm">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span>{doc.document_name}</span>
+                  <span className="text-gray-500">({doc.document_type})</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 추가 서비스 */}
+          {selectedServices.length > 0 && (
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <h3 className="font-semibold text-gray-800 mb-3">추가 서비스</h3>
+              <div className="space-y-2">
+                {selectedServices.map((service, index) => (
+                  <div key={index} className="flex items-center justify-between text-sm">
+                    <span>{service.title}</span>
+                    <span className="font-medium">+{service.price.toLocaleString()}₩</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* 총 결제 금액 */}
+          <div className="p-6 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl text-white">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-lg font-semibold">총 결제 금액</div>
+                <div className="text-blue-200 text-sm">부가세 포함</div>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold">{totalPrice.toLocaleString()}₩</div>
+                {additionalPrice > 0 && (
+                  <div className="text-sm text-blue-200">
+                    (기본: {price.toLocaleString()}₩ + 추가: {additionalPrice.toLocaleString()}₩)
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-between mt-8">
+            <Button
+              variant="outline"
+              onClick={onPrev}
+              className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold transition-all duration-300"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              이전
+            </Button>
+            <Button
+              onClick={onNext}
+              className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <span className="mr-2">다음</span>
+              <ArrowRight className="w-5 h-5" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// 6단계: 결제 (건너뛰기 가능)
+function Step6Payment({ data, onChange, onNext, onPrev, language, price }) {
+  const additionalServices = [
+    { id: "airport_pickup", title: "공항 픽업 서비스", price: 35000 },
+    { id: "fast_track", title: "공항 패스트트랙", price: 25000 },
+    { id: "hotel_booking", title: "호텔 예약 대행", price: 15000 },
+    { id: "travel_insurance", title: "여행자 보험", price: 20000 },
+  ];
+
+  const selectedServices = (data.step4?.selectedServices || [])
+    .map(id => additionalServices.find(service => service.id === id))
+    .filter(Boolean);
+
+  const additionalPrice = selectedServices.reduce((total, service) => total + service.price, 0);
+  const totalPrice = price + additionalPrice;
+
+  const handlePaymentMethodChange = (method) => {
+    onChange({
+      target: { name: "paymentMethod", value: method },
+    });
+  };
+
+  const handleSkipPayment = () => {
+    onChange({
+      target: { name: "paymentSkipped", value: true },
+    });
+    onNext();
+  };
+
+  return (
+    <div className="space-y-8">
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-green-50/30 backdrop-blur-sm">
+        <CardHeader className="pb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+              <CreditCard className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                결제 방법 선택
+              </CardTitle>
+              <p className="text-gray-600 mt-1">결제하거나 나중에 결제할 수 있습니다</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* 결제 금액 요약 */}
+          <div className="p-6 bg-gradient-to-r from-green-600 to-emerald-700 rounded-xl text-white">
+            <div className="text-center">
+              <div className="text-sm text-green-200 mb-2">총 결제 금액</div>
+              <div className="text-4xl font-bold mb-2">{totalPrice.toLocaleString()}₩</div>
+              <div className="text-sm text-green-200">부가세 포함</div>
+            </div>
+          </div>
+
+          {/* 결제 방법 선택 */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-800">결제 방법</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { id: "card", name: "신용카드", icon: "💳" },
+                { id: "bank", name: "계좌이체", icon: "🏦" },
+                { id: "kakao", name: "카카오페이", icon: "💛" },
+                { id: "naver", name: "네이버페이", icon: "💚" },
+              ].map((method) => (
+                <div
+                  key={method.id}
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                    data.paymentMethod === method.id
+                      ? "border-green-500 bg-green-50"
+                      : "border-gray-200 hover:border-green-300"
+                  }`}
+                  onClick={() => handlePaymentMethodChange(method.id)}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{method.icon}</span>
+                    <span className="font-medium">{method.name}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-between mt-8">
+            <Button
+              variant="outline"
+              onClick={onPrev}
+              className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold transition-all duration-300"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              이전
+            </Button>
+            
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={handleSkipPayment}
+                className="px-6 py-3 border-2 border-orange-300 hover:border-orange-400 text-orange-600 rounded-xl font-semibold transition-all duration-300"
+              >
+                나중에 결제
+              </Button>
+              <Button
+                onClick={onNext}
+                disabled={!data.paymentMethod}
+                className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span className="mr-2">결제하기</span>
+                <ArrowRight className="w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// 7단계: 신청서 전송
+function Step7Submit({ data, onSubmit, onPrev, language, isSubmitting }) {
+  return (
+    <div className="space-y-8">
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-purple-50/30 backdrop-blur-sm">
+        <CardHeader className="pb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
+              <Send className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                신청서 전송
+              </CardTitle>
+              <p className="text-gray-600 mt-1">모든 정보를 확인하고 신청서를 전송하세요</p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="text-center py-8">
+            <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Send className="w-12 h-12 text-white" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">
+              신청서 전송 준비 완료
+            </h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              입력하신 모든 정보와 서류를 검토했습니다. 
+              아래 버튼을 클릭하여 베트남 비자 신청서를 전송하세요.
+            </p>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+              <h4 className="font-semibold text-blue-800 mb-2">📋 전송 후 안내사항</h4>
+              <ul className="text-sm text-blue-700 space-y-1 text-left">
+                <li>• 신청서 전송 후 수정이 어려우니 신중히 검토해주세요</li>
+                <li>• 처리 현황은 이메일 및 SMS로 안내드립니다</li>
+                <li>• 추가 서류 요청 시 빠른 제출 부탁드립니다</li>
+                <li>• 문의사항은 고객센터로 연락주세요</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="flex justify-between mt-8">
+            <Button
+              variant="outline"
+              onClick={onPrev}
+              disabled={isSubmitting}
+              className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold transition-all duration-300"
+            >
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              이전
+            </Button>
+            
+            <Button
+              onClick={onSubmit}
+              disabled={isSubmitting}
+              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? (
+                <div className="flex items-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>전송 중...</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span>신청서 전송</span>
+                  <Send className="w-5 h-5" />
+                </div>
+              )}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 function ProgressBar({ step, steps, language }) {
   return (
     <div className="mb-12">
@@ -789,97 +1325,175 @@ function ProgressBar({ step, steps, language }) {
 // 메인 마법사 컴포넌트
 export default function ApplyVisaWizard() {
   const { currentLanguage } = useLanguage();
+  const { toast } = useToast();
+  const dispatch = useDispatch();
+  const applyForm = useSelector((state) => state.applyForm);
+  
   const [mounted, setMounted] = useState(false);
-  const [step, setStep] = useState(0);
-  const [form, setForm] = useState({
-    step1: {},
-    step2: {},
-    step3: {},
-    // step4~6은 이후 추가
-  });
-  const [price, setPrice] = useState(0);
-  const [applicationId, setApplicationId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const steps = [
     "apply.step1.title",
-    "apply.step2.title",
+    "apply.step2.title", 
     "apply.step3.title",
     "apply.step4.title",
     "apply.step5.title",
     "apply.step6.title",
+    "apply.step7.title",
   ];
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // localStorage 연동
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const saved = window.localStorage.getItem("applyVisaForm");
-      if (saved) {
-        try {
-          setForm(JSON.parse(saved));
-        } catch {}
-      }
-    }
-  }, []);
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("applyVisaForm", JSON.stringify(form));
-    }
-  }, [form]);
-
-  // 가격 계산 (샘플: 실제로는 서비스/옵션에 따라 계산)
+  // 가격 계산
   useEffect(() => {
     let base = 89000;
-    if (form.step1?.serviceType === "arrival") base += 20000;
-    if (form.step1?.processing === "express") base += 30000;
-    if (form.step1?.processing === "urgent") base += 60000;
-    setPrice(base);
-  }, [form.step1]);
+    if (applyForm.form.step1?.serviceType === "arrival") base += 20000;
+    if (applyForm.form.step1?.processing === "express") base += 30000;
+    if (applyForm.form.step1?.processing === "urgent") base += 60000;
+    dispatch(setPrice(base));
+  }, [applyForm.form.step1, dispatch]);
 
   // 단계별 데이터 핸들러
   const handleStep1Change = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, step1: { ...prev.step1, [name]: value } }));
+    dispatch(updateStep1({ [name]: value }));
   };
+
   const handleStep2Change = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, step2: { ...prev.step2, [name]: value } }));
+    dispatch(updateStep2({ [name]: value }));
   };
+
   const handleStep3Change = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, step3: { ...prev.step3, [name]: value } }));
+    dispatch(updateStep3({ [name]: value }));
   };
 
-  // 신청서 생성 및 다음 단계로 이동
-  const createApplicationAndNext = async () => {
-    try {
-      // 기존 applicationId가 있으면 사용, 없으면 새로 생성
-      if (!applicationId) {
-        const tempApplicationId = `temp_${Date.now()}`;
-        setApplicationId(tempApplicationId);
-        console.log("Created application ID:", tempApplicationId);
-      }
+  const handleStep4Change = (e) => {
+    const { name, value } = e.target;
+    dispatch(updateStep4({ [name]: value }));
+  };
 
-      console.log("Application data:", {
-        ...form.step1,
-        ...form.step2,
-      });
+  const handleStep5Change = (e) => {
+    const { name, value } = e.target;
+    dispatch(updateStep5({ [name]: value }));
+  };
 
-      next();
-    } catch (error) {
-      console.error("Application creation failed:", error);
-      alert("신청서 생성에 실패했습니다. 다시 시도해주세요.");
-    }
+  const handleStep6Change = (e) => {
+    const { name, value } = e.target;
+    dispatch(updateStep6({ [name]: value }));
   };
 
   // 단계 이동
-  const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
-  const prev = () => setStep((s) => Math.max(s - 1, 0));
+  const next = () => {
+    const newStep = Math.min(applyForm.step + 1, steps.length - 1);
+    dispatch(setStep(newStep));
+  };
+
+  const prev = () => {
+    const newStep = Math.max(applyForm.step - 1, 0);
+    dispatch(setStep(newStep));
+  };
+
+  // 최종 신청서 전송
+  const handleSubmitApplication = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      // 신청서 데이터 준비
+      const applicationData = {
+        // 기본 정보
+        visa_type: applyForm.form.step1.serviceType || "evisa",
+        full_name: applyForm.form.step2.fullName,
+        passport_number: `temp_${Date.now()}`, // 임시값
+        nationality: applyForm.form.step2.nationality,
+        birth_date: applyForm.form.step2.birth,
+        phone: applyForm.form.step2.phone,
+        email: applyForm.form.step2.email,
+        
+        // 추가 정보
+        gender: applyForm.form.step2.gender,
+        processing_speed: applyForm.form.step1.processing,
+        visa_subtype: applyForm.form.step1.visaType,
+        
+        // 서류 정보 (base64 데이터 포함)
+        documents: applyForm.form.step3.documents || [],
+        
+        // 추가 서비스
+        additional_services: applyForm.form.step4?.selectedServices || [],
+        
+        // 결제 정보
+        payment_method: applyForm.form.step6?.paymentMethod,
+        payment_skipped: applyForm.form.step6?.paymentSkipped || false,
+        
+        // 가격 정보
+        base_price: applyForm.price,
+        total_price: applyForm.price + (applyForm.form.step4?.selectedServices?.length || 0) * 25000, // 임시 계산
+      };
+
+      console.log("Submitting application:", applicationData);
+
+      // GraphQL mutation 호출 (임시로 fetch 사용)
+      const response = await fetch('/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: `
+            mutation CreateVisaApplication($input: VisaApplicationInput!) {
+              createVisaApplication(input: $input) {
+                id
+                application_number
+                full_name
+                status
+                created_at
+              }
+            }
+          `,
+          variables: {
+            input: applicationData
+          }
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.data?.createVisaApplication) {
+        const application = result.data.createVisaApplication;
+        
+        toast({
+          title: "신청 완료!",
+          description: `신청번호: ${application.application_number}`,
+        });
+
+        // Redux 상태 초기화
+        dispatch(resetForm());
+        
+        // 성공 페이지로 리다이렉트 또는 다른 처리
+        setTimeout(() => {
+          window.location.href = '/dashboard/applications';
+        }, 2000);
+        
+      } else {
+        throw new Error(result.errors?.[0]?.message || "신청 처리 중 오류가 발생했습니다.");
+      }
+
+    } catch (error) {
+      console.error("Application submission failed:", error);
+      toast({
+        title: "오류",
+        description: error.message || "신청서 전송에 실패했습니다. 다시 시도해주세요.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!mounted) {
-    // SSR과 hydration mismatch 방지: 클라이언트 마운트 전에는 렌더링하지 않음
     return null;
   }
 
@@ -906,38 +1520,76 @@ export default function ApplyVisaWizard() {
             </p>
           </div>
 
-          <ProgressBar step={step} steps={steps} language={currentLanguage} />
+          <ProgressBar step={applyForm.step} steps={steps} language={currentLanguage} />
 
           <div className="relative">
-            {step === 0 && (
+            {applyForm.step === 0 && (
               <Step1ServiceSelection
-                data={form.step1}
+                data={applyForm.form.step1}
                 onChange={handleStep1Change}
-                price={price}
+                price={applyForm.price}
                 onNext={next}
                 language={currentLanguage}
               />
             )}
-            {step === 1 && (
+            {applyForm.step === 1 && (
               <Step2ApplicantInfo
-                data={form.step2}
+                data={applyForm.form.step2}
                 onChange={handleStep2Change}
-                onNext={createApplicationAndNext}
+                onNext={next}
                 onPrev={prev}
                 language={currentLanguage}
               />
             )}
-            {step === 2 && (
+            {applyForm.step === 2 && (
               <Step3DocumentUpload
-                data={form.step3}
+                data={applyForm.form.step3}
                 onChange={handleStep3Change}
                 onNext={next}
                 onPrev={prev}
                 language={currentLanguage}
-                applicationId={applicationId}
+                applicationId={applyForm.applicationId}
+                toast={toast}
               />
             )}
-            {/* 4~6단계는 이후 구현 */}
+            {applyForm.step === 3 && (
+              <Step4AdditionalServices
+                data={applyForm.form.step4}
+                onChange={handleStep4Change}
+                onNext={next}
+                onPrev={prev}
+                language={currentLanguage}
+                price={applyForm.price}
+              />
+            )}
+            {applyForm.step === 4 && (
+              <Step5FinalReview
+                data={applyForm.form}
+                onNext={next}
+                onPrev={prev}
+                language={currentLanguage}
+                price={applyForm.price}
+              />
+            )}
+            {applyForm.step === 5 && (
+              <Step6Payment
+                data={applyForm.form.step6}
+                onChange={handleStep6Change}
+                onNext={next}
+                onPrev={prev}
+                language={currentLanguage}
+                price={applyForm.price}
+              />
+            )}
+            {applyForm.step === 6 && (
+              <Step7Submit
+                data={applyForm.form}
+                onSubmit={handleSubmitApplication}
+                onPrev={prev}
+                language={currentLanguage}
+                isSubmitting={isSubmitting}
+              />
+            )}
           </div>
         </div>
       </div>

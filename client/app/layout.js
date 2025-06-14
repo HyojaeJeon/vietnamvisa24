@@ -324,6 +324,11 @@ export const viewport = {
   ],
 };
 
+import { ToastProvider } from "./src/hooks/useToast";
+import { Toaster } from "./src/components/ui/toaster";
+import StoreProvider from "./storeProvider";
+import ApolloProvider from "./apolloProvider";
+
 export default function RootLayout({ children }) {
   const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
   const isValidGTM = GTM_ID && GTM_ID !== "test";
@@ -338,9 +343,18 @@ export default function RootLayout({ children }) {
         {/* Google Tag Manager NoScript는 body 바로 다음에 위치합니다. */}
         {isValidGTM && <GoogleTagManagerNoScript GTM_ID={GTM_ID} />}
 
-        <ErrorBoundary>
-          <Providers>{children}</Providers>
-        </ErrorBoundary>
+        <StoreProvider>
+          <ApolloProvider>
+            <ToastProvider>
+              <Providers>
+                <ErrorBoundary>
+                  <NoSSR>{children}</NoSSR>
+                </ErrorBoundary>
+              </Providers>
+              <Toaster />
+            </ToastProvider>
+          </ApolloProvider>
+        </StoreProvider>
 
         {/* 스크립트 및 구조화 데이터 컴포넌트는 body 내부에 위치시켜 하이드레이션 오류를 방지합니다. */}
         <TrackingScripts />

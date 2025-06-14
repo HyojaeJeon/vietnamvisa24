@@ -247,14 +247,71 @@ const resolvers = {
             updated_at: new Date().toISOString(),
           };
         } else {
+          // Parse documents and additional_services if they are strings
+          let documentsData = input.documents;
+          let additionalServicesData = input.additional_services;
+          
+          if (typeof input.documents === 'string') {
+            try {
+              documentsData = JSON.parse(input.documents);
+            } catch (e) {
+              documentsData = [];
+            }
+          }
+          
+          if (typeof input.additional_services === 'string') {
+            try {
+              additionalServicesData = JSON.parse(input.additional_services);
+            } catch (e) {
+              additionalServicesData = [];
+            }
+          }
+
           // Create the application
           newApplication = await VisaApplication.create({
             application_number: applicationNumber,
             ...input,
+            documents: JSON.stringify(documentsData || []),
+            additional_services: JSON.stringify(additionalServicesData || []),
             status: "pending",
             created_at: new Date(),
             updated_at: new Date(),
           });
+
+          // Store documents in documents table if provided
+          if (documentsData && Array.isArray(documentsData) && documentsData.length > 0) {
+            const Document = require("../../../models").Document;
+            if (Document) {
+              for (const doc of documentsData) {
+                try {
+                  await Document.create({
+                    application_id: newApplication.id,
+                    document_type: doc.document_type,
+                    document_name: doc.document_name,
+                    file_data: doc.file_data, // base64 data
+                    file_size: doc.file_size,
+                    file_type: doc.file_type,
+                    status: 'uploaded',
+                    created_at: new Date(),
+                    updated_at: new Date(),
+                  });
+                } catch (docError) {
+                  console.error("Failed to save document:", docError);
+                }
+              }
+            }
+          }
+        }
+
+        // Send real-time notification via Socket.IO
+        try {
+          if (context?.io) {
+            const socketManager = require("../../../utils/socketManager");
+            socketManager.notifyNewApplication(newApplication);
+            console.log(`Socket notification sent for new application: ${applicationNumber}`);
+          }
+        } catch (socketError) {
+          console.error("Failed to send socket notification:", socketError);
         }
 
         // Start automated workflow
@@ -266,7 +323,7 @@ const resolvers = {
           // Continue without failing the application creation
         }
 
-        // Send application confirmation email
+        // Send application confirmation email to customer
         try {
           if (input.email) {
             await emailService.sendApplicationConfirmation(input.email, {
@@ -279,6 +336,22 @@ const resolvers = {
           }
         } catch (emailError) {
           console.error("Failed to send confirmation email:", emailError);
+          // Continue without failing
+        }
+
+        // Send admin notification email
+        try {
+          await emailService.sendAdminNotification({
+            applicationNumber: applicationNumber,
+            fullName: input.full_name,
+            visaType: input.visa_type,
+            email: input.email,
+            phone: input.phone,
+            applicationId: newApplication.id,
+          });
+          console.log(`Admin notification email sent for application ${applicationNumber}`);
+        } catch (emailError) {
+          console.error("Failed to send admin notification email:", emailError);
           // Continue without failing
         }
 
