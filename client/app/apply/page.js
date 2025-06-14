@@ -1327,7 +1327,19 @@ export default function ApplyVisaWizard() {
   const { currentLanguage } = useLanguage();
   const { toast } = useToast();
   const dispatch = useDispatch();
-  const applyForm = useSelector((state) => state.applyForm);
+  const applyForm = useSelector((state) => state.applyForm || {
+    step: 0,
+    form: {
+      step1: {},
+      step2: {},
+      step3: { documents: [] },
+      step4: {},
+      step5: {},
+      step6: {},
+    },
+    price: 0,
+    applicationId: null,
+  });
   
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1349,11 +1361,12 @@ export default function ApplyVisaWizard() {
   // 가격 계산
   useEffect(() => {
     let base = 89000;
-    if (applyForm.form.step1?.serviceType === "arrival") base += 20000;
-    if (applyForm.form.step1?.processing === "express") base += 30000;
-    if (applyForm.form.step1?.processing === "urgent") base += 60000;
+    const step1 = applyForm?.form?.step1;
+    if (step1?.serviceType === "arrival") base += 20000;
+    if (step1?.processing === "express") base += 30000;
+    if (step1?.processing === "urgent") base += 60000;
     dispatch(setPrice(base));
-  }, [applyForm.form.step1, dispatch]);
+  }, [applyForm?.form?.step1, dispatch]);
 
   // 단계별 데이터 핸들러
   const handleStep1Change = (e) => {
@@ -1388,12 +1401,12 @@ export default function ApplyVisaWizard() {
 
   // 단계 이동
   const next = () => {
-    const newStep = Math.min(applyForm.step + 1, steps.length - 1);
+    const newStep = Math.min((applyForm?.step || 0) + 1, steps.length - 1);
     dispatch(setStep(newStep));
   };
 
   const prev = () => {
-    const newStep = Math.max(applyForm.step - 1, 0);
+    const newStep = Math.max((applyForm?.step || 0) - 1, 0);
     dispatch(setStep(newStep));
   };
 
@@ -1405,32 +1418,32 @@ export default function ApplyVisaWizard() {
       // 신청서 데이터 준비
       const applicationData = {
         // 기본 정보
-        visa_type: applyForm.form.step1.serviceType || "evisa",
-        full_name: applyForm.form.step2.fullName,
+        visa_type: applyForm?.form?.step1?.serviceType || "evisa",
+        full_name: applyForm?.form?.step2?.fullName,
         passport_number: `temp_${Date.now()}`, // 임시값
-        nationality: applyForm.form.step2.nationality,
-        birth_date: applyForm.form.step2.birth,
-        phone: applyForm.form.step2.phone,
-        email: applyForm.form.step2.email,
+        nationality: applyForm?.form?.step2?.nationality,
+        birth_date: applyForm?.form?.step2?.birth,
+        phone: applyForm?.form?.step2?.phone,
+        email: applyForm?.form?.step2?.email,
         
         // 추가 정보
-        gender: applyForm.form.step2.gender,
-        processing_speed: applyForm.form.step1.processing,
-        visa_subtype: applyForm.form.step1.visaType,
+        gender: applyForm?.form?.step2?.gender,
+        processing_speed: applyForm?.form?.step1?.processing,
+        visa_subtype: applyForm?.form?.step1?.visaType,
         
         // 서류 정보 (base64 데이터 포함)
-        documents: applyForm.form.step3.documents || [],
+        documents: applyForm?.form?.step3?.documents || [],
         
         // 추가 서비스
-        additional_services: applyForm.form.step4?.selectedServices || [],
+        additional_services: applyForm?.form?.step4?.selectedServices || [],
         
         // 결제 정보
-        payment_method: applyForm.form.step6?.paymentMethod,
-        payment_skipped: applyForm.form.step6?.paymentSkipped || false,
+        payment_method: applyForm?.form?.step6?.paymentMethod,
+        payment_skipped: applyForm?.form?.step6?.paymentSkipped || false,
         
         // 가격 정보
-        base_price: applyForm.price,
-        total_price: applyForm.price + (applyForm.form.step4?.selectedServices?.length || 0) * 25000, // 임시 계산
+        base_price: applyForm?.price || 0,
+        total_price: (applyForm?.price || 0) + ((applyForm?.form?.step4?.selectedServices?.length || 0) * 25000), // 임시 계산
       };
 
       console.log("Submitting application:", applicationData);
@@ -1520,70 +1533,70 @@ export default function ApplyVisaWizard() {
             </p>
           </div>
 
-          <ProgressBar step={applyForm.step} steps={steps} language={currentLanguage} />
+          <ProgressBar step={applyForm?.step || 0} steps={steps} language={currentLanguage} />
 
           <div className="relative">
-            {applyForm.step === 0 && (
+            {(applyForm?.step || 0) === 0 && (
               <Step1ServiceSelection
-                data={applyForm.form.step1}
+                data={applyForm?.form?.step1 || {}}
                 onChange={handleStep1Change}
-                price={applyForm.price}
+                price={applyForm?.price || 0}
                 onNext={next}
                 language={currentLanguage}
               />
             )}
-            {applyForm.step === 1 && (
+            {(applyForm?.step || 0) === 1 && (
               <Step2ApplicantInfo
-                data={applyForm.form.step2}
+                data={applyForm?.form?.step2 || {}}
                 onChange={handleStep2Change}
                 onNext={next}
                 onPrev={prev}
                 language={currentLanguage}
               />
             )}
-            {applyForm.step === 2 && (
+            {(applyForm?.step || 0) === 2 && (
               <Step3DocumentUpload
-                data={applyForm.form.step3}
+                data={applyForm?.form?.step3 || { documents: [] }}
                 onChange={handleStep3Change}
                 onNext={next}
                 onPrev={prev}
                 language={currentLanguage}
-                applicationId={applyForm.applicationId}
+                applicationId={applyForm?.applicationId}
                 toast={toast}
               />
             )}
-            {applyForm.step === 3 && (
+            {(applyForm?.step || 0) === 3 && (
               <Step4AdditionalServices
-                data={applyForm.form.step4}
+                data={applyForm?.form?.step4 || {}}
                 onChange={handleStep4Change}
                 onNext={next}
                 onPrev={prev}
                 language={currentLanguage}
-                price={applyForm.price}
+                price={applyForm?.price || 0}
               />
             )}
-            {applyForm.step === 4 && (
+            {(applyForm?.step || 0) === 4 && (
               <Step5FinalReview
-                data={applyForm.form}
+                data={applyForm?.form || {}}
                 onNext={next}
                 onPrev={prev}
                 language={currentLanguage}
-                price={applyForm.price}
+                price={applyForm?.price || 0}
               />
             )}
-            {applyForm.step === 5 && (
+            {(applyForm?.step || 0) === 5 && (
               <Step6Payment
-                data={applyForm.form.step6}
+                data={applyForm?.form?.step6 || {}}
                 onChange={handleStep6Change}
                 onNext={next}
                 onPrev={prev}
                 language={currentLanguage}
-                price={applyForm.price}
+                price={applyForm?.price || 0}
               />
             )}
-            {applyForm.step === 6 && (
+            {(applyForm?.step || 0) === 6 && (
               <Step7Submit
-                data={applyForm.form}
+                data={applyForm?.form || {}}
                 onSubmit={handleSubmitApplication}
                 onPrev={prev}
                 language={currentLanguage}
