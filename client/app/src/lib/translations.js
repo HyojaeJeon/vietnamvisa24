@@ -17,7 +17,8 @@ export const translations = {
       trustBadge: "⭐ 고객 만족도 99.8% 달성",
       title: "베트남 비자 신청",
       subtitle: "빠르고 안전한 베트남 비자 서비스",
-      description: "전문가가 제공하는 신뢰할 수 있는 베트남 비자 대행 서비스로 편안한 여행을 시작하세요.",
+      description:
+        "전문가가 제공하는 신뢰할 수 있는 베트남 비자 대행 서비스로 편안한 여행을 시작하세요.",
       features: {
         fast: "24시간 처리",
         secure: "안전 보장",
@@ -43,12 +44,22 @@ export const translations = {
       tourist: {
         title: "관광 비자",
         description: "베트남 관광을 위한 최적의 비자 서비스",
-        features: ["30일 체류 가능", "단수/복수 선택 가능", "24시간 빠른 처리", "전문가 상담 무료"],
+        features: [
+          "30일 체류 가능",
+          "단수/복수 선택 가능",
+          "24시간 빠른 처리",
+          "전문가 상담 무료",
+        ],
       },
       business: {
         title: "비즈니스 비자",
         description: "출장 및 사업 목적의 베트남 입국을 위한 비자",
-        features: ["90일 체류 가능", "복수 입국 가능", "사업자 등록증 지원", "우선 처리 서비스"],
+        features: [
+          "90일 체류 가능",
+          "복수 입국 가능",
+          "사업자 등록증 지원",
+          "우선 처리 서비스",
+        ],
       },
       electronic: {
         title: "전자 비자",
@@ -136,14 +147,16 @@ export const translations = {
     // Company Info
     company: {
       title: "신뢰할 수 있는 베트남 비자 전문 업체",
-      subtitle: "2015년부터 베트남 비자 전문 서비스를 제공해온 신뢰할 수 있는 파트너입니다.",
+      subtitle:
+        "2015년부터 베트남 비자 전문 서비스를 제공해온 신뢰할 수 있는 파트너입니다.",
       experience: "10년+",
       success: "99.8%",
       customers: "50,000+",
       support: "24/7",
       mission: {
         title: "우리의 사명",
-        description: "고객의 편안한 베트남 여행을 위해 최고의 비자 서비스를 제공합니다",
+        description:
+          "고객의 편안한 베트남 여행을 위해 최고의 비자 서비스를 제공합니다",
       },
       vision: {
         title: "우리의 비전",
@@ -169,15 +182,18 @@ export const translations = {
       items: [
         {
           question: "베트남 비자 신청에 필요한 서류는 무엇인가요?",
-          answer: "여권 사본, 증명사진, 신청서가 기본적으로 필요하며, 비자 종류에 따라 추가 서류가 필요할 수 있습니다.",
+          answer:
+            "여권 사본, 증명사진, 신청서가 기본적으로 필요하며, 비자 종류에 따라 추가 서류가 필요할 수 있습니다.",
         },
         {
           question: "비자 처리 기간은 얼마나 걸리나요?",
-          answer: "일반적으로 3-5 영업일이 소요되며, 긴급 처리 시 24시간 내 발급 가능합니다.",
+          answer:
+            "일반적으로 3-5 영업일이 소요되며, 긴급 처리 시 24시간 내 발급 가능합니다.",
         },
         {
           question: "비자 승인이 거부될 수 있나요?",
-          answer: "저희 서비스를 통해 신청 시 99.8%의 높은 승인률을 자랑하며, 거부 시 전액 환불해드립니다.",
+          answer:
+            "저희 서비스를 통해 신청 시 99.8%의 높은 승인률을 자랑하며, 거부 시 전액 환불해드립니다.",
         },
       ],
     },
@@ -258,53 +274,53 @@ export const translations = {
         fileType: "허용되지 않는 파일 형식입니다.",
         fileSize: "파일 크기가 너무 큽니다.",
       },
-      },
-      step3: {
-        title: "서류 업로드",
-        passport: "여권 사본 업로드",
-        passportGuide: "정보가 있는 면 전체가 빛 번짐 없이 선명하게 보여야 합니다.",
-        photo: "증명사진 업로드",
-        photoGuide: "흰색 배경, 안경/모자 착용 금지 등 규격을 확인하세요.",
-        upload: "업로드",
-        uploading: "업로드 중...",
-        uploaded: "업로드 완료",
-        remove: "삭제",
-      },
-      step4: {
-        title: "추가 서비스 선택",
-        fastTrack: "공항 패스트트랙",
-        pickup: "공항 픽업 서비스",
-        carType: "차량 종류 선택",
-        none: "추가 서비스 없이 진행",
-      },
-      step5: {
-        title: "최종 확인",
-        review: "입력 정보 확인",
-        edit: "수정하기",
-        agree: "서비스 이용약관 및 개인정보처리방침에 동의합니다.",
-        terms: "서비스 이용약관",
-        privacy: "개인정보처리방침",
-        mustAgree: "동의가 필요합니다.",
-      },
-      step6: {
-        title: "결제",
-        paymentMethod: "결제 수단 선택",
-        card: "신용카드(Stripe)",
-        vnpay: "현지 결제(VNPay)",
-        bank: "무통장 입금",
-        pay: "결제하기",
-        skip: "건너뛰기",
-      },
-      priceSummary: "예상 결제 금액",
-      next: "다음",
-      prev: "이전",
-      required: "필수 입력 항목입니다.",
-      error: {
-        invalidEmail: "이메일 형식이 올바르지 않습니다.",
-        passportExpired: "여권 만료일이 6개월 이상 남아있어야 합니다.",
-        fileType: "허용되지 않는 파일 형식입니다.",
-        fileSize: "파일 크기가 너무 큽니다.",
-      },
+    },
+    step3: {
+      title: "서류 업로드",
+      passport: "여권 사본 업로드",
+      passportGuide:
+        "정보가 있는 면 전체가 빛 번짐 없이 선명하게 보여야 합니다.",
+      photo: "증명사진 업로드",
+      photoGuide: "흰색 배경, 안경/모자 착용 금지 등 규격을 확인하세요.",
+      upload: "업로드",
+      uploading: "업로드 중...",
+      uploaded: "업로드 완료",
+      remove: "삭제",
+    },
+    step4: {
+      title: "추가 서비스 선택",
+      fastTrack: "공항 패스트트랙",
+      pickup: "공항 픽업 서비스",
+      carType: "차량 종류 선택",
+      none: "추가 서비스 없이 진행",
+    },
+    step5: {
+      title: "최종 확인",
+      review: "입력 정보 확인",
+      edit: "수정하기",
+      agree: "서비스 이용약관 및 개인정보처리방침에 동의합니다.",
+      terms: "서비스 이용약관",
+      privacy: "개인정보처리방침",
+      mustAgree: "동의가 필요합니다.",
+    },
+    step6: {
+      title: "결제",
+      paymentMethod: "결제 수단 선택",
+      card: "신용카드(Stripe)",
+      vnpay: "현지 결제(VNPay)",
+      bank: "무통장 입금",
+      pay: "결제하기",
+      skip: "건너뛰기",
+    },
+    priceSummary: "예상 결제 금액",
+    next: "다음",
+    prev: "이전",
+    required: "필수 입력 항목입니다.",
+    error: {
+      invalidEmail: "이메일 형식이 올바르지 않습니다.",
+      passportExpired: "여권 만료일이 6개월 이상 남아있어야 합니다.",
+      fileType: "허용되지 않는 파일 형식입니다.",
+      fileSize: "파일 크기가 너무 큽니다.",
     },
   },
 
@@ -326,7 +342,8 @@ export const translations = {
       trustBadge: "⭐ 99.8% Customer Satisfaction",
       title: "Vietnam Visa Application",
       subtitle: "Fast and secure Vietnam visa service",
-      description: "Start your comfortable trip with reliable Vietnam visa agency service provided by experts.",
+      description:
+        "Start your comfortable trip with reliable Vietnam visa agency service provided by experts.",
       features: {
         fast: "24hr Processing",
         secure: "Secure Guaranteed",
@@ -352,17 +369,32 @@ export const translations = {
       tourist: {
         title: "Tourist Visa",
         description: "Optimal visa service for Vietnam tourism",
-        features: ["30-day stay available", "Single/Multiple entry options", "24-hour fast processing", "Free expert consultation"],
+        features: [
+          "30-day stay available",
+          "Single/Multiple entry options",
+          "24-hour fast processing",
+          "Free expert consultation",
+        ],
       },
       business: {
         title: "Business Visa",
         description: "Visa for business trips and business purposes to Vietnam",
-        features: ["90-day stay available", "Multiple entry allowed", "Business registration support", "Priority processing service"],
+        features: [
+          "90-day stay available",
+          "Multiple entry allowed",
+          "Business registration support",
+          "Priority processing service",
+        ],
       },
       electronic: {
         title: "Electronic Visa",
         description: "Electronic visa applied conveniently online",
-        features: ["Online application", "30-day stay", "Instant issuance", "Mobile verification"],
+        features: [
+          "Online application",
+          "30-day stay",
+          "Instant issuance",
+          "Mobile verification",
+        ],
       },
       apply: "Apply",
       unsure: "Not sure which visa you need?",
@@ -377,7 +409,8 @@ export const translations = {
       steps: [
         {
           title: "Online Application",
-          description: "Fill out the visa application form conveniently on our website",
+          description:
+            "Fill out the visa application form conveniently on our website",
         },
         {
           title: "Upload Documents",
@@ -401,11 +434,13 @@ export const translations = {
       subtitle: "We make your Vietnam travel more convenient",
       translation: {
         title: "Document Translation",
-        description: "Professional document translation service provided by certified translators",
+        description:
+          "Professional document translation service provided by certified translators",
       },
       consultation: {
         title: "Expert Consultation",
-        description: "1:1 customized consultation service by Vietnam visa experts",
+        description:
+          "1:1 customized consultation service by Vietnam visa experts",
       },
       insurance: {
         title: "Travel Insurance",
@@ -413,7 +448,8 @@ export const translations = {
       },
       booking: {
         title: "Flight Booking",
-        description: "Vietnam flight booking agency and lowest price guarantee service",
+        description:
+          "Vietnam flight booking agency and lowest price guarantee service",
       },
     },
 
@@ -425,7 +461,8 @@ export const translations = {
       },
       translation: {
         title: "Document Translation Service",
-        description: "Professional document translation by certified translators",
+        description:
+          "Professional document translation by certified translators",
       },
       insurance: {
         title: "Travel Insurance",
@@ -445,18 +482,21 @@ export const translations = {
     // Company Info
     company: {
       title: "Trusted Vietnam Visa Specialist",
-      subtitle: "A trusted partner providing Vietnam visa specialist services since 2015.",
+      subtitle:
+        "A trusted partner providing Vietnam visa specialist services since 2015.",
       experience: "10+ Years",
       success: "99.8%",
       customers: "50,000+",
       support: "24/7",
       mission: {
         title: "Our Mission",
-        description: "We provide the best visa service for customers' comfortable Vietnam travel",
+        description:
+          "We provide the best visa service for customers' comfortable Vietnam travel",
       },
       vision: {
         title: "Our Vision",
-        description: "We will grow as the best visa agency service company in Asia",
+        description:
+          "We will grow as the best visa agency service company in Asia",
       },
     },
 
@@ -467,15 +507,18 @@ export const translations = {
       items: [
         {
           question: "What documents are required for Vietnam visa application?",
-          answer: "Passport copy, photo, and application form are basically required, and additional documents may be needed depending on the visa type.",
+          answer:
+            "Passport copy, photo, and application form are basically required, and additional documents may be needed depending on the visa type.",
         },
         {
           question: "How long does visa processing take?",
-          answer: "It generally takes 3-5 business days, and urgent processing can be issued within 24 hours.",
+          answer:
+            "It generally takes 3-5 business days, and urgent processing can be issued within 24 hours.",
         },
         {
           question: "Can visa approval be rejected?",
-          answer: "When applying through our service, we boast a high approval rate of 99.8%, and we provide a full refund if rejected.",
+          answer:
+            "When applying through our service, we boast a high approval rate of 99.8%, and we provide a full refund if rejected.",
         },
       ],
     },
@@ -483,7 +526,8 @@ export const translations = {
     // Contact
     contact: {
       title: "Contact Us",
-      subtitle: "If you have any questions about Vietnam visa, please contact us anytime",
+      subtitle:
+        "If you have any questions about Vietnam visa, please contact us anytime",
       form: {
         name: "Name",
         email: "Email",
@@ -529,14 +573,14 @@ export const translations = {
         birth: "Date of Birth",
         nationality: "Nationality",
         email: "Email",
-        phone: "Vietnam Contact Number",
+        phone: "Phone",
       },
       step3: {
         title: "Document Upload",
         passport: "Upload Passport Copy",
         passportGuide: "The information page must be clear and glare-free.",
         photo: "Upload Photo",
-        photoGuide: "White background, no glasses/hats, check requirements.",
+        photoGuide: "White background, no glasses or hats; check requirements.",
         upload: "Upload",
         uploading: "Uploading...",
         uploaded: "Upload Complete",
@@ -598,7 +642,8 @@ export const translations = {
       trustBadge: "⭐ Đạt 99.8% sự hài lòng của khách hàng",
       title: "Xin Visa Việt Nam",
       subtitle: "Dịch vụ visa Việt Nam nhanh chóng và an toàn",
-      description: "Bắt đầu chuyến đi thoải mái với dịch vụ đại lý visa Việt Nam đáng tin cậy do các chuyên gia cung cấp.",
+      description:
+        "Bắt đầu chuyến đi thoải mái với dịch vụ đại lý visa Việt Nam đáng tin cậy do các chuyên gia cung cấp.",
       features: {
         fast: "Xử lý 24h",
         secure: "Đảm bảo an toàn",
@@ -615,7 +660,8 @@ export const translations = {
     // Visa Services
     visa: {
       title: "Dịch vụ Visa",
-      subtitle: "Chúng tôi cung cấp các lựa chọn visa Việt Nam đa dạng phù hợp với mục đích của bạn",
+      subtitle:
+        "Chúng tôi cung cấp các lựa chọn visa Việt Nam đa dạng phù hợp với mục đích của bạn",
       badges: {
         popular: "Phổ biến",
         recommended: "Được khuyến nghị",
@@ -624,32 +670,51 @@ export const translations = {
       tourist: {
         title: "Visa Du lịch",
         description: "Dịch vụ visa tối ưu cho du lịch Việt Nam",
-        features: ["Có thể lưu trú 30 ngày", "Lựa chọn nhập cảnh một lần/nhiều lần", "Xử lý nhanh 24 giờ", "Tư vấn chuyên gia miễn phí"],
+        features: [
+          "Có thể lưu trú 30 ngày",
+          "Lựa chọn nhập cảnh một lần/nhiều lần",
+          "Xử lý nhanh 24 giờ",
+          "Tư vấn chuyên gia miễn phí",
+        ],
       },
       business: {
         title: "Visa Kinh doanh",
-        description: "Visa cho chuyến công tác và mục đích kinh doanh tại Việt Nam",
-        features: ["Có thể lưu trú 90 ngày", "Cho phép nhập cảnh nhiều lần", "Hỗ trợ đăng ký kinh doanh", "Dịch vụ xử lý ưu tiên"],
+        description:
+          "Visa cho chuyến công tác và mục đích kinh doanh tại Việt Nam",
+        features: [
+          "Có thể lưu trú 90 ngày",
+          "Cho phép nhập cảnh nhiều lần",
+          "Hỗ trợ đăng ký kinh doanh",
+          "Dịch vụ xử lý ưu tiên",
+        ],
       },
       electronic: {
         title: "Visa Điện tử",
         description: "Visa điện tử được đăng ký thuận tiện trực tuyến",
-        features: ["Đăng ký trực tuyến", "Lưu trú 30 ngày", "Cấp ngay lập tức", "Xác minh qua điện thoại"],
+        features: [
+          "Đăng ký trực tuyến",
+          "Lưu trú 30 ngày",
+          "Cấp ngay lập tức",
+          "Xác minh qua điện thoại",
+        ],
       },
       apply: "Đăng ký",
       unsure: "Không chắc chắn loại visa nào bạn cần?",
-      recommend: "Các chuyên gia tư vấn của chúng tôi sẽ khuyến nghị visa tốt nhất cho bạn",
+      recommend:
+        "Các chuyên gia tư vấn của chúng tôi sẽ khuyến nghị visa tốt nhất cho bạn",
       consultation: "Nhận tư vấn miễn phí",
     },
 
     // Process Steps
     process: {
       title: "Quy trình đăng ký",
-      subtitle: "Quy trình đăng ký visa Việt Nam hoàn thành trong 4 bước đơn giản",
+      subtitle:
+        "Quy trình đăng ký visa Việt Nam hoàn thành trong 4 bước đơn giản",
       steps: [
         {
           title: "Đăng ký trực tuyến",
-          description: "Điền đơn đăng ký visa một cách thuận tiện trên trang web của chúng tôi",
+          description:
+            "Điền đơn đăng ký visa một cách thuận tiện trên trang web của chúng tôi",
         },
         {
           title: "Tải lên tài liệu",
@@ -657,7 +722,8 @@ export const translations = {
         },
         {
           title: "Hoàn thành thanh toán",
-          description: "Thanh toán phí qua hệ thống thanh toán an toàn của chúng tôi",
+          description:
+            "Thanh toán phí qua hệ thống thanh toán an toàn của chúng tôi",
         },
         {
           title: "Cấp visa",
@@ -670,22 +736,27 @@ export const translations = {
     // Additional Services
     additionalServices: {
       title: "Dịch vụ bổ sung",
-      subtitle: "Chúng tôi làm cho chuyến du lịch Việt Nam của bạn thuận tiện hơn",
+      subtitle:
+        "Chúng tôi làm cho chuyến du lịch Việt Nam của bạn thuận tiện hơn",
       translation: {
         title: "Dịch thuật tài liệu",
-        description: "Dịch vụ dịch thuật tài liệu chuyên nghiệp do các dịch giả được chứng nhận cung cấp",
+        description:
+          "Dịch vụ dịch thuật tài liệu chuyên nghiệp do các dịch giả được chứng nhận cung cấp",
       },
       consultation: {
         title: "Tư vấn chuyên gia",
-        description: "Dịch vụ tư vấn cá nhân hóa 1:1 bởi các chuyên gia visa Việt Nam",
+        description:
+          "Dịch vụ tư vấn cá nhân hóa 1:1 bởi các chuyên gia visa Việt Nam",
       },
       insurance: {
         title: "Bảo hiểm du lịch",
-        description: "Bảo hiểm du lịch toàn diện cho chuyến du lịch Việt Nam an toàn",
+        description:
+          "Bảo hiểm du lịch toàn diện cho chuyến du lịch Việt Nam an toàn",
       },
       booking: {
         title: "Đặt vé máy bay",
-        description: "Dịch vụ đại lý đặt vé máy bay Việt Nam và đảm bảo giá thấp nhất",
+        description:
+          "Dịch vụ đại lý đặt vé máy bay Việt Nam và đảm bảo giá thấp nhất",
       },
     },
 
@@ -697,7 +768,8 @@ export const translations = {
       },
       translation: {
         title: "Dịch vụ dịch thuật tài liệu",
-        description: "Dịch thuật tài liệu chuyên nghiệp bởi các dịch giả được chứng nhận",
+        description:
+          "Dịch thuật tài liệu chuyên nghiệp bởi các dịch giả được chứng nhận",
       },
       insurance: {
         title: "Bảo hiểm du lịch",
@@ -717,18 +789,21 @@ export const translations = {
     // Company Info
     company: {
       title: "Chuyên gia Visa Việt Nam đáng tin cậy",
-      subtitle: "Đối tác đáng tin cậy cung cấp dịch vụ chuyên gia visa Việt Nam từ năm 2015.",
+      subtitle:
+        "Đối tác đáng tin cậy cung cấp dịch vụ chuyên gia visa Việt Nam từ năm 2015.",
       experience: "10+ Năm",
       success: "99.8%",
       customers: "50,000+",
       support: "24/7",
       mission: {
         title: "Sứ mệnh của chúng tôi",
-        description: "Chúng tôi cung cấp dịch vụ visa tốt nhất cho chuyến du lịch Việt Nam thoải mái của khách hàng",
+        description:
+          "Chúng tôi cung cấp dịch vụ visa tốt nhất cho chuyến du lịch Việt Nam thoải mái của khách hàng",
       },
       vision: {
         title: "Tầm nhìn của chúng tôi",
-        description: "Chúng tôi sẽ phát triển thành công ty dịch vụ đại lý visa tốt nhất châu Á",
+        description:
+          "Chúng tôi sẽ phát triển thành công ty dịch vụ đại lý visa tốt nhất châu Á",
       },
     },
 
@@ -739,15 +814,18 @@ export const translations = {
       items: [
         {
           question: "Những tài liệu nào cần thiết để đăng ký visa Việt Nam?",
-          answer: "Bản sao hộ chiếu, ảnh và đơn đăng ký về cơ bản là cần thiết, và có thể cần thêm tài liệu tùy thuộc vào loại visa.",
+          answer:
+            "Bản sao hộ chiếu, ảnh và đơn đăng ký về cơ bản là cần thiết, và có thể cần thêm tài liệu tùy thuộc vào loại visa.",
         },
         {
           question: "Xử lý visa mất bao lâu?",
-          answer: "Thường mất 3-5 ngày làm việc, và xử lý khẩn cấp có thể được cấp trong vòng 24 giờ.",
+          answer:
+            "Thường mất 3-5 ngày làm việc, và xử lý khẩn cấp có thể được cấp trong vòng 24 giờ.",
         },
         {
           question: "Phê duyệt visa có thể bị từ chối không?",
-          answer: "Khi đăng ký qua dịch vụ của chúng tôi, chúng tôi tự hào có tỷ lệ phê duyệt cao 99.8%, và chúng tôi hoàn tiền đầy đủ nếu bị từ chối.",
+          answer:
+            "Khi đăng ký qua dịch vụ của chúng tôi, chúng tôi tự hào có tỷ lệ phê duyệt cao 99.8%, và chúng tôi hoàn tiền đầy đủ nếu bị từ chối.",
         },
       ],
     },
@@ -755,7 +833,8 @@ export const translations = {
     // Contact
     contact: {
       title: "Liên hệ với chúng tôi",
-      subtitle: "Nếu bạn có bất kỳ câu hỏi nào về visa Việt Nam, vui lòng liên hệ với chúng tôi bất cứ lúc nào",
+      subtitle:
+        "Nếu bạn có bất kỳ câu hỏi nào về visa Việt Nam, vui lòng liên hệ với chúng tôi bất cứ lúc nào",
       form: {
         name: "Tên",
         email: "Email",
