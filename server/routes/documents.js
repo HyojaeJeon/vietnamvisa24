@@ -44,6 +44,9 @@ const upload = multer({
 
 // 단일 파일 업로드
 router.post('/upload', upload.single('document'), async (req, res) => {
+  console.log(`📤 File upload request received at /upload`);
+  console.log(`📤 Request body:`, req.body);
+  console.log(`📤 Request file:`, req.file ? 'File present' : 'No file');
   // CORS 헤더 설정
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');

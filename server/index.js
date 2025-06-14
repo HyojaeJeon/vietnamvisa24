@@ -56,8 +56,16 @@ async function startServer() {
   // ─── REST API 라우터 설정 ────────────────────────────────────
   app.use(cors(corsOptions)); // 모든 라우터에 CORS 적용
   app.use(express.json()); // JSON 파서 적용
+  
+  // 요청 로깅 미들웨어 추가
+  app.use((req, res, next) => {
+    console.log(`📝 ${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+  });
+  
   // 문서 관리 API 라우터
   app.use("/api/documents", documentsRouter);
+  console.log("✅ Documents router registered at /api/documents");
 
   // 웹훅 API 라우터 (결제 서비스 연동)
   app.use("/api/webhooks", webhooksRouter);
