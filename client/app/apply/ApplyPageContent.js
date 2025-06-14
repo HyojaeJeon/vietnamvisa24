@@ -4,482 +4,252 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "../src/components/header";
 import Footer from "../src/components/footer";
-import { Card, CardContent, CardHeader, CardTitle } from "../src/components/ui/card";
-import { Button } from "../src/components/ui/button";
-import { Input } from "../src/components/ui/input";
-import { Textarea } from "../src/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../src/components/ui/select";
-import {
-  FileText,
-  Clock,
-  Shield,
-  CheckCircle,
-  Upload,
-  User,
-  Calendar,
-  Phone,
-  Mail,
-  MapPin,
-  Globe,
-  AlertCircle,
-  Send,
-  Star,
-  CreditCard,
-  Zap,
-  Camera,
-  Briefcase,
-  Smartphone,
-  ArrowRight,
-  Award,
-} from "lucide-react";
+
+// Import utilities and types
+import { initialFormData, STEPS } from "./_components/types";
+import { validateStep, getStepDescription, getStepTitle } from "./_components/utils";
+
+// Import components
+import ProgressIndicator from "./_components/progressIndicator";
+import PersonalInfoStep from "./_components/personalInfoStep";
+import ContactInfoStep from "./_components/contactInfoStep";
+import TravelInfoStep from "./_components/travelInfoStep";
+import DocumentUploadStep from "./_components/documentUploadStep";
+import ReviewStep from "./_components/reviewStep";
+import PaymentStep from "./_components/paymentStep";
+import ConfirmationStep from "./_components/confirmationStep";
 
 export default function ApplyPageContent() {
-  const searchParams = useSearchParams();
-  const visaType = searchParams.get("type") || "general";
+  console.log("ApplyPageContent rendering...");
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    // 개인정보
-    firstName: "",
-    lastName: "",
-    birthDate: "",
-    nationality: "",
-    passportNumber: "",
-    passportExpiry: "",
-    gender: "",
-
-    // 연락처
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-
-    // 여행정보
-    arrivalDate: "",
-    departureDate: "",
-    purpose: "",
-    previousVisa: "",
-
-    // 파일
-    passportPhoto: null,
-    additionalDocs: [],
-  });
-
-  const [errors, setErrors] = useState({});
+  // State management
+  const [currentStep, setCurrentStep] = useState(STEPS.PERSONAL_INFO);
+  const [formData, setFormData] = useState(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [applicationId, setApplicationId] = useState("");
 
-  const visaTypes = {
-    general: {
-      title: "일반 관광 비자",
-      description: "베트남 관광을 위한 기본 비자",
-      price: "50,000원",
-      duration: "30일",
-      icon: <Globe className="w-8 h-8" />,
-    },
-    express: {
-      title: "긴급 비자",
-      description: "24시간 내 발급 가능한 긴급 비자",
-      price: "100,000원",
-      duration: "30일",
-      icon: <Zap className="w-8 h-8" />,
-    },
-    business: {
-      title: "비즈니스 비자",
-      description: "사업 목적의 베트남 입국 비자",
-      price: "80,000원",
-      duration: "90일",
-      icon: <Briefcase className="w-8 h-8" />,
-    },
-  };
+  const searchParams = useSearchParams();
 
-  const currentVisa = visaTypes[visaType] || visaTypes.general;
+  // Initialize step from URL parameter if present
+  useEffect(() => {
+    const stepParam = searchParams.get("step");
+    if (stepParam) {
+      const stepNumber = parseInt(stepParam);
+      if (stepNumber >= 1 && stepNumber <= 7) {
+        setCurrentStep(stepNumber);
+      }
+    }
+  }, [searchParams]);
 
-  const handleInputChange = (field, value) => {
+  // Update form data
+  const updateFormData = (updates) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value,
+      ...updates,
     }));
-
-    // 에러 제거
-    if (errors[field]) {
-      setErrors((prev) => ({
-        ...prev,
-        [field]: "",
-      }));
-    }
   };
 
-  const validateStep = (step) => {
-    const newErrors = {};
-
-    if (step === 1) {
-      if (!formData.firstName.trim()) newErrors.firstName = "이름을 입력해주세요";
-      if (!formData.lastName.trim()) newErrors.lastName = "성을 입력해주세요";
-      if (!formData.birthDate) newErrors.birthDate = "생년월일을 입력해주세요";
-      if (!formData.nationality) newErrors.nationality = "국적을 선택해주세요";
-      if (!formData.passportNumber.trim()) newErrors.passportNumber = "여권번호를 입력해주세요";
-      if (!formData.passportExpiry) newErrors.passportExpiry = "여권 만료일을 입력해주세요";
-      if (!formData.gender) newErrors.gender = "성별을 선택해주세요";
-    }
-
-    if (step === 2) {
-      if (!formData.email.trim()) newErrors.email = "이메일을 입력해주세요";
-      if (!formData.phone.trim()) newErrors.phone = "전화번호를 입력해주세요";
-      if (!formData.address.trim()) newErrors.address = "주소를 입력해주세요";
-    }
-
-    if (step === 3) {
-      if (!formData.arrivalDate) newErrors.arrivalDate = "입국일을 입력해주세요";
-      if (!formData.departureDate) newErrors.departureDate = "출국일을 입력해주세요";
-      if (!formData.purpose.trim()) newErrors.purpose = "방문 목적을 입력해주세요";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
+  // Navigation handlers
   const handleNext = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, 4));
+    if (currentStep < 7 && validateStep(currentStep, formData)) {
+      setCurrentStep((prev) => prev + 1);
+      // Smooth scroll to top with better mobile handling
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }, 100);
+    } else {
+      // Show validation errors if step is not valid
+      const stepName = getStepTitle(currentStep);
+      console.log(`${stepName} 단계를 완료해주세요.`);
     }
   };
 
   const handlePrev = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1);
+      // Smooth scroll to top
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }, 100);
+    }
   };
 
+  // Handle final submission
   const handleSubmit = async () => {
-    if (!validateStep(currentStep)) return;
-
     setIsSubmitting(true);
     try {
-      // API 호출 시뮬레이션
       await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // 성공 처리
-      alert("비자 신청이 완료되었습니다!");
+      const newApplicationId = "VN-" + Date.now().toString().slice(-8);
+      setApplicationId(newApplicationId);
+      setCurrentStep(STEPS.CONFIRMATION);
     } catch (error) {
-      console.error("신청 오류:", error);
+      console.error("Submission error:", error);
       alert("신청 중 오류가 발생했습니다. 다시 시도해주세요.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const renderPersonalInfo = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">이름 *</label>
-          <Input
-            type="text"
-            value={formData.firstName}
-            onChange={(e) => handleInputChange("firstName", e.target.value)}
-            placeholder="이름을 입력하세요"
-            className={errors.firstName ? "border-red-500" : ""}
-          />
-          {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">성 *</label>
-          <Input
-            type="text"
-            value={formData.lastName}
-            onChange={(e) => handleInputChange("lastName", e.target.value)}
-            placeholder="성을 입력하세요"
-            className={errors.lastName ? "border-red-500" : ""}
-          />
-          {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
-        </div>
-      </div>
+  // Auto-save form data to localStorage
+  useEffect(() => {
+    const savedData = localStorage.getItem("visa-application-form");
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        setFormData((prev) => ({ ...prev, ...parsed }));
+      } catch (error) {
+        console.error("Error loading saved form data:", error);
+      }
+    }
+  }, []);
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">생년월일 *</label>
-          <Input type="date" value={formData.birthDate} onChange={(e) => handleInputChange("birthDate", e.target.value)} className={errors.birthDate ? "border-red-500" : ""} />
-          {errors.birthDate && <p className="text-red-500 text-sm mt-1">{errors.birthDate}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">성별 *</label>
-          <Select value={formData.gender} onValueChange={(value) => handleInputChange("gender", value)}>
-            <SelectTrigger className={errors.gender ? "border-red-500" : ""}>
-              <SelectValue placeholder="성별을 선택하세요" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="male">남성</SelectItem>
-              <SelectItem value="female">여성</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.gender && <p className="text-red-500 text-sm mt-1">{errors.gender}</p>}
-        </div>
-      </div>
+  useEffect(() => {
+    if (currentStep < STEPS.CONFIRMATION) {
+      localStorage.setItem("visa-application-form", JSON.stringify(formData));
+    }
+  }, [formData, currentStep]);
 
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">국적 *</label>
-          <Select value={formData.nationality} onValueChange={(value) => handleInputChange("nationality", value)}>
-            <SelectTrigger className={errors.nationality ? "border-red-500" : ""}>
-              <SelectValue placeholder="국적을 선택하세요" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="korean">한국</SelectItem>
-              <SelectItem value="american">미국</SelectItem>
-              <SelectItem value="japanese">일본</SelectItem>
-              <SelectItem value="chinese">중국</SelectItem>
-            </SelectContent>
-          </Select>
-          {errors.nationality && <p className="text-red-500 text-sm mt-1">{errors.nationality}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">여권번호 *</label>
-          <Input
-            type="text"
-            value={formData.passportNumber}
-            onChange={(e) => handleInputChange("passportNumber", e.target.value)}
-            placeholder="여권번호를 입력하세요"
-            className={errors.passportNumber ? "border-red-500" : ""}
-          />
-          {errors.passportNumber && <p className="text-red-500 text-sm mt-1">{errors.passportNumber}</p>}
-        </div>
-      </div>
+  // Clear saved data when application is completed
+  useEffect(() => {
+    if (currentStep === STEPS.CONFIRMATION) {
+      localStorage.removeItem("visa-application-form");
+    }
+  }, [currentStep]);
 
-      <div>
-        <label className="block text-sm font-medium mb-2">여권 만료일 *</label>
-        <Input type="date" value={formData.passportExpiry} onChange={(e) => handleInputChange("passportExpiry", e.target.value)} className={errors.passportExpiry ? "border-red-500" : ""} />
-        {errors.passportExpiry && <p className="text-red-500 text-sm mt-1">{errors.passportExpiry}</p>}
-      </div>
-    </div>
-  );
+  // Prevent accidental page refresh/back button
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (currentStep > 1 && currentStep < STEPS.CONFIRMATION) {
+        e.preventDefault();
+        e.returnValue = "작성 중인 신청서가 있습니다. 정말 페이지를 나가시겠습니까?";
+        return e.returnValue;
+      }
+    };
 
-  const renderContactInfo = () => (
-    <div className="space-y-6">
-      <div>
-        <label className="block text-sm font-medium mb-2">이메일 *</label>
-        <Input type="email" value={formData.email} onChange={(e) => handleInputChange("email", e.target.value)} placeholder="이메일을 입력하세요" className={errors.email ? "border-red-500" : ""} />
-        {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-      </div>
+    const handlePopState = (e) => {
+      if (currentStep > 1 && currentStep < STEPS.CONFIRMATION) {
+        const userConfirmed = window.confirm("작성 중인 신청서가 있습니다. 정말 뒤로 가시겠습니까? 작성된 내용은 자동 저장됩니다.");
+        if (!userConfirmed) {
+          window.history.pushState(null, null, window.location.pathname);
+        }
+      }
+    };
 
-      <div>
-        <label className="block text-sm font-medium mb-2">전화번호 *</label>
-        <Input type="tel" value={formData.phone} onChange={(e) => handleInputChange("phone", e.target.value)} placeholder="전화번호를 입력하세요" className={errors.phone ? "border-red-500" : ""} />
-        {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-      </div>
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
 
-      <div>
-        <label className="block text-sm font-medium mb-2">주소 *</label>
-        <Textarea value={formData.address} onChange={(e) => handleInputChange("address", e.target.value)} placeholder="주소를 입력하세요" className={errors.address ? "border-red-500" : ""} rows={3} />
-        {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
-      </div>
+    // Keyboard navigation
+    const handleKeyDown = (e) => {
+      // ESC key to show help
+      if (e.key === "Escape" && currentStep < STEPS.CONFIRMATION) {
+        const helpSection = document.querySelector("[data-help-section]");
+        if (helpSection) {
+          helpSection.scrollIntoView({ behavior: "smooth" });
+          helpSection.focus();
+        }
+      }
 
-      <div>
-        <label className="block text-sm font-medium mb-2">도시</label>
-        <Input type="text" value={formData.city} onChange={(e) => handleInputChange("city", e.target.value)} placeholder="도시를 입력하세요" />
-      </div>
-    </div>
-  );
+      // F1 for help
+      if (e.key === "F1") {
+        e.preventDefault();
+        window.open("tel:02-1234-5678");
+      }
+    };
 
-  const renderTravelInfo = () => (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2">입국일 *</label>
-          <Input type="date" value={formData.arrivalDate} onChange={(e) => handleInputChange("arrivalDate", e.target.value)} className={errors.arrivalDate ? "border-red-500" : ""} />
-          {errors.arrivalDate && <p className="text-red-500 text-sm mt-1">{errors.arrivalDate}</p>}
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2">출국일 *</label>
-          <Input type="date" value={formData.departureDate} onChange={(e) => handleInputChange("departureDate", e.target.value)} className={errors.departureDate ? "border-red-500" : ""} />
-          {errors.departureDate && <p className="text-red-500 text-sm mt-1">{errors.departureDate}</p>}
-        </div>
-      </div>
+    window.addEventListener("keydown", handleKeyDown);
 
-      <div>
-        <label className="block text-sm font-medium mb-2">방문 목적 *</label>
-        <Select value={formData.purpose} onValueChange={(value) => handleInputChange("purpose", value)}>
-          <SelectTrigger className={errors.purpose ? "border-red-500" : ""}>
-            <SelectValue placeholder="방문 목적을 선택하세요" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="tourism">관광</SelectItem>
-            <SelectItem value="business">사업</SelectItem>
-            <SelectItem value="visiting">친지 방문</SelectItem>
-            <SelectItem value="other">기타</SelectItem>
-          </SelectContent>
-        </Select>
-        {errors.purpose && <p className="text-red-500 text-sm mt-1">{errors.purpose}</p>}
-      </div>
+    // Push state to prevent back button
+    if (currentStep > 1) {
+      window.history.pushState(null, null, window.location.pathname);
+    }
 
-      <div>
-        <label className="block text-sm font-medium mb-2">이전 베트남 비자 여부</label>
-        <Select value={formData.previousVisa} onValueChange={(value) => handleInputChange("previousVisa", value)}>
-          <SelectTrigger>
-            <SelectValue placeholder="이전 비자 여부를 선택하세요" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="yes">예</SelectItem>
-            <SelectItem value="no">아니오</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-    </div>
-  );
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentStep]);
 
-  const renderReview = () => (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-green-500" />
-            신청 정보 확인
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-600">이름</p>
-              <p className="font-medium">
-                {formData.firstName} {formData.lastName}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">생년월일</p>
-              <p className="font-medium">{formData.birthDate}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">여권번호</p>
-              <p className="font-medium">{formData.passportNumber}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">국적</p>
-              <p className="font-medium">{formData.nationality}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">이메일</p>
-              <p className="font-medium">{formData.email}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">전화번호</p>
-              <p className="font-medium">{formData.phone}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">입국일</p>
-              <p className="font-medium">{formData.arrivalDate}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">출국일</p>
-              <p className="font-medium">{formData.departureDate}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="w-5 h-5 text-blue-500" />
-            비자 정보 및 결제
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
-            <div className="flex items-center gap-3">
-              {currentVisa.icon}
-              <div>
-                <h3 className="font-semibold">{currentVisa.title}</h3>
-                <p className="text-sm text-gray-600">{currentVisa.description}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-blue-600">{currentVisa.price}</p>
-              <p className="text-sm text-gray-600">{currentVisa.duration}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  const steps = [
-    { id: 1, title: "개인정보", icon: <User className="w-5 h-5" /> },
-    { id: 2, title: "연락처", icon: <Phone className="w-5 h-5" /> },
-    { id: 3, title: "여행정보", icon: <Calendar className="w-5 h-5" /> },
-    { id: 4, title: "확인", icon: <CheckCircle className="w-5 h-5" /> },
-  ];
+  // Render current step
+  const renderStep = () => {
+    switch (currentStep) {
+      case STEPS.PERSONAL_INFO:
+        return <PersonalInfoStep formData={formData} onUpdate={updateFormData} onNext={handleNext} />;
+      case STEPS.CONTACT_INFO:
+        return <ContactInfoStep formData={formData} onUpdate={updateFormData} onNext={handleNext} onPrev={handlePrev} />;
+      case STEPS.TRAVEL_INFO:
+        return <TravelInfoStep formData={formData} onUpdate={updateFormData} onNext={handleNext} onPrev={handlePrev} />;
+      case STEPS.DOCUMENT_UPLOAD:
+        return <DocumentUploadStep formData={formData} onUpdate={updateFormData} onNext={handleNext} onPrev={handlePrev} />;
+      case STEPS.REVIEW:
+        return <ReviewStep formData={formData} onNext={handleNext} onPrev={handlePrev} />;
+      case STEPS.PAYMENT:
+        return <PaymentStep formData={formData} onUpdate={updateFormData} onNext={handleSubmit} onPrev={handlePrev} isSubmitting={isSubmitting} />;
+      case STEPS.CONFIRMATION:
+        return <ConfirmationStep formData={formData} applicationId={applicationId} />;
+      default:
+        return null;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Header />
 
-      <main className="py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          {/* 비자 타입 헤더 */}
-          <div className="mb-8">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    {currentVisa.icon}
-                    <div>
-                      <h1 className="text-2xl font-bold">{currentVisa.title}</h1>
-                      <p className="text-gray-600">{currentVisa.description}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-3xl font-bold text-blue-600">{currentVisa.price}</p>
-                    <p className="text-gray-600">{currentVisa.duration}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">베트남 비자 신청</h1>
+            <p className="text-gray-600 text-lg">{getStepDescription(currentStep)}</p>
           </div>
 
-          {/* 진행 단계 */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              {steps.map((step, index) => (
-                <div key={step.id} className="flex items-center">
-                  <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${currentStep >= step.id ? "bg-blue-500 text-white" : "bg-gray-200 text-gray-600"}`}>
-                    {step.icon}
-                    <span className="font-medium">{step.title}</span>
-                  </div>
-                  {index < steps.length - 1 && <ArrowRight className="w-5 h-5 text-gray-400 mx-2" />}
-                </div>
-              ))}
+          {/* Progress Indicator */}
+          {currentStep < STEPS.CONFIRMATION && <ProgressIndicator currentStep={currentStep} totalSteps={6} />}
+
+          {/* Loading overlay for submission */}
+          {isSubmitting && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-8 max-w-sm mx-4 text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <h3 className="text-lg font-semibold mb-2">신청서 제출 중...</h3>
+                <p className="text-gray-600">잠시만 기다려주세요</p>
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* 폼 컨텐츠 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>
-                {currentStep === 1 && "개인정보 입력"}
-                {currentStep === 2 && "연락처 정보"}
-                {currentStep === 3 && "여행 정보"}
-                {currentStep === 4 && "신청 정보 확인"}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {currentStep === 1 && renderPersonalInfo()}
-              {currentStep === 2 && renderContactInfo()}
-              {currentStep === 3 && renderTravelInfo()}
-              {currentStep === 4 && renderReview()}
-            </CardContent>
-          </Card>
+          {/* Step Content */}
+          <div className="mb-8">{renderStep()}</div>
 
-          {/* 네비게이션 버튼 */}
-          <div className="flex justify-between mt-8">
-            <Button variant="outline" onClick={handlePrev} disabled={currentStep === 1}>
-              이전
-            </Button>
-
-            {currentStep < 4 ? (
-              <Button onClick={handleNext}>다음</Button>
-            ) : (
-              <Button onClick={handleSubmit} disabled={isSubmitting} className="bg-blue-600 hover:bg-blue-700">
-                {isSubmitting ? "처리중..." : "신청 완료"}
-              </Button>
-            )}
-          </div>
+          {/* Help Section */}
+          {currentStep < STEPS.CONFIRMATION && (
+            <div className="mt-12 bg-gray-50 rounded-lg p-6" data-help-section tabIndex="-1">
+              <h3 className="font-semibold text-gray-800 mb-3">📞 도움이 필요하신가요?</h3>
+              <div className="text-xs text-gray-500 mb-4">💡 ESC 키를 누르면 이 도움말로 이동하며, F1 키로 바로 전화연결이 가능합니다</div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <div className="font-medium">전화 문의</div>
+                  <div className="text-blue-600">02-1234-5678</div>
+                  <div className="text-gray-500">평일 9:00-18:00</div>
+                </div>
+                <div>
+                  <div className="font-medium">이메일 문의</div>
+                  <div className="text-green-600">support@vietnamvisa24.com</div>
+                  <div className="text-gray-500">24시간 접수</div>
+                </div>
+                <div>
+                  <div className="font-medium">카카오톡 문의</div>
+                  <div className="text-yellow-600">@vietnamvisa24</div>
+                  <div className="text-gray-500">실시간 상담</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
