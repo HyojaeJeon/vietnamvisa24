@@ -8,7 +8,7 @@ import { Input } from "../src/components/ui/input";
 import Header from "../src/components/header";
 import { t as baseT, translations } from "../src/lib/translations";
 import { useLanguage } from "../src/hooks/useLanguage";
-import { CheckCircle, Star, Clock, Shield, ArrowRight, ArrowLeft, Globe, CreditCard, FileText, User, Phone, Calendar } from "lucide-react";
+import { CheckCircle, Star, Clock, Shield, ArrowRight, ArrowLeft, Globe, CreditCard, FileText, User, Phone, Calendar, Upload } from "lucide-react";
 
 // t 함수 개선: 언어별로 우선 찾고, 없으면 ko로 fallback
 function t(key, language) {
