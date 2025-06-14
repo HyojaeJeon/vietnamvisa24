@@ -328,41 +328,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
             </div>
           </div>
 
-          {/* 기본 정보 입력 */}
-          <div className="mt-8 p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <User className="w-5 h-5 text-blue-600" />
-              기본 정보
-            </h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* 성별 선택 */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-gray-700">
-                  성별 *
-                </label>
-                <CustomSelect
-                  value={data?.gender || ""}
-                  onValueChange={(value) => handleCustomSelectChange("gender", value)}
-                  placeholder="성별을 선택해주세요"
-                  options={genderOptions}
-                />
-              </div>
-
-              {/* 국적 선택 */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-gray-700">
-                  국적 *
-                </label>
-                <CustomSelect
-                  value={data?.nationality || ""}
-                  onValueChange={(value) => handleCustomSelectChange("nationality", value)}
-                  placeholder="국적을 선택해주세요"
-                  options={countryOptions}
-                />
-              </div>
-            </div>
-          </div>
+          
 
           {/* 실시간 가격 요약 */}
           <div className="sticky bottom-0 mt-8 p-6 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-2xl">
@@ -385,7 +351,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
           <div className="flex justify-end mt-8">
             <Button
               onClick={onNext}
-              disabled={!data?.serviceType || !data?.visaType || !data?.processing || !data?.gender || !data?.nationality}
+              disabled={!data?.serviceType || !data?.visaType || !data?.processing}
               className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="mr-2">
@@ -401,6 +367,37 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
 }
 
 function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
+  // 성별 옵션
+  const genderOptions = [
+    { value: "male", label: "남성" },
+    { value: "female", label: "여성" },
+  ];
+
+  // 국가 옵션 (10개 이상)
+  const countryOptions = [
+    { value: "KR", label: "대한민국", flag: "🇰🇷" },
+    { value: "US", label: "미국", flag: "🇺🇸" },
+    { value: "JP", label: "일본", flag: "🇯🇵" },
+    { value: "CN", label: "중국", flag: "🇨🇳" },
+    { value: "GB", label: "영국", flag: "🇬🇧" },
+    { value: "DE", label: "독일", flag: "🇩🇪" },
+    { value: "FR", label: "프랑스", flag: "🇫🇷" },
+    { value: "CA", label: "캐나다", flag: "🇨🇦" },
+    { value: "AU", label: "호주", flag: "🇦🇺" },
+    { value: "SG", label: "싱가포르", flag: "🇸🇬" },
+    { value: "TH", label: "태국", flag: "🇹🇭" },
+    { value: "MY", label: "말레이시아", flag: "🇲🇾" },
+    { value: "PH", label: "필리핀", flag: "🇵🇭" },
+    { value: "ID", label: "인도네시아", flag: "🇮🇩" },
+    { value: "IN", label: "인도", flag: "🇮🇳" },
+  ];
+
+  const handleCustomSelectChange = (name, value) => {
+    onChange({
+      target: { name, value },
+    });
+  };
+
   return (
     <div className="space-y-8">
       <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-green-50/30 backdrop-blur-sm">
@@ -441,18 +438,12 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
               <label className="block text-sm font-semibold text-gray-700">
                 {t("apply.step2.gender", language) || "성별"} *
               </label>
-              <select
-                name="gender"
+              <CustomSelect
                 value={data.gender || ""}
-                onChange={onChange}
-                className="w-full border-2 border-gray-200 focus:border-green-500 rounded-xl px-4 py-3 text-lg transition-all duration-300"
-              >
-                <option value="">
-                  {t("apply.step2.selectGender", language) || "선택"}
-                </option>
-                <option value="male">남성</option>
-                <option value="female">여성</option>
-              </select>
+                onValueChange={(value) => handleCustomSelectChange("gender", value)}
+                placeholder="성별을 선택해주세요"
+                options={genderOptions}
+              />
             </div>
           </div>
 
@@ -474,12 +465,11 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
               <label className="block text-sm font-semibold text-gray-700">
                 {t("apply.step2.nationality", language) || "국적"} *
               </label>
-              <Input
-                name="nationality"
+              <CustomSelect
                 value={data.nationality || ""}
-                onChange={onChange}
-                placeholder="예: 대한민국"
-                className="border-2 border-gray-200 focus:border-green-500 rounded-xl px-4 py-3 text-lg transition-all duration-300"
+                onValueChange={(value) => handleCustomSelectChange("nationality", value)}
+                placeholder="국적을 선택해주세요"
+                options={countryOptions}
               />
             </div>
           </div>
