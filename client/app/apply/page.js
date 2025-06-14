@@ -334,8 +334,29 @@ function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applica
   ];
 
   const handleFileUpload = async (documentType, file) => {
-    if (!applicationId) {
-      alert('신청서를 먼저 생성해주세요.');
+    // applicationId가 없으면 자동 생성
+    let currentApplicationId = applicationId;
+    if (!currentApplicationId) {
+      currentApplicationId = `temp_${Date.now()}`;
+      setApplicationId(currentApplicationId);
+    }
+
+    // 파일 유효성 검사
+    if (!file) {
+      alert('파일을 선택해주세요.');
+      return;
+    }
+
+    // 파일 크기 검사 (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      alert('파일 크기는 10MB를 초과할 수 없습니다.');
+      return;
+    }
+
+    // 파일 형식 검사
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('JPG, PNG, PDF 파일만 업로드 가능합니다.');
       return;
     }
 
@@ -345,12 +366,16 @@ function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applica
       const formData = new FormData();
       formData.append('document', file);
       formData.append('document_type', documentType);
-      formData.append('application_id', applicationId);
+      formData.append('application_id', currentApplicationId);
 
-      const response = await fetch('/api/documents/upload', {
+      const response = await fetch('http://localhost:5000/api/documents/upload', {
         method: 'POST',
         body: formData,
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const result = await response.json();
 
@@ -367,12 +392,14 @@ function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applica
             value: [...uploadedDocuments.filter(doc => doc.document_type !== documentType), newDocument]
           }
         });
+
+        alert('파일이 성공적으로 업로드되었습니다.');
       } else {
         throw new Error(result.message || '업로드 실패');
       }
     } catch (error) {
       console.error('Upload error:', error);
-      alert(`업로드 오류: ${error.message}`);
+      alert(`업로드 오류: ${error.message || '파일 업로드에 실패했습니다.'}`);
     } finally {
       setUploadingFiles(prev => ({ ...prev, [documentType]: false }));
     }
@@ -650,12 +677,14 @@ export default function ApplyVisaWizard() {
   // 신청서 생성 및 다음 단계로 이동
   const createApplicationAndNext = async () => {
     try {
-      // 임시 신청서 생성 (실제로는 GraphQL mutation 사용)
-      const tempApplicationId = `temp_${Date.now()}`;
-      setApplicationId(tempApplicationId);
+      // 기존 applicationId가 있으면 사용, 없으면 새로 생성
+      if (!applicationId) {
+        const tempApplicationId = `temp_${Date.now()}`;
+        setApplicationId(tempApplicationId);
+        console.log('Created application ID:', tempApplicationId);
+      }
       
-      // 실제 구현시에는 여기서 GraphQL CREATE_APPLICATION mutation을 호출
-      console.log('Creating application with data:', {
+      console.log('Application data:', {
         ...form.step1,
         ...form.step2
       });
