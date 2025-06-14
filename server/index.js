@@ -63,8 +63,11 @@ async function startServer() {
     next();
   });
   
-  // 문서 관리 API 라우터
-  app.use("/api/documents", documentsRouter);
+  // 문서 관리 API 라우터 디버깅
+  app.use("/api/documents", (req, res, next) => {
+    console.log(`📍 Documents route hit: ${req.method} ${req.url}`);
+    next();
+  }, documentsRouter);
   console.log("✅ Documents router registered at /api/documents");
 
   // 웹훅 API 라우터 (결제 서비스 연동)

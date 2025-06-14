@@ -13,45 +13,12 @@ if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
-// Multer 설정
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadsDir);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
-const upload = multer({ 
-  storage: storage,
-  limits: {
-    fileSize: 10 * 1024 * 1024 // 10MB
-  },
-  fileFilter: function (req, file, cb) {
-    const allowedTypes = /jpeg|jpg|png|pdf|doc|docx/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error('지원되지 않는 파일 형식입니다.'));
-    }
-  }
-});
-
 // 단일 파일 업로드
-router.post('/upload', upload.single('document'), async (req, res) => {
+router.post('/upload', uploadSingle, async (req, res) => {
   console.log(`📤 File upload request received at /upload`);
   console.log(`📤 Request body:`, req.body);
   console.log(`📤 Request file:`, req.file ? 'File present' : 'No file');
-  // CORS 헤더 설정
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-
+  
   try {
     if (!req.file) {
       return res.status(400).json({
