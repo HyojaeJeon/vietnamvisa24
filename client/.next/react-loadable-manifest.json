@@ -1,1 +1,38 @@
-{}
+{
+  "app/src/components/InteractiveSections.js -> ./additionalServices": {
+    "id": "app/src/components/InteractiveSections.js -> ./additionalServices",
+    "files": [
+      "static/chunks/_app-pages-browser_app_src_components_additionalServices_js.js"
+    ]
+  },
+  "app/src/components/InteractiveSections.js -> ./chatbot": {
+    "id": "app/src/components/InteractiveSections.js -> ./chatbot",
+    "files": [
+      "static/chunks/_app-pages-browser_app_src_components_chatbot_js.js"
+    ]
+  },
+  "app/src/components/InteractiveSections.js -> ./contactForm": {
+    "id": "app/src/components/InteractiveSections.js -> ./contactForm",
+    "files": [
+      "static/chunks/_app-pages-browser_app_src_components_contactForm_js.js"
+    ]
+  },
+  "app/src/components/InteractiveSections.js -> ./header": {
+    "id": "app/src/components/InteractiveSections.js -> ./header",
+    "files": [
+      "static/chunks/_app-pages-browser_app_src_components_header_js.js"
+    ]
+  },
+  "app/src/components/InteractiveSections.js -> ./test/GraphQLTest.jsx": {
+    "id": "app/src/components/InteractiveSections.js -> ./test/GraphQLTest.jsx",
+    "files": [
+      "static/chunks/_app-pages-browser_app_src_components_test_GraphQLTest_jsx.js"
+    ]
+  },
+  "app/src/components/InteractiveSections.js -> ./visaServices": {
+    "id": "app/src/components/InteractiveSections.js -> ./visaServices",
+    "files": [
+      "static/chunks/_app-pages-browser_app_src_components_visaServices_js.js"
+    ]
+  }
+}
