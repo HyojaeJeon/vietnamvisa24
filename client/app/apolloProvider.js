@@ -1,7 +1,7 @@
 "use client";
 
-import { ApolloProvider } from '@apollo/client';
-import apolloClient from './src/lib/apolloClient';
+import { ApolloProvider } from "@apollo/client";
+import { apolloClient } from "./src/lib/apolloClient";
 import { useEffect, useState } from 'react';
 
 export default function CustomApolloProvider({ children }) {

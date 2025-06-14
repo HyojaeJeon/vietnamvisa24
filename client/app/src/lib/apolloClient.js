@@ -249,7 +249,7 @@ const retryLink = new RetryLink({
 });
 
 // Create Apollo Client
-const apolloClient = new ApolloClient({
+export const apolloClient = new ApolloClient({
   link: from([errorLink, retryLink, authLink, httpLink]),
   cache: new InMemoryCache({
     typePolicies: {
