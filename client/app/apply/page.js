@@ -1,14 +1,32 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../src/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../src/components/ui/card";
 import { Button } from "../src/components/ui/button";
 import { Input } from "../src/components/ui/input";
 import Header from "../src/components/header";
 import { t as baseT, translations } from "../src/lib/translations";
 import { useLanguage } from "../src/hooks/useLanguage";
-import { CheckCircle, Star, Clock, Shield, ArrowRight, ArrowLeft, Globe, CreditCard, FileText, User, Phone, Calendar, Upload } from "lucide-react";
+import {
+  CheckCircle,
+  Star,
+  Clock,
+  Shield,
+  ArrowRight,
+  ArrowLeft,
+  Globe,
+  CreditCard,
+  FileText,
+  User,
+  Phone,
+  Calendar,
+  Upload,
+} from "lucide-react";
 
 // t 함수 개선: 언어별로 우선 찾고, 없으면 ko로 fallback
 function t(key, language) {
@@ -41,7 +59,9 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
               <CardTitle className="text-2xl bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                 {t("apply.step1.title", language) || "서비스 선택"}
               </CardTitle>
-              <p className="text-gray-600 mt-1">원하시는 서비스를 선택해주세요</p>
+              <p className="text-gray-600 mt-1">
+                원하시는 서비스를 선택해주세요
+              </p>
             </div>
           </div>
         </CardHeader>
@@ -53,22 +73,43 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
             </label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { value: "evisa", label: "E-Visa", desc: "온라인 비자 신청", icon: "🌐" },
-                { value: "arrival", label: "도착 비자", desc: "공항에서 발급", icon: "✈️" },
-                { value: "visarun", label: "비자런", desc: "국경 통과 서비스", icon: "🚗" }
+                {
+                  value: "evisa",
+                  label: "E-Visa",
+                  desc: "온라인 비자 신청",
+                  icon: "🌐",
+                },
+                {
+                  value: "arrival",
+                  label: "도착 비자",
+                  desc: "공항에서 발급",
+                  icon: "✈️",
+                },
+                {
+                  value: "visarun",
+                  label: "비자런",
+                  desc: "국경 통과 서비스",
+                  icon: "🚗",
+                },
               ].map((service) => (
-                <div 
+                <div
                   key={service.value}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                    data.serviceType === service.value 
-                      ? 'border-blue-500 bg-blue-50 shadow-lg transform scale-105' 
-                      : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
+                    data.serviceType === service.value
+                      ? "border-blue-500 bg-blue-50 shadow-lg transform scale-105"
+                      : "border-gray-200 hover:border-blue-300 hover:shadow-md"
                   }`}
-                  onClick={() => onChange({ target: { name: 'serviceType', value: service.value } })}
+                  onClick={() =>
+                    onChange({
+                      target: { name: "serviceType", value: service.value },
+                    })
+                  }
                 >
                   <div className="text-center">
                     <div className="text-3xl mb-2">{service.icon}</div>
-                    <div className="font-semibold text-gray-800">{service.label}</div>
+                    <div className="font-semibold text-gray-800">
+                      {service.label}
+                    </div>
                     <div className="text-sm text-gray-600">{service.desc}</div>
                   </div>
                 </div>
@@ -83,24 +124,40 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
             </label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[
-                { value: "single", label: "90일 단수", desc: "1회 입국 가능", badge: "인기" },
-                { value: "multiple", label: "90일 복수", desc: "여러 번 입국 가능", badge: "추천" }
+                {
+                  value: "single",
+                  label: "90일 단수",
+                  desc: "1회 입국 가능",
+                  badge: "인기",
+                },
+                {
+                  value: "multiple",
+                  label: "90일 복수",
+                  desc: "여러 번 입국 가능",
+                  badge: "추천",
+                },
               ].map((visa) => (
-                <div 
+                <div
                   key={visa.value}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 relative ${
-                    data.visaType === visa.value 
-                      ? 'border-green-500 bg-green-50 shadow-lg' 
-                      : 'border-gray-200 hover:border-green-300 hover:shadow-md'
+                    data.visaType === visa.value
+                      ? "border-green-500 bg-green-50 shadow-lg"
+                      : "border-gray-200 hover:border-green-300 hover:shadow-md"
                   }`}
-                  onClick={() => onChange({ target: { name: 'visaType', value: visa.value } })}
+                  onClick={() =>
+                    onChange({
+                      target: { name: "visaType", value: visa.value },
+                    })
+                  }
                 >
                   {visa.badge && (
                     <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-400 to-red-500 text-white text-xs px-2 py-1 rounded-full">
                       {visa.badge}
                     </div>
                   )}
-                  <div className="font-semibold text-gray-800">{visa.label}</div>
+                  <div className="font-semibold text-gray-800">
+                    {visa.label}
+                  </div>
                   <div className="text-sm text-gray-600">{visa.desc}</div>
                 </div>
               ))}
@@ -114,24 +171,52 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
             </label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {[
-                { value: "standard", label: "일반", time: "3-5일", icon: <Clock className="w-5 h-5" />, color: "blue" },
-                { value: "express", label: "급행", time: "1-2일", icon: <Star className="w-5 h-5" />, color: "purple" },
-                { value: "urgent", label: "초급행", time: "당일", icon: <Shield className="w-5 h-5" />, color: "red" }
+                {
+                  value: "standard",
+                  label: "일반",
+                  time: "3-5일",
+                  icon: <Clock className="w-5 h-5" />,
+                  color: "blue",
+                },
+                {
+                  value: "express",
+                  label: "급행",
+                  time: "1-2일",
+                  icon: <Star className="w-5 h-5" />,
+                  color: "purple",
+                },
+                {
+                  value: "urgent",
+                  label: "초급행",
+                  time: "당일",
+                  icon: <Shield className="w-5 h-5" />,
+                  color: "red",
+                },
               ].map((processing) => (
-                <div 
+                <div
                   key={processing.value}
                   className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                    data.processing === processing.value 
-                      ? `border-${processing.color}-500 bg-${processing.color}-50 shadow-lg` 
-                      : 'border-gray-200 hover:border-gray-300 hover:shadow-md'
+                    data.processing === processing.value
+                      ? `border-${processing.color}-500 bg-${processing.color}-50 shadow-lg`
+                      : "border-gray-200 hover:border-gray-300 hover:shadow-md"
                   }`}
-                  onClick={() => onChange({ target: { name: 'processing', value: processing.value } })}
+                  onClick={() =>
+                    onChange({
+                      target: { name: "processing", value: processing.value },
+                    })
+                  }
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`text-${processing.color}-600`}>{processing.icon}</div>
+                    <div className={`text-${processing.color}-600`}>
+                      {processing.icon}
+                    </div>
                     <div>
-                      <div className="font-semibold text-gray-800">{processing.label}</div>
-                      <div className="text-sm text-gray-600">{processing.time}</div>
+                      <div className="font-semibold text-gray-800">
+                        {processing.label}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {processing.time}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -144,22 +229,28 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
             <div className="flex items-center justify-between text-white">
               <div className="flex items-center gap-3">
                 <CreditCard className="w-6 h-6" />
-                <span className="text-lg font-semibold">{t("apply.priceSummary", language) || "예상 결제 금액"}</span>
+                <span className="text-lg font-semibold">
+                  {t("apply.priceSummary", language) || "예상 결제 금액"}
+                </span>
               </div>
               <div className="text-right">
-                <div className="text-3xl font-bold">{price.toLocaleString()}₩</div>
+                <div className="text-3xl font-bold">
+                  {price.toLocaleString()}₩
+                </div>
                 <div className="text-blue-200 text-sm">부가세 포함</div>
               </div>
             </div>
           </div>
 
           <div className="flex justify-end mt-8">
-            <Button 
-              onClick={onNext} 
+            <Button
+              onClick={onNext}
               disabled={!data.serviceType || !data.visaType || !data.processing}
               className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="mr-2">{t("apply.next", language) || "다음"}</span>
+              <span className="mr-2">
+                {t("apply.next", language) || "다음"}
+              </span>
               <ArrowRight className="w-5 h-5" />
             </Button>
           </div>
@@ -190,28 +281,35 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700">
-                {t("apply.step2.fullNameLabel", language) || "성명(여권과 동일)"} *
+                {t("apply.step2.fullNameLabel", language) ||
+                  "성명(여권과 동일)"}{" "}
+                *
               </label>
-              <Input 
-                name="fullName" 
-                value={data.fullName || ""} 
-                onChange={onChange} 
-                placeholder={t("apply.step2.fullNamePlaceholder", language) || "예: HONG GILDONG"}
+              <Input
+                name="fullName"
+                value={data.fullName || ""}
+                onChange={onChange}
+                placeholder={
+                  t("apply.step2.fullNamePlaceholder", language) ||
+                  "예: HONG GILDONG"
+                }
                 className="border-2 border-gray-200 focus:border-green-500 rounded-xl px-4 py-3 text-lg transition-all duration-300"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700">
                 {t("apply.step2.gender", language) || "성별"} *
               </label>
-              <select 
-                name="gender" 
-                value={data.gender || ""} 
-                onChange={onChange} 
+              <select
+                name="gender"
+                value={data.gender || ""}
+                onChange={onChange}
                 className="w-full border-2 border-gray-200 focus:border-green-500 rounded-xl px-4 py-3 text-lg transition-all duration-300"
               >
-                <option value="">{t("apply.step2.selectGender", language) || "선택"}</option>
+                <option value="">
+                  {t("apply.step2.selectGender", language) || "선택"}
+                </option>
                 <option value="male">남성</option>
                 <option value="female">여성</option>
               </select>
@@ -223,22 +321,22 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
               <label className="block text-sm font-semibold text-gray-700">
                 {t("apply.step2.birth", language) || "생년월일"} *
               </label>
-              <Input 
-                name="birth" 
-                type="date" 
-                value={data.birth || ""} 
+              <Input
+                name="birth"
+                type="date"
+                value={data.birth || ""}
                 onChange={onChange}
                 className="border-2 border-gray-200 focus:border-green-500 rounded-xl px-4 py-3 text-lg transition-all duration-300"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700">
                 {t("apply.step2.nationality", language) || "국적"} *
               </label>
-              <Input 
-                name="nationality" 
-                value={data.nationality || ""} 
+              <Input
+                name="nationality"
+                value={data.nationality || ""}
                 onChange={onChange}
                 placeholder="예: 대한민국"
                 className="border-2 border-gray-200 focus:border-green-500 rounded-xl px-4 py-3 text-lg transition-all duration-300"
@@ -251,23 +349,23 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
               <label className="block text-sm font-semibold text-gray-700">
                 {t("apply.step2.email", language) || "이메일"} *
               </label>
-              <Input 
-                name="email" 
-                type="email" 
-                value={data.email || ""} 
+              <Input
+                name="email"
+                type="email"
+                value={data.email || ""}
                 onChange={onChange}
                 placeholder="example@email.com"
                 className="border-2 border-gray-200 focus:border-green-500 rounded-xl px-4 py-3 text-lg transition-all duration-300"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700">
                 {t("apply.step2.phone", language) || "베트남 내 연락처"} *
               </label>
-              <Input 
-                name="phone" 
-                value={data.phone || ""} 
+              <Input
+                name="phone"
+                value={data.phone || ""}
                 onChange={onChange}
                 placeholder="010-1234-5678"
                 className="border-2 border-gray-200 focus:border-green-500 rounded-xl px-4 py-3 text-lg transition-all duration-300"
@@ -276,20 +374,28 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
           </div>
 
           <div className="flex justify-between mt-8">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={onPrev}
               className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold transition-all duration-300"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               {t("apply.prev", language) || "이전"}
             </Button>
-            <Button 
-              onClick={onNext} 
-              disabled={!data.fullName || !data.gender || !data.birth || !data.nationality || !data.email}
+            <Button
+              onClick={onNext}
+              disabled={
+                !data.fullName ||
+                !data.gender ||
+                !data.birth ||
+                !data.nationality ||
+                !data.email
+              }
               className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="mr-2">{t("apply.next", language) || "다음"}</span>
+              <span className="mr-2">
+                {t("apply.next", language) || "다음"}
+              </span>
               <ArrowRight className="w-5 h-5" />
             </Button>
           </div>
@@ -299,38 +405,47 @@ function Step2ApplicantInfo({ data, onChange, onNext, onPrev, language }) {
   );
 }
 
-function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applicationId }) {
-  const [uploadedDocuments, setUploadedDocuments] = useState(data.documents || []);
+function Step3DocumentUpload({
+  data,
+  onChange,
+  onNext,
+  onPrev,
+  language,
+  applicationId,
+}) {
+  const [uploadedDocuments, setUploadedDocuments] = useState(
+    data.documents || [],
+  );
   const [uploadingFiles, setUploadingFiles] = useState({});
 
   const documentRequirements = [
     {
-      type: 'passport',
-      title: '여권 사본',
-      description: '정보가 있는 면 전체가 빛 번짐 없이 선명하게 보여야 합니다',
+      type: "passport",
+      title: "여권 사본",
+      description: "정보가 있는 면 전체가 빛 번짐 없이 선명하게 보여야 합니다",
       required: true,
       icon: <FileText className="w-6 h-6" />,
       guidelines: [
-        '여권 정보면 전체가 한 장에 나와야 합니다',
-        '글자가 선명하고 읽기 쉬워야 합니다',
-        '빛 번짐이나 그림자가 없어야 합니다',
-        '여권 모서리가 모두 보여야 합니다'
-      ]
+        "여권 정보면 전체가 한 장에 나와야 합니다",
+        "글자가 선명하고 읽기 쉬워야 합니다",
+        "빛 번짐이나 그림자가 없어야 합니다",
+        "여권 모서리가 모두 보여야 합니다",
+      ],
     },
     {
-      type: 'photo',
-      title: '증명사진',
-      description: '흰색 배경, 안경/모자 착용 금지 등의 규격을 준수해야 합니다',
+      type: "photo",
+      title: "증명사진",
+      description: "흰색 배경, 안경/모자 착용 금지 등의 규격을 준수해야 합니다",
       required: true,
       icon: <User className="w-6 h-6" />,
       guidelines: [
-        '흰색 배경 (다른 색상 불가)',
-        '안경, 모자, 액세서리 착용 금지',
-        '정면을 향한 자연스러운 표정',
-        '크기: 4cm × 6cm (최근 6개월 이내)',
-        '고해상도 (최소 300dpi)'
-      ]
-    }
+        "흰색 배경 (다른 색상 불가)",
+        "안경, 모자, 액세서리 착용 금지",
+        "정면을 향한 자연스러운 표정",
+        "크기: 4cm × 6cm (최근 6개월 이내)",
+        "고해상도 (최소 300dpi)",
+      ],
+    },
   ];
 
   const handleFileUpload = async (documentType, file) => {
@@ -343,35 +458,43 @@ function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applica
 
     // 파일 유효성 검사
     if (!file) {
-      alert('파일을 선택해주세요.');
+      alert("파일을 선택해주세요.");
       return;
     }
 
     // 파일 크기 검사 (10MB)
     if (file.size > 10 * 1024 * 1024) {
-      alert('파일 크기는 10MB를 초과할 수 없습니다.');
+      alert("파일 크기는 10MB를 초과할 수 없습니다.");
       return;
     }
 
     // 파일 형식 검사
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "application/pdf",
+    ];
     if (!allowedTypes.includes(file.type)) {
-      alert('JPG, PNG, PDF 파일만 업로드 가능합니다.');
+      alert("JPG, PNG, PDF 파일만 업로드 가능합니다.");
       return;
     }
 
-    setUploadingFiles(prev => ({ ...prev, [documentType]: true }));
+    setUploadingFiles((prev) => ({ ...prev, [documentType]: true }));
 
     try {
       const formData = new FormData();
-      formData.append('document', file);
-      formData.append('document_type', documentType);
-      formData.append('application_id', currentApplicationId);
+      formData.append("document", file);
+      formData.append("document_type", documentType);
+      formData.append("application_id", currentApplicationId);
 
-      const response = await fetch('http://localhost:5000/api/documents/upload', {
-        method: 'POST',
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:5000/api/documents/uploads",
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -381,27 +504,34 @@ function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applica
 
       if (result.success) {
         const newDocument = result.document;
-        setUploadedDocuments(prev => {
-          const filtered = prev.filter(doc => doc.document_type !== documentType);
+        setUploadedDocuments((prev) => {
+          const filtered = prev.filter(
+            (doc) => doc.document_type !== documentType,
+          );
           return [...filtered, newDocument];
         });
-        
+
         onChange({
           target: {
-            name: 'documents',
-            value: [...uploadedDocuments.filter(doc => doc.document_type !== documentType), newDocument]
-          }
+            name: "documents",
+            value: [
+              ...uploadedDocuments.filter(
+                (doc) => doc.document_type !== documentType,
+              ),
+              newDocument,
+            ],
+          },
         });
 
-        alert('파일이 성공적으로 업로드되었습니다.');
+        alert("파일이 성공적으로 업로드되었습니다.");
       } else {
-        throw new Error(result.message || '업로드 실패');
+        throw new Error(result.message || "업로드 실패");
       }
     } catch (error) {
-      console.error('Upload error:', error);
-      alert(`업로드 오류: ${error.message || '파일 업로드에 실패했습니다.'}`);
+      console.error("Upload error:", error);
+      alert(`업로드 오류: ${error.message || "파일 업로드에 실패했습니다."}`);
     } finally {
-      setUploadingFiles(prev => ({ ...prev, [documentType]: false }));
+      setUploadingFiles((prev) => ({ ...prev, [documentType]: false }));
     }
   };
 
@@ -421,16 +551,16 @@ function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applica
   };
 
   const isDocumentUploaded = (documentType) => {
-    return uploadedDocuments.some(doc => doc.document_type === documentType);
+    return uploadedDocuments.some((doc) => doc.document_type === documentType);
   };
 
   const getUploadedDocument = (documentType) => {
-    return uploadedDocuments.find(doc => doc.document_type === documentType);
+    return uploadedDocuments.find((doc) => doc.document_type === documentType);
   };
 
   const requiredDocumentsUploaded = documentRequirements
-    .filter(req => req.required)
-    .every(req => isDocumentUploaded(req.type));
+    .filter((req) => req.required)
+    .every((req) => isDocumentUploaded(req.type));
 
   return (
     <div className="space-y-8">
@@ -457,22 +587,34 @@ function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applica
             return (
               <div key={requirement.type} className="space-y-4">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`p-2 rounded-lg ${isUploaded ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'}`}>
+                  <div
+                    className={`p-2 rounded-lg ${isUploaded ? "bg-green-100 text-green-600" : "bg-gray-100 text-gray-600"}`}
+                  >
                     {requirement.icon}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="text-lg font-semibold text-gray-900">{requirement.title}</h3>
-                      {requirement.required && <span className="text-red-500 text-sm">*필수</span>}
-                      {isUploaded && <CheckCircle className="w-5 h-5 text-green-500" />}
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {requirement.title}
+                      </h3>
+                      {requirement.required && (
+                        <span className="text-red-500 text-sm">*필수</span>
+                      )}
+                      {isUploaded && (
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                      )}
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">{requirement.description}</p>
+                    <p className="text-sm text-gray-600 mt-1">
+                      {requirement.description}
+                    </p>
                   </div>
                 </div>
 
                 {/* 가이드라인 */}
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                  <h4 className="font-semibold text-blue-800 mb-2">📋 업로드 가이드라인</h4>
+                  <h4 className="font-semibold text-blue-800 mb-2">
+                    📋 업로드 가이드라인
+                  </h4>
                   <ul className="text-sm text-blue-700 space-y-1">
                     {requirement.guidelines.map((guideline, index) => (
                       <li key={index} className="flex items-start gap-2">
@@ -489,12 +631,18 @@ function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applica
                     className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer transition-all duration-300 hover:border-purple-400 hover:bg-purple-50"
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => handleFileDrop(requirement.type, e)}
-                    onClick={() => document.getElementById(`file-${requirement.type}`).click()}
+                    onClick={() =>
+                      document
+                        .getElementById(`file-${requirement.type}`)
+                        .click()
+                    }
                   >
                     {isUploading ? (
                       <div className="flex flex-col items-center gap-3">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-                        <p className="text-purple-600 font-medium">업로드 중...</p>
+                        <p className="text-purple-600 font-medium">
+                          업로드 중...
+                        </p>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center gap-3">
@@ -523,14 +671,20 @@ function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applica
                       <div className="flex items-center gap-3">
                         <CheckCircle className="w-8 h-8 text-green-600" />
                         <div>
-                          <p className="font-semibold text-green-800">{uploadedDoc.document_name}</p>
+                          <p className="font-semibold text-green-800">
+                            {uploadedDoc.document_name}
+                          </p>
                           <p className="text-sm text-green-600">업로드 완료</p>
                         </div>
                       </div>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => document.getElementById(`file-${requirement.type}`).click()}
+                        onClick={() =>
+                          document
+                            .getElementById(`file-${requirement.type}`)
+                            .click()
+                        }
                         className="border-green-300 text-green-700 hover:bg-green-100"
                       >
                         다시 업로드
@@ -550,20 +704,25 @@ function Step3DocumentUpload({ data, onChange, onNext, onPrev, language, applica
           })}
 
           <div className="flex justify-between mt-8">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={onPrev}
               className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold transition-all duration-300"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               {t("apply.prev", language) || "이전"}
             </Button>
-            <Button 
-              onClick={onNext} 
-              disabled={!requiredDocumentsUploaded || Object.values(uploadingFiles).some(Boolean)}
+            <Button
+              onClick={onNext}
+              disabled={
+                !requiredDocumentsUploaded ||
+                Object.values(uploadingFiles).some(Boolean)
+              }
               className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span className="mr-2">{t("apply.next", language) || "다음"}</span>
+              <span className="mr-2">
+                {t("apply.next", language) || "다음"}
+              </span>
               <ArrowRight className="w-5 h-5" />
             </Button>
           </div>
@@ -581,13 +740,15 @@ function ProgressBar({ step, steps, language }) {
           {steps.map((key, idx) => (
             <React.Fragment key={key}>
               <div className="flex items-center">
-                <div className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-sm transition-all duration-500 ${
-                  idx < step 
-                    ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg" 
-                    : idx === step 
-                    ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg ring-4 ring-blue-200" 
-                    : "bg-gray-200 text-gray-500"
-                }`}>
+                <div
+                  className={`flex items-center justify-center w-12 h-12 rounded-full font-bold text-sm transition-all duration-500 ${
+                    idx < step
+                      ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg"
+                      : idx === step
+                        ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg ring-4 ring-blue-200"
+                        : "bg-gray-200 text-gray-500"
+                  }`}
+                >
                   {idx < step ? (
                     <CheckCircle className="w-6 h-6" />
                   ) : (
@@ -595,17 +756,23 @@ function ProgressBar({ step, steps, language }) {
                   )}
                 </div>
                 <div className="ml-3 hidden sm:block">
-                  <div className={`font-semibold text-sm ${
-                    idx <= step ? "text-gray-800" : "text-gray-400"
-                  }`}>
+                  <div
+                    className={`font-semibold text-sm ${
+                      idx <= step ? "text-gray-800" : "text-gray-400"
+                    }`}
+                  >
                     {t(key, language)}
                   </div>
                 </div>
               </div>
               {idx < steps.length - 1 && (
-                <div className={`w-16 h-1 rounded-full transition-all duration-500 ${
-                  idx < step ? "bg-gradient-to-r from-green-500 to-emerald-600" : "bg-gray-200"
-                }`} />
+                <div
+                  className={`w-16 h-1 rounded-full transition-all duration-500 ${
+                    idx < step
+                      ? "bg-gradient-to-r from-green-500 to-emerald-600"
+                      : "bg-gray-200"
+                  }`}
+                />
               )}
             </React.Fragment>
           ))}
@@ -628,7 +795,14 @@ export default function ApplyVisaWizard() {
   });
   const [price, setPrice] = useState(0);
   const [applicationId, setApplicationId] = useState(null);
-  const steps = ["apply.step1.title", "apply.step2.title", "apply.step3.title", "apply.step4.title", "apply.step5.title", "apply.step6.title"];
+  const steps = [
+    "apply.step1.title",
+    "apply.step2.title",
+    "apply.step3.title",
+    "apply.step4.title",
+    "apply.step5.title",
+    "apply.step6.title",
+  ];
 
   useEffect(() => {
     setMounted(true);
@@ -681,18 +855,18 @@ export default function ApplyVisaWizard() {
       if (!applicationId) {
         const tempApplicationId = `temp_${Date.now()}`;
         setApplicationId(tempApplicationId);
-        console.log('Created application ID:', tempApplicationId);
+        console.log("Created application ID:", tempApplicationId);
       }
-      
-      console.log('Application data:', {
+
+      console.log("Application data:", {
         ...form.step1,
-        ...form.step2
+        ...form.step2,
       });
-      
+
       next();
     } catch (error) {
-      console.error('Application creation failed:', error);
-      alert('신청서 생성에 실패했습니다. 다시 시도해주세요.');
+      console.error("Application creation failed:", error);
+      alert("신청서 생성에 실패했습니다. 다시 시도해주세요.");
     }
   };
 
@@ -710,14 +884,14 @@ export default function ApplyVisaWizard() {
       <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100">
         <Header />
       </div>
-      
+
       <div className="relative">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-600/20 rounded-full blur-3xl"></div>
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-green-400/20 to-emerald-600/20 rounded-full blur-3xl"></div>
         </div>
-        
+
         <div className="relative max-w-4xl px-4 py-12 mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
@@ -729,11 +903,36 @@ export default function ApplyVisaWizard() {
           </div>
 
           <ProgressBar step={step} steps={steps} language={currentLanguage} />
-          
+
           <div className="relative">
-            {step === 0 && <Step1ServiceSelection data={form.step1} onChange={handleStep1Change} price={price} onNext={next} language={currentLanguage} />}
-            {step === 1 && <Step2ApplicantInfo data={form.step2} onChange={handleStep2Change} onNext={createApplicationAndNext} onPrev={prev} language={currentLanguage} />}
-            {step === 2 && <Step3DocumentUpload data={form.step3} onChange={handleStep3Change} onNext={next} onPrev={prev} language={currentLanguage} applicationId={applicationId} />}
+            {step === 0 && (
+              <Step1ServiceSelection
+                data={form.step1}
+                onChange={handleStep1Change}
+                price={price}
+                onNext={next}
+                language={currentLanguage}
+              />
+            )}
+            {step === 1 && (
+              <Step2ApplicantInfo
+                data={form.step2}
+                onChange={handleStep2Change}
+                onNext={createApplicationAndNext}
+                onPrev={prev}
+                language={currentLanguage}
+              />
+            )}
+            {step === 2 && (
+              <Step3DocumentUpload
+                data={form.step3}
+                onChange={handleStep3Change}
+                onNext={next}
+                onPrev={prev}
+                language={currentLanguage}
+                applicationId={applicationId}
+              />
+            )}
             {/* 4~6단계는 이후 구현 */}
           </div>
         </div>
