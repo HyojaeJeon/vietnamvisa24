@@ -1,0 +1,57 @@
+ ⨯ ./app/src/hooks/useToast.js
+Error: 
+  × You're importing a component that needs createContext. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  │ Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  │ 
+  │ 
+   ╭─[/home/runner/workspace/client/app/src/hooks/useToast.js:1:1]
+ 1 │ 
+ 2 │ import React, { createContext, useContext, useState } from "react";
+   ·                 ─────────────
+ 3 │ 
+ 4 │ const ToastContext = createContext();
+   ╰────
+
+  × You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  │ Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  │ 
+  │ 
+   ╭─[/home/runner/workspace/client/app/src/hooks/useToast.js:1:1]
+ 1 │ 
+ 2 │ import React, { createContext, useContext, useState } from "react";
+   ·                                            ────────
+ 3 │ 
+ 4 │ const ToastContext = createContext();
+   ╰────
+
+Import trace for requested module:
+./app/src/hooks/useToast.js
+./app/layout.js
+ ⨯ ./app/src/hooks/useToast.js
+Error: 
+  × You're importing a component that needs createContext. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  │ Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  │ 
+  │ 
+   ╭─[/home/runner/workspace/client/app/src/hooks/useToast.js:1:1]
+ 1 │ 
+ 2 │ import React, { createContext, useContext, useState } from "react";
+   ·                 ─────────────
+ 3 │ 
+ 4 │ const ToastContext = createContext();
+   ╰────
+
+  × You're importing a component that needs useState. It only works in a Client Component but none of its parents are marked with "use client", so they're Server Components by default.
+  │ Learn more: https://nextjs.org/docs/getting-started/react-essentials
+  │ 
+  │ 
+   ╭─[/home/runner/workspace/client/app/src/hooks/useToast.js:1:1]
+ 1 │ 
+ 2 │ import React, { createContext, useContext, useState } from "react";
+   ·                                            ────────
+ 3 │ 
+ 4 │ const ToastContext = createContext();
+   ╰────
+
+Import trace for requested module:
+./app/src/hooks/useToast.js
