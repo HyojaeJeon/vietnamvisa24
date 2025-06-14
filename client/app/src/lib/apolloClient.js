@@ -152,7 +152,7 @@ const refreshTokensAsync = async (isAdmin = false) => {
       }
 
       console.log(
-        `✅ ${isAdmin ? "Admin" : "User"} token refreshed successfully!`,
+        `✅ ${isAdmin ? "admin" : "user"} token refreshed successfully!`,
       );
       return data.token;
     }
@@ -312,5 +312,4 @@ if (typeof window !== "undefined") {
 
 // Export token manager for use in other components
 export { tokenManager };
-// export { apolloClient };
 export default apolloClient;
