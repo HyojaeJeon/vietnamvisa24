@@ -173,9 +173,9 @@ const authTypeDefs = gql`
     refreshToken: String
     user: User!
   }
-
   type AdminAuthResponse {
     token: String!
+    refreshToken: String
     admin: Admin!
   }
 
@@ -196,6 +196,7 @@ const authTypeDefs = gql`
     userLogin(input: LoginInput!): AuthResponse!
     adminLogin(input: AdminLoginInput!): AdminAuthResponse!
     refreshToken(refreshToken: String!): RefreshTokenResponse!
+    refreshAdminToken(refreshToken: String!): RefreshTokenResponse!
     createDocument(input: DocumentInput!): Document!
     updateDocumentStatus(id: ID!, status: DocumentStatus!, notes: String): Document!
     createNotification(input: NotificationInput!): Notification!

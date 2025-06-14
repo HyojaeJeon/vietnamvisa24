@@ -1,8 +1,9 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { models } = require("../../../models");
-const { getUserFromToken, getAdminFromToken } = require("../../../utils/auth");
+const { getUserFromToken, getAdminFromToken, generateTokens, generateAdminTokens, refreshTokens, refreshAdminTokens } = require("../../../utils/auth");
 const { asyncHandler } = require("../../../utils/errorHandler");
+const { TokenExpiredError } = require("../../../utils/errorTypes");
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
@@ -80,12 +81,14 @@ const resolvers = {
         password: hashedPassword,
         name,
         phone,
+        tokenVersion: 0,
       });
 
-      const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: "30d" });
+      const { accessToken, refreshToken } = generateTokens(user);
 
       return {
-        token,
+        token: accessToken,
+        refreshToken,
         user: {
           id: user.id,
           email: user.email,
@@ -108,10 +111,11 @@ const resolvers = {
         throw new Error("Invalid credentials");
       }
 
-      const token = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: "30d" });
+      const { accessToken, refreshToken } = generateTokens(user);
 
       return {
-        token,
+        token: accessToken,
+        refreshToken,
         user: {
           id: user.id,
           email: user.email,
@@ -121,7 +125,6 @@ const resolvers = {
         },
       };
     },
-
     adminLogin: async (_, { input }) => {
       const { email, password } = input;
 
@@ -135,10 +138,11 @@ const resolvers = {
         throw new Error("Invalid credentials");
       }
 
-      const token = jwt.sign({ adminId: admin.id, email: admin.email, role: admin.role }, JWT_SECRET, { expiresIn: "8h" });
+      const { accessToken, refreshToken } = generateAdminTokens(admin);
 
       return {
-        token,
+        token: accessToken,
+        refreshToken,
         admin: {
           id: admin.id,
           email: admin.email,
@@ -149,18 +153,27 @@ const resolvers = {
         },
       };
     },
-
     refreshToken: async (_, { refreshToken }) => {
       try {
-        const decoded = jwt.verify(refreshToken, JWT_SECRET);
-        const newToken = jwt.sign({ userId: decoded.userId, email: decoded.email }, JWT_SECRET, { expiresIn: "30d" });
-
+        const tokens = await refreshTokens(refreshToken);
         return {
-          token: newToken,
-          refreshToken: refreshToken,
+          token: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
         };
       } catch (error) {
-        throw new Error("Invalid refresh token");
+        throw new Error(error.message || "Invalid refresh token");
+      }
+    },
+
+    refreshAdminToken: async (_, { refreshToken }) => {
+      try {
+        const tokens = await refreshAdminTokens(refreshToken);
+        return {
+          token: tokens.accessToken,
+          refreshToken: tokens.refreshToken,
+        };
+      } catch (error) {
+        throw new Error(error.message || "Invalid admin refresh token");
       }
     },
 

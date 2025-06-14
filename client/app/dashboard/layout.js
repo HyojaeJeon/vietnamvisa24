@@ -3,7 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useQuery } from "@apollo/client";
+import { Toaster } from "react-hot-toast";
 import { GET_ADMIN_ME_QUERY } from "../../lib/graphql";
+import useSocket from "../src/hooks/useSocket";
+import NotificationCenter from "../src/components/NotificationCenter";
 import {
   LayoutDashboard,
   FileText,
@@ -36,6 +39,12 @@ export default function DashboardLayout({ children }) {
   const { data, loading, error } = useQuery(GET_ADMIN_ME_QUERY, {
     errorPolicy: "all",
   });
+
+  // Socket.IO 연결 설정 (관리자 토큰으로)
+  const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+  const adminId = data?.adminMe?.id;
+
+  const { isConnected, notifications, unreadCount, markNotificationAsRead, markAllNotificationsAsRead, removeNotification, clearAllNotifications } = useSocket(adminId, adminToken);
 
   // 화면 크기 감지
   useEffect(() => {
@@ -190,10 +199,10 @@ export default function DashboardLayout({ children }) {
       {/* Sidebar */}
       <div
         className={`
-        fixed lg:static inset-y-0 left-0 z-50 
-        ${sidebarOpen ? "w-72" : "w-0 lg:w-16"} 
-        bg-white shadow-2xl 
-        transform transition-all duration-300 ease-in-out 
+        fixed lg:static inset-y-0 left-0 z-50
+        ${sidebarOpen ? "w-72" : "w-0 lg:w-16"}
+        bg-white shadow-2xl
+        transform transition-all duration-300 ease-in-out
         ${isMobile ? (sidebarOpen ? "translate-x-0" : "-translate-x-full") : "translate-x-0"}
         border-r border-gray-200 overflow-hidden
       `}
@@ -341,13 +350,17 @@ export default function DashboardLayout({ children }) {
               <ChevronDown className="h-4 w-4 text-gray-400 rotate-[-90deg]" />
               <span className="text-sm font-medium text-gray-600">{menuItems.find((item) => item.active)?.name || "대시보드"}</span>
             </div>
-          </div>
-
+          </div>{" "}
           <div className="flex items-center space-x-4">
-            <button className="relative p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-all">
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-            </button>
+            <NotificationCenter
+              notifications={notifications}
+              unreadCount={unreadCount}
+              isConnected={isConnected}
+              onMarkAsRead={markNotificationAsRead}
+              onMarkAllAsRead={markAllNotificationsAsRead}
+              onRemove={removeNotification}
+              onClear={clearAllNotifications}
+            />
 
             <div className="hidden sm:block text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-lg">
               {new Date().toLocaleDateString("ko-KR", {
@@ -357,13 +370,31 @@ export default function DashboardLayout({ children }) {
               })}
             </div>
           </div>
-        </div>
-
+        </div>{" "}
         {/* Page content */}
         <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>
+
+      {/* Toast notifications */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+          success: {
+            duration: 3000,
+            theme: {
+              primary: "green",
+              secondary: "black",
+            },
+          },
+        }}
+      />
     </div>
   );
 }

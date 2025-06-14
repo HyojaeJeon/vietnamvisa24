@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상담 답변 완료</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #28a745;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        .title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin: 0;
+        }
+        .reply-badge {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            border-radius: 50px;
+            padding: 10px 20px;
+            display: inline-block;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .consultation-summary {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .consultation-summary h3 {
+            color: #495057;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .original-message {
+            background-color: #e9ecef;
+            border-left: 4px solid #6c757d;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .reply-message {
+            background-color: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .expert-info {
+            background-color: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+        }
+        .expert-avatar {
+            width: 50px;
+            height: 50px;
+            background-color: #28a745;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .expert-details h4 {
+            margin: 0 0 5px 0;
+            color: #155724;
+        }
+        .expert-details p {
+            margin: 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        .additional-notes {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 4px solid #ffc107;
+        }
+        .next-actions {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #17a2b8;
+        }
+        .next-actions h3 {
+            color: #0c5460;
+            margin-top: 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #28a745;
+            color: white !important;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 10px 5px;
+            text-align: center;
+        }
+        .button.secondary {
+            background-color: #17a2b8;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .contact-info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .rating-section {
+            text-align: center;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">VietnamVisa24</div>
+            <h1 class="title">✅ 상담 답변 완료</h1>
+        </div>
+
+        <div class="content">
+            <div style="text-align: center;">
+                <div class="reply-badge">📞 전문가 답변 완료</div>
+            </div>
+
+            <div class="greeting">
+                안녕하세요, <strong>{{customerName}}</strong>님
+            </div>
+
+            <div class="info-box">
+                <strong>상담 번호:</strong> {{consultationId}}<br>
+                <strong>서비스 유형:</strong> {{serviceType}}<br>
+                <strong>답변 일시:</strong> {{repliedAt}}
+            </div>
+
+            <p>귀하의 베트남 비자 상담에 대한 전문가 답변을 보내드립니다.</p>
+
+            <div class="consultation-summary">
+                <h3>📋 원본 문의 내용</h3>
+                <div class="original-message">
+                    <h4>고객 문의:</h4>
+                    <p style="white-space: pre-wrap;">{{originalMessage}}</p>
+                </div>
+            </div>
+
+            <div class="expert-info">
+                <div class="expert-avatar">
+                    {{#if repliedBy}}{{repliedBy.[0]}}{{else}}전{{/if}}
+                </div>
+                <div class="expert-details">
+                    <h4>{{repliedBy}}</h4>
+                    <p>베트남 비자 전문 상담사</p>
+                </div>
+            </div>
+
+            <div class="consultation-summary">
+                <h3>💡 전문가 답변</h3>
+                <div class="reply-message">
+                    <h4>상담사 답변:</h4>
+                    <p style="white-space: pre-wrap;">{{replyMessage}}</p>
+                </div>
+            </div>
+
+            {{#if additionalNotes}}
+            <div class="additional-notes">
+                <h4>📝 추가 안내사항</h4>
+                <p style="white-space: pre-wrap;">{{additionalNotes}}</p>
+            </div>
+            {{/if}}
+
+            <div class="next-actions">
+                <h3>🚀 다음 단계 안내</h3>
+                <ul>
+                    <li><strong>비자 신청:</strong> 답변을 참고하여 비자 신청을 진행하세요</li>
+                    <li><strong>추가 문의:</strong> 더 궁금한 점이 있으시면 언제든 연락주세요</li>
+                    <li><strong>서류 준비:</strong> 필요한 서류를 미리 준비해 두시면 빠른 처리가 가능합니다</li>
+                    <li><strong>예약 상담:</strong> 전화 상담이 필요하시면 예약해 주세요</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center;">
+                <a href="/apply" class="button">지금 비자 신청하기</a>
+                <a href="{{portalUrl}}" class="button secondary">상담 내역 확인</a>
+            </div>
+
+            <div class="rating-section">
+                <h4>⭐ 상담 만족도 평가</h4>
+                <p>저희 상담 서비스는 어떠셨나요?</p>
+                <div style="margin: 15px 0;">
+                    <a href="/feedback/{{consultationId}}?rating=5" style="text-decoration: none; margin: 0 5px; font-size: 24px;">⭐⭐⭐⭐⭐</a>
+                    <a href="/feedback/{{consultationId}}?rating=4" style="text-decoration: none; margin: 0 5px; font-size: 24px;">⭐⭐⭐⭐</a>
+                    <a href="/feedback/{{consultationId}}?rating=3" style="text-decoration: none; margin: 0 5px; font-size: 24px;">⭐⭐⭐</a>
+                </div>
+                <p style="font-size: 12px; color: #6c757d;">별점을 클릭하여 평가해 주세요</p>
+            </div>
+
+            <div class="contact-info">
+                <h3>📞 추가 문의</h3>
+                <p>더 자세한 상담이 필요하시면 언제든 연락해 주세요:</p>
+                <ul>
+                    <li><strong>전화:</strong> 1588-0000 (평일 09:00~18:00)</li>
+                    <li><strong>카카오톡:</strong> @vietnamvisa24</li>
+                    <li><strong>WhatsApp:</strong> +84-93-721-7284</li>
+                    <li><strong>이메일:</strong> support@vietnamvisa24.com</li>
+                </ul>
+            </div>
+
+            <p style="text-align: center; margin-top: 30px;">
+                <strong>즐거운 베트남 여행을 위해 최선을 다하겠습니다! 🌟🇻🇳</strong>
+            </p>
+        </div>
+
+        <div class="footer">
+            <p><strong>VietnamVisa24</strong></p>
+            <p>📞 1588-0000 | 📧 support@vietnamvisa24.com</p>
+            <p>평일 09:00~18:00 (토/일/공휴일 휴무)</p>
+            <p style="font-size: 12px; color: #95a5a6; margin-top: 15px;">
+                본 메일은 발신전용입니다. 문의사항이 있으시면 고객센터로 연락해 주세요.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

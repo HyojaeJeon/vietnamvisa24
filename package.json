@@ -2,12 +2,14 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "react-hot-toast": "^2.5.2",
+    "react-i18next": "^15.5.3",
     "redux-persist": "^6.0.0",
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.3",
     "sqlite3": "^5.1.7",
     "swiper": "^11.2.8",
     "tailwind-merge": "^3.3.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "uuid": "^11.1.0"
   }
 }

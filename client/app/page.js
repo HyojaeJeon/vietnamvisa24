@@ -1,175 +1,75 @@
-"use client";
-
-import { useState, useEffect } from "react";
+// SEO 친화적인 서버 컴포넌트로 리팩토링된 메인 페이지
+import React from "react";
 import dynamic from "next/dynamic";
 
-// 모든 컴포넌트를 동적 임포트로 변경하여 하이드레이션 문제 해결
-const Header = dynamic(() => import("./src/components/header"), {
-  ssr: false,
-  loading: () => null,
-});
+// 정적 컴포넌트들 - 서버 사이드 렌더링 지원
+import StaticHeroSection from "./src/components/StaticHeroSection";
+import StaticProcessSteps from "./src/components/StaticProcessSteps";
+import StaticFaqSection from "./src/components/StaticFaqSection";
+import StaticCompanyInfo from "./src/components/StaticCompanyInfo";
+import StaticFooter from "./src/components/StaticFooter";
 
-const Footer = dynamic(() => import("./src/components/footer"), {
-  ssr: false,
-  loading: () => null,
-});
-
-const HeroSection = dynamic(() => import("./src/components/heroSection"), {
-  ssr: false,
-  loading: () => null,
-});
-
-const ProcessSteps = dynamic(() => import("./src/components/processSteps"), {
-  ssr: false,
-  loading: () => null,
-});
-
-const FaqSection = dynamic(() => import("./src/components/faqSection"), {
-  ssr: false,
-  loading: () => null,
-});
-
-const ContactForm = dynamic(() => import("./src/components/contactForm"), {
-  ssr: false,
-  loading: () => null,
-});
-
-const VisaServices = dynamic(() => import("./src/components/visaServices"), {
+// 인터랙티브 섹션들 - 클라이언트 사이드에서만 로드
+const InteractiveSections = dynamic(() => import("./src/components/InteractiveSections"), {
   ssr: false,
   loading: () => (
-    <div className="py-16 bg-gradient-to-br from-blue-50 to-indigo-100">
-      <div className="container px-4 mx-auto">
-        <div className="mb-12 text-center">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <div className="container px-4 py-16 mx-auto">
+        <div className="text-center">
           <div className="w-1/3 h-8 mx-auto mb-4 bg-gray-200 rounded animate-pulse"></div>
           <div className="w-2/3 h-4 mx-auto bg-gray-200 rounded animate-pulse"></div>
         </div>
-        <div className="grid gap-8 md:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={`fallback-visa-${i}`} className="p-6 bg-white shadow-lg rounded-xl">
-              <div className="h-48 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   ),
 });
 
-const AdditionalServices = dynamic(() => import("./src/components/additionalServices"), {
-  ssr: false,
-  loading: () => (
-    <div className="py-16 bg-white">
-      <div className="container px-4 mx-auto">
-        <div className="w-1/4 h-6 mx-auto mb-8 bg-gray-200 rounded animate-pulse"></div>
-        <div className="grid gap-6 md:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={`fallback-additional-${i}`} className="p-4 rounded-lg bg-gray-50">
-              <div className="h-32 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  ),
-});
+// 메타데이터 설정 (SEO 최적화)
+export const metadata = {
+  title: "베트남 비자 신청 대행 | Vietnam Visa 24 - 99.8% 승인률 보장",
+  description: "베트남 E-VISA 전문 대행 서비스. 99.8% 승인률, 24시간 빠른 처리, 한국어 완벽 지원. 복잡한 비자 신청을 전문가가 완벽하게 처리해드립니다.",
+  keywords: "베트남 비자, E-VISA, 베트남 관광비자, 베트남 상용비자, 비자 대행, 베트남 여행",
+  openGraph: {
+    title: "베트남 비자 신청 대행 | Vietnam Visa 24",
+    description: "99.8% 승인률의 믿을 수 있는 베트남 비자 대행 서비스. 24시간 빠른 처리로 여행 준비를 완벽하게 도와드립니다.",
+    type: "website",
+    locale: "ko_KR",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "베트남 비자 신청 대행 | Vietnam Visa 24",
+    description: "99.8% 승인률의 믿을 수 있는 베트남 비자 대행 서비스",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+};
 
-const CompanyInfo = dynamic(() => import("./src/components/companyInfo"), {
-  ssr: false,
-  loading: () => (
-    <div className="py-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container px-4 mx-auto">
-        <div className="mb-12 text-center">
-          <div className="w-1/3 h-8 mx-auto mb-4 bg-gray-200 rounded animate-pulse"></div>
-          <div className="w-2/3 h-4 mx-auto bg-gray-200 rounded animate-pulse"></div>
-        </div>
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={`fallback-company-${i}`} className="p-6 bg-white shadow-lg rounded-xl">
-              <div className="h-24 bg-gray-200 rounded animate-pulse"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  ),
-});
-
-const Chatbot = dynamic(() => import("./src/components/chatbot"), {
-  ssr: false,
-  loading: () => null,
-});
-
-const GraphQLTest = dynamic(() => import("./src/components/test/GraphQLTest.jsx"), {
-  ssr: false,
-  loading: () => null,
-});
-
+// 서버 컴포넌트로 변환된 메인 페이지
 export default function HomePage() {
-  const [mounted, setMounted] = useState(false);
-  const [isChatbotOpen, setIsChatbotOpen] = useState(false);
-  const [applicationData, setApplicationData] = useState(null);
-
-  // 컴포넌트가 마운트되었는지 확인 (클라이언트 사이드)
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const handleVisaApply = (visaData) => {
-    console.log("Visa apply clicked:", visaData); // 디버깅용
-    setApplicationData(visaData);
-    setIsChatbotOpen(true);
-  };
-
-  const handleChatbotToggle = () => {
-    setIsChatbotOpen(!isChatbotOpen);
-    // 챗봇을 닫을 때만 applicationData를 초기화
-    if (isChatbotOpen) {
-      setApplicationData(null);
-    }
-  };
-
-  // 마운트되지 않은 경우 로딩 상태 표시
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-        <div className="container px-4 py-16 mx-auto">
-          <div className="text-center">
-            <div className="w-1/3 h-8 mx-auto mb-4 bg-gray-200 rounded animate-pulse"></div>
-            <div className="w-2/3 h-4 mx-auto bg-gray-200 rounded animate-pulse"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen">
-      <Header />
+    <>
+      {/* 인터랙티브 헤더와 챗봇 등 클라이언트 기능 */}
+      <InteractiveSections />
+
+      {/* 정적 콘텐츠 - 서버 사이드 렌더링으로 SEO 최적화 */}
       <main>
-        <HeroSection />
-        <VisaServices onApplyClick={handleVisaApply} />
-        <ProcessSteps />
-        <AdditionalServices onApplyClick={handleVisaApply} />
-        <CompanyInfo />
-
-        {/* GraphQL Test - 개발 모드에서만 표시 */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="py-12 bg-gray-50">
-            <div className="max-w-4xl px-4 mx-auto">
-              <GraphQLTest />
-            </div>
-          </div>
-        )}
-
-        <FaqSection />
-        <ContactForm />
+        <StaticHeroSection />
+        <StaticProcessSteps />
+        <StaticCompanyInfo />
+        <StaticFaqSection />
       </main>
-      <Footer />
 
-      {/* Floating Chatbot */}
-      <div className="fixed z-50 bottom-6 right-6">
-        <Chatbot isOpen={isChatbotOpen} onToggle={handleChatbotToggle} applicationData={applicationData} />
-      </div>
-    </div>
+      {/* 정적 푸터 */}
+      <StaticFooter />
+    </>
   );
 }

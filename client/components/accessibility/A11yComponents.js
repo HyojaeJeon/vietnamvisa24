@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import PropTypes from "prop-types";
 
 // 포커스 트랩 컴포넌트 (모달, 드롭다운 등에 사용)
 export const FocusTrap = ({ children, isActive = true }) => {
@@ -148,6 +149,19 @@ export const AccessibleModal = ({ isOpen, onClose, title, children, size = "md" 
       </div>
     </div>
   );
+};
+
+FocusTrap.propTypes = {
+  children: PropTypes.node.isRequired,
+  isActive: PropTypes.bool,
+};
+
+AccessibleModal.propTypes = {
+  isOpen: PropTypes.bool.isRequired,
+  onClose: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+  size: PropTypes.string,
 };
 
 // 접근 가능한 툴팁 컴포넌트

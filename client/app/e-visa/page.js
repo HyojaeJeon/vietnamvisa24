@@ -40,6 +40,10 @@ import {
   Timer,
   BadgeCheck,
 } from "lucide-react";
+import { useQuery } from "@apollo/client";
+import { GET_E_VISA_PRICES } from "../../src/lib/graphql";
+import { Select } from "../../src/components/ui/select";
+import { toast } from "react-hot-toast";
 
 export default function EVisa() {
   const [expandedFaq, setExpandedFaq] = useState(null);
@@ -144,24 +148,50 @@ export default function EVisa() {
 
   const testimonials = [
     {
+      id: 1,
       name: "김민수",
       location: "서울",
       comment: "급하게 필요했는데 1일 만에 처리해주셔서 감사합니다! 덕분에 출장 일정에 차질 없이 다녀올 수 있었어요.",
       rating: 5,
     },
     {
+      id: 2,
       name: "박지영",
       location: "부산",
       comment: "혼자 하다가 계속 오류 나서 맡겼는데 바로 해결됐어요. 사진 규격도 맞춰주시고 너무 편했습니다.",
       rating: 5,
     },
     {
+      id: 3,
       name: "이준호",
       location: "대구",
       comment: "복잡한 절차 없이 한국어로 간편하게 신청할 수 있어서 좋았어요. 전문가 서비스 추천합니다!",
       rating: 5,
     },
   ];
+
+  const { data, loading } = useQuery(GET_E_VISA_PRICES);
+
+  const [nationality, setNationality] = useState("");
+  const [processingSpeed, setProcessingSpeed] = useState("normal");
+  const [price, setPrice] = useState(null);
+
+  const handleCalculatePrice = () => {
+    if (!nationality) {
+      toast.error("국적을 선택하세요.");
+      return;
+    }
+
+    const selectedPrice = data?.getEVisaPrices?.find((item) => item.nationality === nationality && item.processingSpeed === processingSpeed);
+
+    if (selectedPrice) {
+      setPrice(selectedPrice.price);
+    } else {
+      toast.error("해당 조건에 대한 가격 정보를 찾을 수 없습니다.");
+    }
+  };
+
+  if (loading) return <div>로딩 중...</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
@@ -597,8 +627,8 @@ export default function EVisa() {
 
             {/* 고객 후기 */}
             <div className="grid md:grid-cols-3 gap-8 mb-16 max-w-6xl mx-auto">
-              {testimonials.map((testimonial, index) => (
-                <Card key={index} className="bg-white/10 backdrop-blur-sm border border-white/20 text-white">
+              {testimonials.map((testimonial) => (
+                <Card key={testimonial.id} className="bg-white/10 backdrop-blur-sm border border-white/20 text-white">
                   <CardContent className="p-6">
                     <div className="flex items-center mb-4">
                       {[...Array(testimonial.rating)].map((_, i) => (
@@ -672,6 +702,51 @@ export default function EVisa() {
                   </CardContent>
                 </Card>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* E-Visa 가격 계산기 */}
+        <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center space-x-2 bg-green-100 px-4 py-2 rounded-full text-green-700 text-sm font-medium mb-6">
+                <CreditCard className="h-4 w-4" />
+                <span>E-Visa 가격 계산기</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">나에게 맞는 E-VISA 가격은?</h2>
+              <p className="text-gray-600 text-xl max-w-3xl mx-auto">국적과 처리 속도를 선택하고 예상 비용을 계산해보세요</p>
+            </div>
+
+            <div className="max-w-md mx-auto">
+              <Card className="shadow-lg border-0">
+                <CardContent className="p-8">
+                  <div className="space-y-4">
+                    <div>
+                      <label htmlFor="nationality" className="block text-sm font-medium text-gray-700">
+                        국적
+                      </label>
+                      <Select
+                        id="nationality"
+                        value={nationality}
+                        onChange={(e) => setNationality(e.target.value)}
+                        options={data?.getEVisaPrices?.map((item) => item.nationality)}
+                        placeholder="국적을 선택하세요"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="processing-speed" className="block text-sm font-medium text-gray-700">
+                        처리 속도
+                      </label>
+                      <Select id="processing-speed" value={processingSpeed} onChange={(e) => setProcessingSpeed(e.target.value)} options={["normal", "urgent"]} placeholder="처리 속도를 선택하세요" />
+                    </div>
+                    <Button onClick={handleCalculatePrice} className="bg-blue-600 hover:bg-blue-700">
+                      가격 계산
+                    </Button>
+                    {price !== null && <div className="mt-4 text-lg font-bold text-green-600">예상 비용: {price} USD</div>}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>

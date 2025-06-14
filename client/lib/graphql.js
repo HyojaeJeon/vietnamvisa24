@@ -1,6 +1,7 @@
+// Legacy GraphQL exports - redirects to the main organized GraphQL structure
+// All GraphQL queries, mutations, and types are now organized in /app/src/lib/graphql/
 export * from "../app/src/lib/graphql/index.js";
-// export { default as apolloClient } from "../app/src/lib/apolloClient.js";
-export * from "./graphql-mutations";
-import { client } from './apolloClient';
-// export { apolloClient };
 
+// Apollo Client is available separately
+import { apolloClient } from "../app/src/lib/apolloClient";
+export { apolloClient };

@@ -1,5 +1,6 @@
 // index.js
 const express = require("express");
+const { createServer } = require("http");
 const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
 const cors = require("cors");
@@ -7,6 +8,11 @@ const typeDefs = require("./graphql/schema");
 const resolvers = require("./graphql/resolvers");
 const { formatError } = require("./utils/errorHandler");
 const { connectDB } = require("./database");
+const { initializeSocket } = require("./utils/socketManager");
+
+// API 라우터 임포트
+const documentsRouter = require("./routes/documents");
+const webhooksRouter = require("./routes/webhooks");
 
 async function startServer() {
   // 1) DB 연결
@@ -22,8 +28,15 @@ async function startServer() {
   });
   await server.start();
   console.log("✅ Apollo Server started");
-
   const app = express();
+  const httpServer = createServer(app);
+
+  // Socket.IO 초기화
+  const io = initializeSocket(httpServer);
+  console.log("✅ Socket.IO initialized");
+
+  // 앱에 Socket.IO 인스턴스 저장 (리졸버에서 사용하기 위해)
+  app.set("io", io);
   // ─── CORS 옵션 정의 ───────────────────────────────────────────
   const corsOptions = {
     origin: true, // 모든 origin 허용 (개발용)
@@ -39,6 +52,20 @@ async function startServer() {
   app.get("/health", (req, res) => {
     res.json({ status: "OK", timestamp: new Date().toISOString() });
   });
+
+  // ─── REST API 라우터 설정 ────────────────────────────────────
+  app.use(cors(corsOptions)); // 모든 라우터에 CORS 적용
+  app.use(express.json()); // JSON 파서 적용
+  // 문서 관리 API 라우터
+  app.use("/api/documents", documentsRouter);
+
+  // 웹훅 API 라우터 (결제 서비스 연동)
+  app.use("/api/webhooks", webhooksRouter);
+
+  // 업로드된 파일의 정적 서빙 (선택사항)
+  app.use("/uploads", express.static("uploads"));
+  // ─────────────────────────────────────────────────────────────
+
   // ─── GraphQL 전용 CORS + JSON 파서 + Apollo 미들웨어 ────────────
   app.options("/graphql", cors(corsOptions)); // 사전 요청 처리
 
@@ -49,7 +76,6 @@ async function startServer() {
     console.log(`📝 Headers:`, req.headers);
     next();
   });
-
   app.use(
     "/graphql",
     cors(corsOptions), // CORS 헤더 부착
@@ -58,16 +84,17 @@ async function startServer() {
       context: async ({ req }) => {
         const token = req.headers.authorization || "";
         const adminToken = req.headers["admin-token"] || "";
-        return { token, adminToken, req };
+        const io = req.app.get("io");
+        return { token, adminToken, req, io };
       },
     })
-  );
-  // ─────────────────────────────────────────────────────────────
-  // 서버 기동
+  ); // ─────────────────────────────────────────────────────────────
+  // 서버 기동 (Socket.IO와 함께)
   const PORT = process.env.PORT || 5002;
-  app.listen(PORT, "0.0.0.0", () => {
+  httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Server running on http://0.0.0.0:${PORT}/graphql`);
     console.log(`📊 Health available at http://0.0.0.0:${PORT}/health`);
+    console.log(`⚡ Socket.IO ready for real-time communication`);
   });
 }
 

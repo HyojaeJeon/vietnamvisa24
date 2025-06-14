@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>서류 요청 안내</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 10px;
+        }
+        .title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin: 0;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .greeting {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .document-list {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .document-list h3 {
+            color: #856404;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .document-item {
+            margin: 10px 0;
+            padding: 8px;
+            background-color: #fff;
+            border-radius: 3px;
+            border-left: 3px solid #ffc107;
+        }
+        .urgent {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid #dc3545;
+        }
+        .button {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white !important;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .contact-info {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">VietnamVisa24</div>
+            <h1 class="title">추가 서류 요청 안내</h1>
+        </div>
+
+        <div class="content">
+            <div class="greeting">
+                안녕하세요, <strong>{{fullName}}</strong>님
+            </div>
+
+            <div class="info-box">
+                <strong>신청번호:</strong> {{applicationNumber}}<br>
+                <strong>비자 종류:</strong> {{visaType}}<br>
+                <strong>요청일시:</strong> {{requestDate}}
+            </div>
+
+            <p>비자 신청 검토 중 추가로 필요한 서류가 있어 연락드립니다.</p>
+
+            <div class="document-list">
+                <h3>📋 제출 필요 서류</h3>
+                {{#each requiredDocuments}}
+                <div class="document-item">
+                    <strong>{{name}}</strong>
+                    {{#if description}}
+                    <br><small>{{description}}</small>
+                    {{/if}}
+                </div>
+                {{/each}}
+            </div>
+
+            {{#if isUrgent}}
+            <div class="urgent">
+                <strong>⚠️ 긴급 처리 필요</strong><br>
+                빠른 처리를 위해 가능한 한 빨리 서류를 제출해 주시기 바랍니다.
+            </div>
+            {{/if}}
+
+            <div class="contact-info">
+                <h3>📤 서류 제출 방법</h3>
+                <ul>
+                    <li>이메일: documents@vietnamvisa24.com</li>
+                    <li>고화질 스캔 또는 사진으로 제출</li>
+                    <li>파일명: 신청번호_서류명 (예: {{applicationNumber}}_여권사본.jpg)</li>
+                </ul>
+            </div>
+
+            <p>서류 제출 후 검토가 완료되면 다시 연락드리겠습니다.</p>
+
+            <div style="text-align: center;">
+                <a href="{{portalUrl}}" class="button">내 신청 현황 확인하기</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p><strong>VietnamVisa24</strong></p>
+            <p>📞 1588-0000 | 📧 support@vietnamvisa24.com</p>
+            <p>평일 09:00~18:00 (토/일/공휴일 휴무)</p>
+            <p style="font-size: 12px; color: #95a5a6; margin-top: 15px;">
+                본 메일은 발신전용입니다. 문의사항이 있으시면 고객센터로 연락해 주세요.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-import { generatePageMetadata } from "../lib/seo-utils";
+import { generatePageMetadata } from "./src/lib/seo-utils";
 
 // 정적 페이지 목록
 const staticPages = [

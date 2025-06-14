@@ -8,6 +8,7 @@ export const CREATE_CONSULTATION_MUTATION = gql`
       phone
       email
       service_type
+      message
       status
       created_at
     }

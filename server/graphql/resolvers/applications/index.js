@@ -3,9 +3,11 @@ const { Kind } = require("graphql/language");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
+const workflowEngine = require("../../../utils/workflowEngine");
+const emailService = require("../../../utils/emailService");
 
 // Import models with error handling
-let VisaApplication, User, Admin, ApplicationStatusHistory, ApplicationMemo;
+let VisaApplication, User, Admin, ApplicationStatusHistory, ApplicationMemo, Payment;
 try {
   const models = require("../../../models");
   VisaApplication = models.VisaApplication;
@@ -13,6 +15,7 @@ try {
   Admin = models.Admin;
   ApplicationStatusHistory = models.ApplicationStatusHistory;
   ApplicationMemo = models.ApplicationMemo;
+  Payment = models.Payment;
 } catch (error) {
   console.error("Error importing models:", error);
 }
@@ -224,6 +227,78 @@ const resolvers = {
   },
 
   Mutation: {
+    createVisaApplication: async (_, { input }, context) => {
+      try {
+        console.log("Creating visa application:", input);
+
+        // Generate application number
+        const applicationNumber = `VN-${new Date().getFullYear()}-${Date.now().toString().slice(-6)}`;
+
+        let newApplication;
+
+        if (!VisaApplication) {
+          console.log("VisaApplication model not available, returning mock response");
+          newApplication = {
+            id: Date.now(),
+            application_number: applicationNumber,
+            ...input,
+            status: "PENDING",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          };
+        } else {
+          // Create the application
+          newApplication = await VisaApplication.create({
+            application_number: applicationNumber,
+            ...input,
+            status: "pending",
+            created_at: new Date(),
+            updated_at: new Date(),
+          });
+        }
+
+        // Start automated workflow
+        try {
+          await workflowEngine.startWorkflow(newApplication.id, input.visa_type || "E-VISA");
+          console.log(`Workflow started for application ${newApplication.id}`);
+        } catch (workflowError) {
+          console.error("Failed to start workflow:", workflowError);
+          // Continue without failing the application creation
+        }
+
+        // Send application confirmation email
+        try {
+          if (input.email) {
+            await emailService.sendApplicationConfirmation(input.email, {
+              applicationNumber: applicationNumber,
+              fullName: input.full_name || input.fullName,
+              visaType: input.visa_type || input.visaType,
+              applicationId: newApplication.id,
+            });
+            console.log(`Confirmation email sent to ${input.email}`);
+          }
+        } catch (emailError) {
+          console.error("Failed to send confirmation email:", emailError);
+          // Continue without failing
+        }
+
+        // Convert to GraphQL format
+        const result = {
+          ...newApplication,
+          status: dbToGraphQLStatus(newApplication.status || "pending"),
+        };
+
+        return result;
+      } catch (error) {
+        console.error("Create visa application error:", error);
+        throw new GraphQLError("비자 신청 생성에 실패했습니다.", {
+          extensions: {
+            code: "INTERNAL_SERVER_ERROR",
+            details: error.message,
+          },
+        });
+      }
+    },
     updateApplicationStatus: async (_, { id, status }, context) => {
       try {
         console.log("Updating application status:", { id, status });
@@ -251,10 +326,55 @@ const resolvers = {
 
         // Use the new status conversion function
         const dbStatus = graphQLToDbStatus(status);
-        console.log("Mapping status:", status, "->", dbStatus);
-
-        // Update application status
+        console.log("Mapping status:", status, "->", dbStatus); // Update application status
         await application.update({ status: dbStatus });
+
+        // Send real-time notification via Socket.IO
+        try {
+          if (context?.io && application.user_id) {
+            const socketManager = require("../../../utils/socketManager");
+            socketManager.notifyApplicationStatusChange(
+              application.user_id,
+              {
+                ...application.toJSON(),
+                status: dbStatus,
+                application_number: application.application_number,
+                full_name: application.full_name,
+              },
+              previousStatus,
+              dbStatus
+            );
+            console.log(`Socket notification sent for status change: ${previousStatus} -> ${dbStatus}`);
+          }
+        } catch (socketError) {
+          console.error("Failed to send socket notification:", socketError);
+          // Continue without failing
+        }
+
+        // Trigger workflow progression if status change is significant
+        try {
+          const triggerMap = {
+            PROCESSING: "status_changed",
+            DOCUMENT_REVIEW: "documents_received",
+            SUBMITTED_TO_AUTHORITY: "submitted_to_authority",
+            APPROVED: "visa_approved",
+            REJECTED: "visa_rejected",
+            COMPLETED: "application_completed",
+          };
+
+          const trigger = triggerMap[status];
+          if (trigger) {
+            await workflowEngine.handleTrigger(id, trigger, {
+              previousStatus: previousStatus,
+              newStatus: dbStatus,
+              updatedBy: context?.user?.id || "system",
+            });
+            console.log(`Workflow trigger ${trigger} processed for application ${id}`);
+          }
+        } catch (workflowError) {
+          console.error("Failed to trigger workflow:", workflowError);
+          // Continue without failing the status update
+        }
 
         // Optionally create status history record if the model exists
         try {
@@ -428,7 +548,7 @@ const resolvers = {
         if (!VisaApplication) {
           console.log("VisaApplication model not available, returning mock response");
           return {
-            downloadUrl: `/api/download/application/${applicationId}/documents.zip`,
+            downloadUrl: `/api/documents/application/${applicationId}/download-zip`,
             fileName: `app_${applicationId}_documents.zip`,
           };
         }
@@ -439,11 +559,9 @@ const resolvers = {
           throw new GraphQLError("신청을 찾을 수 없습니다.", {
             extensions: { code: "NOT_FOUND" },
           });
-        }
-
-        // For now, return a mock response
+        } // For now, return a mock response
         return {
-          downloadUrl: `/api/download/application/${applicationId}/documents.zip`,
+          downloadUrl: `/api/documents/application/${applicationId}/download-zip`,
           fileName: `${application.application_number || "app_" + applicationId}_documents.zip`,
         };
       } catch (error) {

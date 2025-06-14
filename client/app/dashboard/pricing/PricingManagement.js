@@ -1,25 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
-import { 
-  PlusIcon, 
-  PencilIcon, 
-  TrashIcon,
-  BanknotesIcon,
-  CurrencyDollarIcon,
-  GlobeAltIcon,
-  ClockIcon,
-  UserGroupIcon,
-  BuildingOfficeIcon
-} from '@heroicons/react/24/outline';
-import { GET_ALL_PRICING_DATA } from '../../../lib/graphql/pricing/queries';
-import { 
-  DELETE_E_VISA_PRICE,
-  DELETE_VISA_RUN_PRICE,
-  DELETE_FAST_TRACK_PRICE
-} from '../../../lib/graphql/pricing/mutations';
-import PricingModal from './PricingModal';
+import { useState, useEffect } from "react";
+import { useQuery, useMutation } from "@apollo/client";
+import { PlusIcon, PencilIcon, TrashIcon, BanknotesIcon, CurrencyDollarIcon, GlobeAltIcon, ClockIcon, UserGroupIcon, BuildingOfficeIcon } from "@heroicons/react/24/outline";
+import { GET_ALL_PRICING_DATA } from "../../src/lib/graphql";
+import { DELETE_E_VISA_PRICE, DELETE_VISA_RUN_PRICE, DELETE_FAST_TRACK_PRICE } from "../../src/lib/graphql";
+import PricingModal from "./PricingModal";
 
 export default function PricingManagement() {
   const [activeTab, setActiveTab] = useState("evisa");
@@ -129,8 +115,7 @@ export default function PricingManagement() {
             onClick={() => handleCreate("evisa")}
             className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700"
           >
-            <PlusIcon className="w-4 h-4 mr-2" />
-            새 가격 추가
+            <PlusIcon className="w-4 h-4 mr-2" />새 가격 추가
           </button>
         </div>
 
@@ -153,13 +138,8 @@ export default function PricingManagement() {
                     <div className="flex items-center">
                       <GlobeAltIcon className="w-5 h-5 mr-2 text-gray-400" />
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {price.type === "SINGLE" ? "단일 비자" : "복수 비자"}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {price.processingTime === "NORMAL" ? "일반" : 
-                           price.processingTime === "URGENT" ? "긴급" : "초긴급"}
-                        </div>
+                        <div className="text-sm font-medium text-gray-900">{price.type === "SINGLE" ? "단일 비자" : "복수 비자"}</div>
+                        <div className="text-sm text-gray-500">{price.processingTime === "NORMAL" ? "일반" : price.processingTime === "URGENT" ? "긴급" : "초긴급"}</div>
                       </div>
                     </div>
                   </td>
@@ -176,24 +156,16 @@ export default function PricingManagement() {
                     <div className="text-sm text-gray-500">마진: ₩{price.marginKrw?.toLocaleString()}</div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      price.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                    }`}>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${price.isActive ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
                       {price.isActive ? "활성" : "비활성"}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm font-medium whitespace-nowrap">
                     <div className="flex space-x-2">
-                      <button 
-                        onClick={() => handleEdit(price, "evisa")} 
-                        className="text-blue-600 hover:text-blue-900"
-                      >
+                      <button onClick={() => handleEdit(price, "evisa")} className="text-blue-600 hover:text-blue-900">
                         <PencilIcon className="w-4 h-4" />
                       </button>
-                      <button 
-                        onClick={() => handleDelete(price.id, "evisa")} 
-                        className="text-red-600 hover:text-red-900"
-                      >
+                      <button onClick={() => handleDelete(price.id, "evisa")} className="text-red-600 hover:text-red-900">
                         <TrashIcon className="w-4 h-4" />
                       </button>
                     </div>
@@ -219,9 +191,7 @@ export default function PricingManagement() {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center ${
-                    activeTab === tab.id 
-                      ? "border-blue-500 text-blue-600" 
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    activeTab === tab.id ? "border-blue-500 text-blue-600" : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                   }`}
                 >
                   <Icon className="w-5 h-5 mr-2" />
@@ -234,16 +204,7 @@ export default function PricingManagement() {
 
         {activeTab === "evisa" && renderEVisaPriceTable()}
 
-        {modalOpen && (
-          <PricingModal 
-            isOpen={modalOpen} 
-            onClose={() => setModalOpen(false)} 
-            type={modalType} 
-            priceType={selectedPriceType} 
-            price={selectedPrice} 
-            onRefetch={refetch} 
-          />
-        )}
+        {modalOpen && <PricingModal isOpen={modalOpen} onClose={() => setModalOpen(false)} type={modalType} priceType={selectedPriceType} price={selectedPrice} onRefetch={refetch} />}
       </div>
     </div>
   );

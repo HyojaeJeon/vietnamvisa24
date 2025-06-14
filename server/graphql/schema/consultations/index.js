@@ -6,6 +6,7 @@ const consultationsTypeDefs = gql`
     phone: String!
     email: String!
     service_type: String!
+    message: String
     notes: String
   }
 

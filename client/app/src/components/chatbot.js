@@ -2,7 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { Button } from "./ui/button.js";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card.js";
 import { Input } from "./ui/input.js";
-import { MessageCircle, Send, X, Bot, User, FileText, CheckCircle, Clock } from "lucide-react";
+import { MessageCircle, Send, X, Bot, User, FileText, CheckCircle, Clock, UserPlus } from "lucide-react";
+import { useMutation } from "@apollo/client";
+import { CREATE_CONSULTATION_MUTATION } from "../lib/graphql/mutation/consultations/index.js";
 import PropTypes from "prop-types";
 
 function Chatbot({ isOpen, onToggle, applicationData = null, initialMessage = "" }) {
@@ -16,8 +18,44 @@ function Chatbot({ isOpen, onToggle, applicationData = null, initialMessage = ""
     },
   ]);
   const [inputMessage, setInputMessage] = useState(initialMessage);
+  const [showConsultationForm, setShowConsultationForm] = useState(false);
+  const [consultationForm, setConsultationForm] = useState({
+    customer_name: "",
+    phone: "",
+    email: "",
+    service_type: "general_inquiry",
+  });
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+
+  // GraphQL mutation for creating consultation
+  const [createConsultation, { loading: creatingConsultation }] = useMutation(CREATE_CONSULTATION_MUTATION, {
+    onCompleted: (data) => {
+      const botResponse = {
+        id: Date.now(),
+        text: `상담 티켓이 생성되었습니다! 티켓번호: CS-${data.createConsultation.id}. 담당자가 빠른 시일 내에 연락드리겠습니다.`,
+        isBot: true,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, botResponse]);
+      setShowConsultationForm(false);
+      setConsultationForm({
+        customer_name: "",
+        phone: "",
+        email: "",
+        service_type: "general_inquiry",
+      });
+    },
+    onError: (error) => {
+      const botResponse = {
+        id: Date.now(),
+        text: "죄송합니다. 상담 접수 중 오류가 발생했습니다. 다시 시도해 주세요.",
+        isBot: true,
+        timestamp: new Date(),
+      };
+      setMessages((prev) => [...prev, botResponse]);
+    },
+  });
 
   // Check if component is mounted (client-side)
   useEffect(() => {
@@ -62,9 +100,32 @@ function Chatbot({ isOpen, onToggle, applicationData = null, initialMessage = ""
       setMessages((prev) => [...prev, applicationMessage, confirmMessage]);
     }
   }, [applicationData, isOpen]);
-
   const getResponse = (message) => {
     const lowerMessage = message.toLowerCase();
+
+    // 상담원 연결 요청 키워드 체크
+    if (
+      lowerMessage.includes("상담원") ||
+      lowerMessage.includes("담당자") ||
+      lowerMessage.includes("전문가") ||
+      lowerMessage.includes("연결") ||
+      lowerMessage.includes("직접 문의") ||
+      lowerMessage.includes("실제 상담")
+    ) {
+      // 상담 연결 확인 메시지 표시
+      setTimeout(() => {
+        const confirmMessage = {
+          id: Date.now() + 2,
+          text: "전문 상담사와 연결해드릴까요?",
+          isBot: true,
+          isConsultationOffer: true,
+          timestamp: new Date(),
+        };
+        setMessages((prev) => [...prev, confirmMessage]);
+      }, 1500);
+
+      return "네, 더 자세한 상담을 원하시는군요. 전문 상담사가 직접 도움을 드릴 수 있습니다.";
+    }
 
     if (lowerMessage.includes("관광") || lowerMessage.includes("여행")) {
       return "관광 비자(DL)는 베트남 여행을 위한 비자입니다. 최대 30일간 체류가 가능하며, 24시간 내 발급됩니다. 더 자세한 정보가 필요하시면 상담원 연결을 도와드릴까요?";
@@ -80,7 +141,6 @@ function Chatbot({ isOpen, onToggle, applicationData = null, initialMessage = ""
       return "죄송합니다. 더 자세한 답변을 위해 전문 상담사와 연결해드릴까요? 또는 다른 질문을 해주세요.";
     }
   };
-
   const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
 
@@ -107,6 +167,42 @@ function Chatbot({ isOpen, onToggle, applicationData = null, initialMessage = ""
     setTimeout(() => {
       inputRef.current?.focus();
     }, 100);
+  };
+
+  // 상담 신청 처리
+  const handleConsultationRequest = () => {
+    setShowConsultationForm(true);
+    const botMessage = {
+      id: Date.now(),
+      text: "상담 신청을 위해 간단한 정보를 입력해 주세요:",
+      isBot: true,
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, botMessage]);
+  };
+
+  // 상담 신청 완료
+  const handleSubmitConsultation = () => {
+    if (!consultationForm.customer_name || !consultationForm.phone || !consultationForm.email) {
+      alert("모든 필수 정보를 입력해 주세요.");
+      return;
+    }
+
+    // 대화 기록을 JSON 형태로 저장
+    const chatHistory = messages.map((msg) => ({
+      timestamp: msg.timestamp,
+      isBot: msg.isBot,
+      text: msg.text,
+    }));
+
+    createConsultation({
+      variables: {
+        input: {
+          ...consultationForm,
+          message: `채팅 상담 요청\n\n대화 기록:\n${JSON.stringify(chatHistory, null, 2)}`,
+        },
+      },
+    });
   };
 
   const ApplicationCard = ({ data }) => (
@@ -207,10 +303,41 @@ function Chatbot({ isOpen, onToggle, applicationData = null, initialMessage = ""
                   scrollbarColor: "#cbd5e1 #f1f5f9",
                 }}
               >
+                {" "}
                 {messages.map((message) => (
                   <div key={message.id} className={`flex ${message.isBot ? "justify-start" : "justify-end"}`}>
                     {message.isApplicationCard ? (
                       <ApplicationCard data={message.applicationData} />
+                    ) : message.isConsultationOffer ? (
+                      // 상담 연결 확인 메시지
+                      <div className="max-w-[80%]">
+                        <div className="p-3 mb-2 text-gray-800 bg-white border rounded-lg shadow-sm">
+                          <div className="flex items-start space-x-2">
+                            <Bot className="h-4 w-4 mt-0.5 flex-shrink-0 text-blue-600" />
+                            <p className="text-sm leading-relaxed">{message.text}</p>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button onClick={handleConsultationRequest} className="px-4 py-2 text-sm text-white bg-green-600 rounded-lg hover:bg-green-700">
+                            예, 상담 신청하기
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              const botMessage = {
+                                id: Date.now(),
+                                text: "알겠습니다. 다른 궁금한 점이 있으시면 언제든 말씀해 주세요!",
+                                isBot: true,
+                                timestamp: new Date(),
+                              };
+                              setMessages((prev) => [...prev, botMessage]);
+                            }}
+                            variant="outline"
+                            className="px-4 py-2 text-sm rounded-lg"
+                          >
+                            나중에 하기
+                          </Button>
+                        </div>
+                      </div>
                     ) : (
                       <div className={`max-w-[80%] p-3 rounded-lg ${message.isBot ? "bg-white text-gray-800 shadow-sm border" : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white"}`}>
                         <div className="flex items-start space-x-2">
@@ -222,6 +349,46 @@ function Chatbot({ isOpen, onToggle, applicationData = null, initialMessage = ""
                     )}
                   </div>
                 ))}
+                {/* 상담 신청 폼 */}
+                {showConsultationForm && (
+                  <div className="p-4 space-y-3 bg-white border rounded-lg">
+                    <h4 className="font-medium text-gray-900">상담 신청 정보</h4>
+                    <div className="space-y-2">
+                      <Input
+                        placeholder="성함"
+                        value={consultationForm.customer_name}
+                        onChange={(e) => setConsultationForm((prev) => ({ ...prev, customer_name: e.target.value }))}
+                        className="text-sm"
+                      />
+                      <Input placeholder="연락처" value={consultationForm.phone} onChange={(e) => setConsultationForm((prev) => ({ ...prev, phone: e.target.value }))} className="text-sm" />
+                      <Input
+                        placeholder="이메일"
+                        type="email"
+                        value={consultationForm.email}
+                        onChange={(e) => setConsultationForm((prev) => ({ ...prev, email: e.target.value }))}
+                        className="text-sm"
+                      />
+                      <select
+                        value={consultationForm.service_type}
+                        onChange={(e) => setConsultationForm((prev) => ({ ...prev, service_type: e.target.value }))}
+                        className="w-full p-2 text-sm border border-gray-300 rounded-md"
+                      >
+                        <option value="general_inquiry">일반 문의</option>
+                        <option value="visa_inquiry">비자 관련</option>
+                        <option value="payment_inquiry">결제 문의</option>
+                        <option value="document_inquiry">서류 문의</option>
+                      </select>
+                    </div>
+                    <div className="flex space-x-2">
+                      <Button onClick={handleSubmitConsultation} disabled={creatingConsultation} className="flex-1 px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+                        {creatingConsultation ? "신청 중..." : "상담 신청"}
+                      </Button>
+                      <Button onClick={() => setShowConsultationForm(false)} variant="outline" className="px-4 py-2 text-sm rounded-lg">
+                        취소
+                      </Button>
+                    </div>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
 

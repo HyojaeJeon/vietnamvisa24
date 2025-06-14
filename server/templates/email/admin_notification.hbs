@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>관리자 알림</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        .title {
+            font-size: 20px;
+            color: #2c3e50;
+            margin: 0;
+        }
+        .notification-badge {
+            background-color: #3498db;
+            color: white;
+            border-radius: 50px;
+            padding: 8px 16px;
+            display: inline-block;
+            font-weight: bold;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        .urgent-badge {
+            background-color: #e74c3c;
+        }
+        .content {
+            margin-bottom: 30px;
+        }
+        .info-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .detail-item {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .detail-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+        .detail-value {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .priority-high {
+            color: #e74c3c;
+        }
+        .priority-medium {
+            color: #f39c12;
+        }
+        .priority-low {
+            color: #27ae60;
+        }
+        .action-buttons {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white !important;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        .button.urgent {
+            background-color: #e74c3c;
+        }
+        .button.secondary {
+            background-color: #95a5a6;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .stats-container {
+            background-color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .stats-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">VietnamVisa24 관리자</div>
+            <h1 class="title">시스템 알림</h1>
+        </div>
+
+        <div class="content">
+            <div style="text-align: center;">
+                <div class="notification-badge {{#if isUrgent}}urgent-badge{{/if}}">
+                    {{#if isUrgent}}🚨 긴급{{else}}📢 알림{{/if}}
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>알림 유형:</strong> {{notificationTitle}}<br>
+                <strong>발생 시간:</strong> {{timestamp}}<br>
+                {{#if applicationNumber}}
+                <strong>신청번호:</strong> {{applicationNumber}}<br>
+                {{/if}}
+                {{#if customerName}}
+                <strong>고객명:</strong> {{customerName}}
+                {{/if}}
+            </div>
+
+            <h3>📋 상세 정보</h3>
+            
+            {{#if notificationType}}
+                {{#eq notificationType "new_application"}}
+                <p><strong>새로운 비자 신청이 접수되었습니다.</strong></p>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">고객명</div>
+                        <div class="detail-value">{{customerName}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">비자 종류</div>
+                        <div class="detail-value">{{visaType}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">이메일</div>
+                        <div class="detail-value">{{email}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">전화번호</div>
+                        <div class="detail-value">{{phone}}</div>
+                    </div>
+                </div>
+                {{/eq}}
+
+                {{#eq notificationType "payment_received"}}
+                <p><strong>결제가 완료되었습니다.</strong></p>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">결제 금액</div>
+                        <div class="detail-value">{{amount}} {{currency}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">결제 방법</div>
+                        <div class="detail-value">{{paymentMethod}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">거래 ID</div>
+                        <div class="detail-value">{{transactionId}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">결제 시간</div>
+                        <div class="detail-value">{{paidAt}}</div>
+                    </div>
+                </div>
+                {{/eq}}
+
+                {{#eq notificationType "document_uploaded"}}
+                <p><strong>새로운 서류가 업로드되었습니다.</strong></p>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">서류 종류</div>
+                        <div class="detail-value">{{documentType}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">파일명</div>
+                        <div class="detail-value">{{fileName}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">파일 크기</div>
+                        <div class="detail-value">{{fileSize}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">업로드 시간</div>
+                        <div class="detail-value">{{uploadedAt}}</div>
+                    </div>
+                </div>
+                {{/eq}}
+
+                {{#eq notificationType "urgent_application"}}
+                <p><strong>긴급 처리가 필요한 신청입니다.</strong></p>
+                <div class="details-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">우선순위</div>
+                        <div class="detail-value priority-high">{{priority}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">처리 기한</div>
+                        <div class="detail-value">{{deadline}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">요청 사유</div>
+                        <div class="detail-value">{{urgentReason}}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">연락처</div>
+                        <div class="detail-value">{{contactInfo}}</div>
+                    </div>
+                </div>
+                {{/eq}}
+            {{/if}}
+
+            {{#if message}}
+            <div class="info-box">
+                <strong>추가 메시지:</strong><br>
+                {{message}}
+            </div>
+            {{/if}}
+
+            {{#if stats}}
+            <div class="stats-container">
+                <h4>📊 현재 대시보드 현황</h4>
+                <div class="stats-item">
+                    <span>대기 중인 신청:</span>
+                    <strong>{{stats.pendingApplications}}건</strong>
+                </div>
+                <div class="stats-item">
+                    <span>검토 대기 서류:</span>
+                    <strong>{{stats.pendingDocuments}}건</strong>
+                </div>
+                <div class="stats-item">
+                    <span>미결제 신청:</span>
+                    <strong>{{stats.unpaidApplications}}건</strong>
+                </div>
+            </div>
+            {{/if}}
+
+            <div class="action-buttons">
+                {{#if dashboardUrl}}
+                <a href="{{dashboardUrl}}" class="button{{#if isUrgent}} urgent{{/if}}">
+                    대시보드로 이동
+                </a>
+                {{/if}}
+                
+                {{#if applicationUrl}}
+                <a href="{{applicationUrl}}" class="button">
+                    신청 상세보기
+                </a>
+                {{/if}}
+
+                {{#if documentUrl}}
+                <a href="{{documentUrl}}" class="button">
+                    서류 검토하기
+                </a>
+                {{/if}}
+            </div>
+
+            {{#if notes}}
+            <div class="info-box">
+                <strong>시스템 메모:</strong><br>
+                {{notes}}
+            </div>
+            {{/if}}
+        </div>
+
+        <div class="footer">
+            <p><strong>VietnamVisa24 관리 시스템</strong></p>
+            <p>📧 admin@vietnamvisa24.com | 📞 관리자 전용: 1588-0000</p>
+            <p style="font-size: 12px; color: #95a5a6; margin-top: 15px;">
+                본 메일은 관리자 전용 알림입니다. 적절한 조치를 취해주시기 바랍니다.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
