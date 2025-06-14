@@ -1,0 +1,24 @@
+#!/bin/bash
+
+echo "🚀 Starting Vietnam Visa Service Development Environment..."
+
+# Kill any existing processes
+pkill -f "nodemon" 2>/dev/null || true
+pkill -f "next dev" 2>/dev/null || true
+sleep 2
+
+# Start server in background
+echo "📊 Starting server on port 5000..."
+cd server && npm run dev &
+SERVER_PID=$!
+
+# Wait for server to start
+sleep 3
+
+# Start client
+echo "🌐 Starting client on port 3002..."
+cd ../client && npm run dev &
+CLIENT_PID=$!
+
+# Wait for both processes
+wait $SERVER_PID $CLIENT_PID
