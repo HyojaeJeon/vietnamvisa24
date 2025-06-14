@@ -1,0 +1,89 @@
+ ⨯ ./app/src/lib/translations.js
+Error: 
+  × Unterminated string constant
+     ╭─[/home/runner/workspace/client/app/src/lib/translations.js:250:1]
+ 250 │       },
+ 251 │       next: "다음",
+ 252 │       prev: "이전",
+ 253 │       priceSummary: "예상 결제 금액",",
+     ·                                            ──
+ 254 │         nationality: "국적",
+ 255 │         email: "이메일",
+ 256 │         phone: "베트남 내 연락처",
+     ╰────
+
+  × Unexpected token `nationality`. Expected identifier
+     ╭─[/home/runner/workspace/client/app/src/lib/translations.js:251:1]
+ 251 │       next: "다음",
+ 252 │       prev: "이전",
+ 253 │       priceSummary: "예상 결제 금액",",
+ 254 │         nationality: "국적",
+     ·         ───────────
+ 255 │         email: "이메일",
+ 256 │         phone: "베트남 내 연락처",
+ 257 │       },
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/src/lib/translations.js
+./app/apply/page.js
+ ⨯ ./app/src/lib/translations.js
+Error: 
+  × Unterminated string constant
+     ╭─[/home/runner/workspace/client/app/src/lib/translations.js:250:1]
+ 250 │       },
+ 251 │       next: "다음",
+ 252 │       prev: "이전",
+ 253 │       priceSummary: "예상 결제 금액",",
+     ·                                            ──
+ 254 │         nationality: "국적",
+ 255 │         email: "이메일",
+ 256 │         phone: "베트남 내 연락처",
+     ╰────
+
+  × Unexpected token `nationality`. Expected identifier
+     ╭─[/home/runner/workspace/client/app/src/lib/translations.js:251:1]
+ 251 │       next: "다음",
+ 252 │       prev: "이전",
+ 253 │       priceSummary: "예상 결제 금액",",
+ 254 │         nationality: "국적",
+     ·         ───────────
+ 255 │         email: "이메일",
+ 256 │         phone: "베트남 내 연락처",
+ 257 │       },
+     ╰────
+
+Caused by:
+    Syntax Error
+
+Import trace for requested module:
+./app/src/lib/translations.js
+./app/apply/page.js
+ ⨯ ./app/src/lib/translations.js
+Error: 
+  × Unterminated string constant
+     ╭─[/home/runner/workspace/client/app/src/lib/translations.js:250:1]
+ 250 │       },
+ 251 │       next: "다음",
+ 252 │       prev: "이전",
+ 253 │       priceSummary: "예상 결제 금액",",
+     ·                                            ──
+ 254 │         nationality: "국적",
+ 255 │         email: "이메일",
+ 256 │         phone: "베트남 내 연락처",
+     ╰────
+
+  × Unexpected token `nationality`. Expected identifier
+     ╭─[/home/runner/workspace/client/app/src/lib/translations.js:251:1]
+ 251 │       next: "다음",
+ 252 │       prev: "이전",
+ 253 │       priceSummary: "예상 결제 금액",",
+ 254 │         nationality: "국적",
+     ·         ───────────
+ 255 │         email: "이메일",
+ 256 │         phone: "베트남 내 연락처",
+ 257 │       },
+     ╰────
