@@ -19,7 +19,7 @@ export default function Header() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { currentLanguage } = useSelector((state) => state.language);
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth || {});
   const dispatch = useDispatch();
   const router = useRouter();
 

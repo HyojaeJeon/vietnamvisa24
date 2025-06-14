@@ -516,7 +516,7 @@ function Step3DocumentUpload({
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64Data = e.target.result;
-        
+
         const documentData = {
           document_type: documentType,
           document_name: file.name,
@@ -811,7 +811,7 @@ function Step4AdditionalServices({ data, onChange, onNext, onPrev, language, pri
   const handleServiceToggle = (serviceId) => {
     const currentServices = data.selectedServices || [];
     const isSelected = currentServices.includes(serviceId);
-    
+
     const newServices = isSelected
       ? currentServices.filter(id => id !== serviceId)
       : [...currentServices, serviceId];
@@ -1170,7 +1170,7 @@ function Step6Payment({ data, onChange, onNext, onPrev, language, price }) {
               <ArrowLeft className="w-5 h-5 mr-2" />
               이전
             </Button>
-            
+
             <div className="flex gap-3">
               <Button
                 variant="outline"
@@ -1247,7 +1247,7 @@ function Step7Submit({ data, onSubmit, onPrev, language, isSubmitting }) {
               <ArrowLeft className="w-5 h-5 mr-2" />
               이전
             </Button>
-            
+
             <Button
               onClick={onSubmit}
               disabled={isSubmitting}
@@ -1340,10 +1340,12 @@ export default function ApplyVisaWizard() {
     price: 0,
     applicationId: null,
   });
-  
+
+  const { isAuthenticated, user } = useSelector((state) => state.auth || {});
+
   const [mounted, setMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const steps = [
     "apply.step1.title",
     "apply.step2.title", 
@@ -1413,7 +1415,7 @@ export default function ApplyVisaWizard() {
   // 최종 신청서 전송
   const handleSubmitApplication = async () => {
     setIsSubmitting(true);
-    
+
     try {
       // 신청서 데이터 준비
       const applicationData = {
@@ -1425,22 +1427,22 @@ export default function ApplyVisaWizard() {
         birth_date: applyForm?.form?.step2?.birth,
         phone: applyForm?.form?.step2?.phone,
         email: applyForm?.form?.step2?.email,
-        
+
         // 추가 정보
         gender: applyForm?.form?.step2?.gender,
         processing_speed: applyForm?.form?.step1?.processing,
         visa_subtype: applyForm?.form?.step1?.visaType,
-        
+
         // 서류 정보 (base64 데이터 포함)
         documents: applyForm?.form?.step3?.documents || [],
-        
+
         // 추가 서비스
         additional_services: applyForm?.form?.step4?.selectedServices || [],
-        
+
         // 결제 정보
         payment_method: applyForm?.form?.step6?.paymentMethod,
         payment_skipped: applyForm?.form?.step6?.paymentSkipped || false,
-        
+
         // 가격 정보
         base_price: applyForm?.price || 0,
         total_price: (applyForm?.price || 0) + ((applyForm?.form?.step4?.selectedServices?.length || 0) * 25000), // 임시 계산
@@ -1476,7 +1478,7 @@ export default function ApplyVisaWizard() {
 
       if (result.data?.createVisaApplication) {
         const application = result.data.createVisaApplication;
-        
+
         toast({
           title: "신청 완료!",
           description: `신청번호: ${application.application_number}`,
@@ -1484,12 +1486,12 @@ export default function ApplyVisaWizard() {
 
         // Redux 상태 초기화
         dispatch(resetForm());
-        
+
         // 성공 페이지로 리다이렉트 또는 다른 처리
         setTimeout(() => {
           window.location.href = '/dashboard/applications';
         }, 2000);
-        
+
       } else {
         throw new Error(result.errors?.[0]?.message || "신청 처리 중 오류가 발생했습니다.");
       }
@@ -1596,7 +1598,7 @@ export default function ApplyVisaWizard() {
             )}
             {(applyForm?.step || 0) === 6 && (
               <Step7Submit
-                data={applyForm?.form || {}}
+                data={applyForm?.form|| {}}
                 onSubmit={handleSubmitApplication}
                 onPrev={prev}
                 language={currentLanguage}
