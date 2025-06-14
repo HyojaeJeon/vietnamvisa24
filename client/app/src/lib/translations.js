@@ -248,12 +248,16 @@ export const translations = {
       step7: {
         title: "신청서 전송",
       },
+      priceSummary: "예상 결제 금액",
       next: "다음",
       prev: "이전",
-      priceSummary: "예상 결제 금액",",
-        nationality: "국적",
-        email: "이메일",
-        phone: "베트남 내 연락처",
+      required: "필수 입력 항목입니다.",
+      error: {
+        invalidEmail: "이메일 형식이 올바르지 않습니다.",
+        passportExpired: "여권 만료일이 6개월 이상 남아있어야 합니다.",
+        fileType: "허용되지 않는 파일 형식입니다.",
+        fileSize: "파일 크기가 너무 큽니다.",
+      },
       },
       step3: {
         title: "서류 업로드",

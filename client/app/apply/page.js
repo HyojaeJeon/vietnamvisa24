@@ -69,8 +69,88 @@ function t(key, language) {
   return key;
 }
 
+// Custom Select Component
+function CustomSelect({ value, onValueChange, placeholder, options, className = "" }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState(
+    options.find(opt => opt.value === value) || null
+  );
+
+  const handleSelect = (option) => {
+    setSelectedOption(option);
+    onValueChange(option.value);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className={`relative ${className}`}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full p-4 rounded-xl border-2 border-gray-200 hover:border-blue-300 focus:border-blue-500 bg-white text-left flex items-center justify-between transition-all duration-300"
+      >
+        <span className={selectedOption ? "text-gray-800" : "text-gray-500"}>
+          {selectedOption ? selectedOption.label : placeholder}
+        </span>
+        <div className={`transform transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
+      </button>
+      
+      {isOpen && (
+        <div className="absolute z-50 w-full mt-2 bg-white border-2 border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+          {options.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => handleSelect(option)}
+              className="w-full p-4 text-left hover:bg-blue-50 transition-colors duration-200 flex items-center gap-3"
+            >
+              {option.flag && <span className="text-xl">{option.flag}</span>}
+              <span className="text-gray-800">{option.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // 단계별 컴포넌트 (1~2단계만 우선 구현)
 function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
+  // 성별 옵션
+  const genderOptions = [
+    { value: "male", label: "남성" },
+    { value: "female", label: "여성" },
+  ];
+
+  // 국가 옵션 (10개 이상)
+  const countryOptions = [
+    { value: "KR", label: "대한민국", flag: "🇰🇷" },
+    { value: "US", label: "미국", flag: "🇺🇸" },
+    { value: "JP", label: "일본", flag: "🇯🇵" },
+    { value: "CN", label: "중국", flag: "🇨🇳" },
+    { value: "GB", label: "영국", flag: "🇬🇧" },
+    { value: "DE", label: "독일", flag: "🇩🇪" },
+    { value: "FR", label: "프랑스", flag: "🇫🇷" },
+    { value: "CA", label: "캐나다", flag: "🇨🇦" },
+    { value: "AU", label: "호주", flag: "🇦🇺" },
+    { value: "SG", label: "싱가포르", flag: "🇸🇬" },
+    { value: "TH", label: "태국", flag: "🇹🇭" },
+    { value: "MY", label: "말레이시아", flag: "🇲🇾" },
+    { value: "PH", label: "필리핀", flag: "🇵🇭" },
+    { value: "ID", label: "인도네시아", flag: "🇮🇩" },
+    { value: "IN", label: "인도", flag: "🇮🇳" },
+  ];
+
+  const handleCustomSelectChange = (name, value) => {
+    onChange({
+      target: { name, value },
+    });
+  };
+
   return (
     <div className="space-y-8">
       <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-blue-50/30 backdrop-blur-sm">
@@ -84,7 +164,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
                 {t("apply.step1.title", language) || "서비스 선택"}
               </CardTitle>
               <p className="text-gray-600 mt-1">
-                원하시는 서비스를 선택해주세요
+                원하시는 서비스와 기본정보를 선택해주세요
               </p>
             </div>
           </div>
@@ -248,6 +328,42 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
             </div>
           </div>
 
+          {/* 기본 정보 입력 */}
+          <div className="mt-8 p-6 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <User className="w-5 h-5 text-blue-600" />
+              기본 정보
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* 성별 선택 */}
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-700">
+                  성별 *
+                </label>
+                <CustomSelect
+                  value={data?.gender || ""}
+                  onValueChange={(value) => handleCustomSelectChange("gender", value)}
+                  placeholder="성별을 선택해주세요"
+                  options={genderOptions}
+                />
+              </div>
+
+              {/* 국적 선택 */}
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-700">
+                  국적 *
+                </label>
+                <CustomSelect
+                  value={data?.nationality || ""}
+                  onValueChange={(value) => handleCustomSelectChange("nationality", value)}
+                  placeholder="국적을 선택해주세요"
+                  options={countryOptions}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* 실시간 가격 요약 */}
           <div className="sticky bottom-0 mt-8 p-6 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl shadow-2xl">
             <div className="flex items-center justify-between text-white">
@@ -269,7 +385,7 @@ function Step1ServiceSelection({ data, onChange, price, onNext, language }) {
           <div className="flex justify-end mt-8">
             <Button
               onClick={onNext}
-              disabled={!data?.serviceType || !data?.visaType || !data?.processing}
+              disabled={!data?.serviceType || !data?.visaType || !data?.processing || !data?.gender || !data?.nationality}
               className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="mr-2">
