@@ -489,7 +489,7 @@ function Step3DocumentUpload({
       formData.append("application_id", currentApplicationId);
 
       const response = await fetch(
-        "http://localhost:5000/api/documents/uploads",
+        "http://localhost:5000/api/documents/upload",
         {
           method: "POST",
           body: formData,
