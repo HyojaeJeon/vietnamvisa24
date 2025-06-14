@@ -90,7 +90,7 @@ async function startServer() {
     })
   ); // ─────────────────────────────────────────────────────────────
   // 서버 기동 (Socket.IO와 함께)
-  const PORT = process.env.PORT || 5002;
+  const PORT = process.env.PORT || 5000;
   httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`🚀 Server running on http://0.0.0.0:${PORT}/graphql`);
     console.log(`📊 Health available at http://0.0.0.0:${PORT}/health`);
