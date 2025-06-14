@@ -6,12 +6,13 @@ const initialState = {
   form: {
     step1: {},
     step2: {},
-    step3: {
+    step3: {},
+    step4: {
       documents: []
     },
-    step4: {},
     step5: {},
     step6: {},
+    step7: {},
   },
   price: 0,
   applicationId: null,
@@ -41,6 +42,9 @@ const applyFormSlice = createSlice({
     },
     updateStep6: (state, action) => {
       state.form.step6 = { ...state.form.step6, ...action.payload };
+    },
+    updateStep7: (state, action) => {
+      state.form.step7 = { ...state.form.step7, ...action.payload };
     },
     setPrice: (state, action) => {
       state.price = action.payload;
@@ -80,6 +84,7 @@ export const {
   updateStep4,
   updateStep5,
   updateStep6,
+  updateStep7,
   setPrice,
   setApplicationId,
   addDocument,

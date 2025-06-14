@@ -47,26 +47,28 @@ export const calculateVisaPrice = (visaType, processingType) => {
 
 export const getStepTitle = (step) => {
   const titles = {
-    1: "개인정보 입력",
-    2: "연락처 정보",
-    3: "여행 정보",
-    4: "서류 업로드",
-    5: "신청 내용 확인",
-    6: "결제",
-    7: "신청 완료",
+    1: "서비스 선택",
+    2: "개인정보 입력",
+    3: "연락처 정보",
+    4: "여행 정보",
+    5: "서류 업로드",
+    6: "신청 내용 확인",
+    7: "결제",
+    8: "신청 완료"
   };
-  return titles[step] || "";
+  return titles[step] || `단계 ${step}`;
 };
 
 export const getStepDescription = (step) => {
   const descriptions = {
-    1: "여권 정보와 동일하게 입력해주세요",
-    2: "연락 가능한 정보를 입력해주세요",
-    3: "베트남 방문 계획을 입력해주세요",
-    4: "필요한 서류를 업로드해주세요",
-    5: "입력하신 정보를 확인해주세요",
-    6: "결제 방법을 선택해주세요",
-    7: "신청이 완료되었습니다",
+    1: "원하시는 서비스를 선택해주세요",
+    2: "개인정보를 입력해주세요",
+    3: "연락처 정보를 입력해주세요", 
+    4: "여행 정보를 입력해주세요",
+    5: "필수 서류를 업로드해주세요",
+    6: "입력하신 정보를 확인해주세요",
+    7: "결제를 진행해주세요",
+    8: "신청이 완료되었습니다"
   };
   return descriptions[step] || "";
 };
@@ -75,15 +77,15 @@ export const validateStep = (step, formData) => {
   switch (step) {
     case 1:
       return formData.firstName && formData.lastName && formData.birthDate && formData.nationality && formData.passportNumber && formData.passportExpiry && formData.gender;
-    case 2:
-      return formData.email && formData.phone && formData.address && validateEmail(formData.email) && validatePhone(formData.phone);
     case 3:
-      return formData.visaType && formData.processingType && formData.entryDate && formData.purpose;
+      return formData.email && formData.phone && formData.address && validateEmail(formData.email) && validatePhone(formData.phone);
     case 4:
-      return formData.documents && formData.documents.length >= 2; // passport + photo minimum
+      return formData.visaType && formData.processingType && formData.entryDate && formData.purpose;
     case 5:
-      return true; // Review step doesn't need validation
+      return formData.documents && formData.documents.length >= 2; // passport + photo minimum
     case 6:
+      return true; // Review step
+    case 7:
       return formData.paymentMethod && formData.agreementAccepted;
     default:
       return false;

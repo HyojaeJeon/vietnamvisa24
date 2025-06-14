@@ -11,6 +11,7 @@ import { validateStep, getStepDescription, getStepTitle } from "./_components/ut
 
 // Import components
 import ProgressIndicator from "./_components/progressIndicator";
+import ServiceSelectionStep from "./_components/serviceSelectionStep";
 import PersonalInfoStep from "./_components/personalInfoStep";
 import ContactInfoStep from "./_components/contactInfoStep";
 import TravelInfoStep from "./_components/travelInfoStep";
@@ -23,7 +24,7 @@ export default function ApplyPageContent() {
   console.log("ApplyPageContent rendering...");
 
   // State management
-  const [currentStep, setCurrentStep] = useState(STEPS.PERSONAL_INFO);
+  const [currentStep, setCurrentStep] = useState(STEPS.SERVICE_SELECTION);
   const [formData, setFormData] = useState(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [applicationId, setApplicationId] = useState("");
@@ -35,7 +36,7 @@ export default function ApplyPageContent() {
     const stepParam = searchParams.get("step");
     if (stepParam) {
       const stepNumber = parseInt(stepParam);
-      if (stepNumber >= 1 && stepNumber <= 7) {
+      if (stepNumber >= 1 && stepNumber <= 8) {
         setCurrentStep(stepNumber);
       }
     }
@@ -51,7 +52,7 @@ export default function ApplyPageContent() {
 
   // Navigation handlers
   const handleNext = () => {
-    if (currentStep < 7 && validateStep(currentStep, formData)) {
+    if (currentStep < 8 && validateStep(currentStep, formData)) {
       setCurrentStep((prev) => prev + 1);
       // Smooth scroll to top with better mobile handling
       setTimeout(() => {
@@ -179,8 +180,10 @@ export default function ApplyPageContent() {
   // Render current step
   const renderStep = () => {
     switch (currentStep) {
+      case STEPS.SERVICE_SELECTION:
+        return <ServiceSelectionStep formData={formData} onUpdate={updateFormData} onNext={handleNext} />;
       case STEPS.PERSONAL_INFO:
-        return <PersonalInfoStep formData={formData} onUpdate={updateFormData} onNext={handleNext} />;
+        return <PersonalInfoStep formData={formData} onUpdate={updateFormData} onNext={handleNext} onPrev={handlePrev} />;
       case STEPS.CONTACT_INFO:
         return <ContactInfoStep formData={formData} onUpdate={updateFormData} onNext={handleNext} onPrev={handlePrev} />;
       case STEPS.TRAVEL_INFO:
@@ -210,7 +213,7 @@ export default function ApplyPageContent() {
           </div>
 
           {/* Progress Indicator */}
-          {currentStep < STEPS.CONFIRMATION && <ProgressIndicator currentStep={currentStep} totalSteps={6} />}
+          {currentStep < STEPS.CONFIRMATION && <ProgressIndicator currentStep={currentStep} totalSteps={7} />}
 
           {/* Loading overlay for submission */}
           {isSubmitting && (

@@ -22,16 +22,33 @@ export const DOCUMENT_TYPES = {
 };
 
 export const STEPS = {
-  PERSONAL_INFO: 1,
-  CONTACT_INFO: 2,
-  TRAVEL_INFO: 3,
-  DOCUMENT_UPLOAD: 4,
-  REVIEW: 5,
-  PAYMENT: 6,
-  CONFIRMATION: 7,
+  SERVICE_SELECTION: 1,
+  PERSONAL_INFO: 2,
+  CONTACT_INFO: 3,
+  TRAVEL_INFO: 4,
+  DOCUMENT_UPLOAD: 5,
+  REVIEW: 6,
+  PAYMENT: 7,
+  CONFIRMATION: 8,
+};
+
+export const SERVICE_TYPES = {
+  E_VISA: "e_visa",
+  ARRIVAL_VISA: "arrival_visa",
+  VISA_RUN: "visa_run",
+};
+
+export const VISA_DURATION_TYPES = {
+  SINGLE_90: "single_90",
+  MULTIPLE_90: "multiple_90",
 };
 
 export const initialFormData = {
+  // Service Selection
+  serviceType: "e_visa",
+  visaDurationType: "single_90",
+  processingType: "standard",
+  
   // Personal Information
   firstName: "",
   lastName: "",
@@ -50,7 +67,6 @@ export const initialFormData = {
 
   // Travel Information
   visaType: "general",
-  processingType: "standard",
   entryDate: "",
   exitDate: "",
   purpose: "",
