@@ -27,7 +27,7 @@ localPort = 5002
 externalPort = 80
 
 [workflows]
-runButton = "Run Full Stack Safe"
+runButton = "Start application"
 
 [[workflows.workflow]]
 name = "Project"
@@ -70,7 +70,7 @@ args = "sleep 3"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd server && npm run dev &"
+args = "cd server && npm run dev "
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
@@ -78,4 +78,4 @@ args = "sleep 1"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd client && npm run dev"
+args = "cd ../client && npm run dev"

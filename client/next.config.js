@@ -114,7 +114,13 @@ const nextConfig = {
       return [
         {
           source: "/graphql",
-          destination: "https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:5000/graphql",
+          destination:
+            "https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:5000/graphql",
+        },
+        {
+          source: "/api/documents/:path*",
+          destination:
+            "https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:5000/api/documents/:path*",
         },
       ];
     }

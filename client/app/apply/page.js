@@ -28,6 +28,10 @@ import {
   Upload,
 } from "lucide-react";
 
+const REPLIT_BACK_END_URL =
+  "https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:5000";
+const DEV_BACK_END_URL = "http://localhost:5000";
+
 // t 함수 개선: 언어별로 우선 찾고, 없으면 ko로 fallback
 function t(key, language) {
   const keys = key.split(".");
@@ -489,7 +493,7 @@ function Step3DocumentUpload({
       formData.append("application_id", currentApplicationId);
 
       const response = await fetch(
-        "http://localhost:5000/api/documents/upload",
+        `${REPLIT_BACK_END_URL}/api/documents/upload`,
         {
           method: "POST",
           body: formData,
