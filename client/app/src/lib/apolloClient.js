@@ -1,6 +1,11 @@
 // apolloClient.js with token refresh capability
 
-import { ApolloClient, InMemoryCache, createHttpLink, from } from "@apollo/client";
+import {
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+  from,
+} from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
@@ -100,16 +105,22 @@ const tokenManager = {
 
 // Token refresh function
 const refreshTokensAsync = async (isAdmin = false) => {
-  const refreshToken = isAdmin ? tokenManager.getAdminRefreshToken() : tokenManager.getRefreshToken();
+  const refreshToken = isAdmin
+    ? tokenManager.getAdminRefreshToken()
+    : tokenManager.getRefreshToken();
 
   if (!refreshToken) {
     throw new Error("No refresh token available");
   }
 
   try {
-    const mutation = isAdmin ? REFRESH_ADMIN_TOKEN_MUTATION : REFRESH_TOKEN_MUTATION;
+    const mutation = isAdmin
+      ? REFRESH_ADMIN_TOKEN_MUTATION
+      : REFRESH_TOKEN_MUTATION;
 
-    console.log(`🔄 Attempting to refresh ${isAdmin ? "admin" : "user"} token...`);
+    console.log(
+      `🔄 Attempting to refresh ${isAdmin ? "admin" : "user"} token...`,
+    );
 
     // Use fetch instead of Apollo Client to avoid circular dependencies
     const response = await fetch(GRAPHQL_ENDPOINT, {
@@ -140,7 +151,9 @@ const refreshTokensAsync = async (isAdmin = false) => {
         tokenManager.setTokens(data.token, data.refreshToken);
       }
 
-      console.log(`✅ ${isAdmin ? "Admin" : "User"} token refreshed successfully!`);
+      console.log(
+        `✅ ${isAdmin ? "Admin" : "User"} token refreshed successfully!`,
+      );
       return data.token;
     }
 
@@ -153,13 +166,17 @@ const refreshTokensAsync = async (isAdmin = false) => {
       tokenManager.clearAdminTokens();
       if (typeof window !== "undefined") {
         // Don't redirect immediately, let the component handle this
-        console.log("🔄 Admin tokens cleared, component should handle login redirect");
+        console.log(
+          "🔄 Admin tokens cleared, component should handle login redirect",
+        );
       }
     } else {
       tokenManager.clearTokens();
       if (typeof window !== "undefined") {
         // Don't redirect immediately, let the component handle this
-        console.log("🔄 User tokens cleared, component should handle login redirect");
+        console.log(
+          "🔄 User tokens cleared, component should handle login redirect",
+        );
       }
     }
 
@@ -182,58 +199,71 @@ const authLink = setContext((_, { headers }) => {
 });
 
 // Error Link with token refresh logic
-const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
-  if (graphQLErrors) {
-    for (let err of graphQLErrors) {
-      console.error("🚨 GraphQL error:", err);
+const errorLink = onError(
+  ({ graphQLErrors, networkError, operation, forward }) => {
+    if (graphQLErrors) {
+      for (let err of graphQLErrors) {
+        console.error("🚨 GraphQL error:", err);
 
-      // Check for token expiration
-      if (err.message === "Token has expired" || err.extensions?.code === "UNAUTHENTICATED" || err.extensions?.code === "TOKEN_EXPIRED") {
-        console.log("🔄 Token expired, attempting refresh...");
+        // Check for token expiration
+        if (
+          err.message === "Token has expired" ||
+          err.extensions?.code === "UNAUTHENTICATED" ||
+          err.extensions?.code === "TOKEN_EXPIRED"
+        ) {
+          console.log("🔄 Token expired, attempting refresh...");
 
-        // Determine if this is an admin request
-        const context = operation.getContext();
-        const isAdminRequest = context.headers?.["admin-token"] || operation.operationName?.includes("Admin") || operation.operationName?.includes("getAdminMe");
+          // Determine if this is an admin request
+          const context = operation.getContext();
+          const isAdminRequest =
+            context.headers?.["admin-token"] ||
+            operation.operationName?.includes("Admin") ||
+            operation.operationName?.includes("getAdminMe");
 
-        console.log(`🔍 Detected ${isAdminRequest ? "admin" : "user"} request: ${operation.operationName}`);
+          console.log(
+            `🔍 Detected ${isAdminRequest ? "admin" : "user"} request: ${operation.operationName}`,
+          );
 
-        // Return Observable that handles token refresh
-        return new Observable((observer) => {
-          refreshTokensAsync(isAdminRequest)
-            .then((newToken) => {
-              // Update the operation's context with new token
-              const oldHeaders = operation.getContext().headers;
-              operation.setContext({
-                headers: {
-                  ...oldHeaders,
-                  ...(isAdminRequest ? { "admin-token": newToken } : { authorization: `Bearer ${newToken}` }),
-                },
+          // Return Observable that handles token refresh
+          return new Observable((observer) => {
+            refreshTokensAsync(isAdminRequest)
+              .then((newToken) => {
+                // Update the operation's context with new token
+                const oldHeaders = operation.getContext().headers;
+                operation.setContext({
+                  headers: {
+                    ...oldHeaders,
+                    ...(isAdminRequest
+                      ? { "admin-token": newToken }
+                      : { authorization: `Bearer ${newToken}` }),
+                  },
+                });
+
+                console.log("✅ Token refreshed, retrying original request");
+
+                // Retry the operation and subscribe to it
+                const subscription = forward(operation).subscribe({
+                  next: observer.next.bind(observer),
+                  error: observer.error.bind(observer),
+                  complete: observer.complete.bind(observer),
+                });
+
+                return () => subscription.unsubscribe();
+              })
+              .catch((refreshError) => {
+                console.error("❌ Token refresh failed:", refreshError);
+                observer.error(refreshError);
               });
-
-              console.log("✅ Token refreshed, retrying original request");
-
-              // Retry the operation and subscribe to it
-              const subscription = forward(operation).subscribe({
-                next: observer.next.bind(observer),
-                error: observer.error.bind(observer),
-                complete: observer.complete.bind(observer),
-              });
-
-              return () => subscription.unsubscribe();
-            })
-            .catch((refreshError) => {
-              console.error("❌ Token refresh failed:", refreshError);
-              observer.error(refreshError);
-            });
-        });
+          });
+        }
       }
     }
-  }
 
-  if (networkError) {
-    console.error("🚨 Network error:", networkError);
-  }
-});
+    if (networkError) {
+      console.error("🚨 Network error:", networkError);
+    }
+  },
+);
 
 // Retry Link for network errors
 const retryLink = new RetryLink({
@@ -282,5 +312,5 @@ if (typeof window !== "undefined") {
 
 // Export token manager for use in other components
 export { tokenManager };
-export { apolloClient };
+// export { apolloClient };
 export default apolloClient;
