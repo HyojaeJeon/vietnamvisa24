@@ -4,6 +4,7 @@ const { createServer } = require("http");
 const { ApolloServer } = require("@apollo/server");
 const { expressMiddleware } = require("@apollo/server/express4");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const typeDefs = require("./graphql/schema");
 const resolvers = require("./graphql/resolvers");
 const { formatError } = require("./utils/errorHandler");
@@ -56,6 +57,7 @@ async function startServer() {
   // ─── REST API 라우터 설정 ────────────────────────────────────
   app.use(cors(corsOptions)); // 모든 라우터에 CORS 적용
   app.use(express.json()); // JSON 파서 적용
+  app.use(cookieParser());
   
   // 요청 로깅 미들웨어 추가
   app.use((req, res, next) => {
@@ -89,14 +91,16 @@ async function startServer() {
   });
   app.use(
     "/graphql",
-    cors(corsOptions), // CORS 헤더 부착
-    express.json(), // JSON 요청 바디 파싱
+    cors(corsOptions),
+    express.json(),
     expressMiddleware(server, {
-      context: async ({ req }) => {
-        const token = req.headers.authorization || "";
-        const adminToken = req.headers["admin-token"] || "";
+      context: async ({ req, res }) => {
+        const token = req.headers.authorization || req.cookies.accessToken || "";
+        const adminToken = req.headers["admin-token"] || req.cookies.adminAccessToken || "";
+        const refreshToken = req.cookies.refreshToken || "";
+        const adminRefreshToken = req.cookies.adminRefreshToken || "";
         const io = req.app.get("io");
-        return { token, adminToken, req, io };
+        return { token, adminToken, refreshToken, adminRefreshToken, req, res, io };
       },
     })
   ); // ─────────────────────────────────────────────────────────────

@@ -1,11 +1,8 @@
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const { models } = require("../../../models");
 const { getUserFromToken, getAdminFromToken, generateTokens, generateAdminTokens, refreshTokens, refreshAdminTokens } = require("../../../utils/auth");
 const { asyncHandler } = require("../../../utils/errorHandler");
 const { TokenExpiredError } = require("../../../utils/errorTypes");
-
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 const resolvers = {
   Query: {
@@ -68,7 +65,7 @@ const resolvers = {
   },
 
   Mutation: {
-    userRegister: async (_, { input }) => {
+    userRegister: async (_, { input }, { res }) => {
       const { email, password, name, phone } = input;
       const existingUser = await models.User.findOne({ where: { email } });
       if (existingUser) {
@@ -84,7 +81,9 @@ const resolvers = {
         tokenVersion: 0,
       });
 
-      const { accessToken, refreshToken } = generateTokens(user);
+      const { accessToken, refreshToken } = await generateTokens(user);
+      res.cookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax' });
+      res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'lax' });
 
       return {
         token: accessToken,
@@ -99,7 +98,7 @@ const resolvers = {
       };
     },
 
-    userLogin: async (_, { input }) => {
+    userLogin: async (_, { input }, { res }) => {
       const { email, password } = input;
 
       const user = await models.User.findOne({ where: { email } });
@@ -111,7 +110,9 @@ const resolvers = {
         throw new Error("Invalid credentials");
       }
 
-      const { accessToken, refreshToken } = generateTokens(user);
+      const { accessToken, refreshToken } = await generateTokens(user);
+      res.cookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax' });
+      res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'lax' });
 
       return {
         token: accessToken,
@@ -125,7 +126,7 @@ const resolvers = {
         },
       };
     },
-    adminLogin: async (_, { input }) => {
+    adminLogin: async (_, { input }, { res }) => {
       const { email, password } = input;
 
       const admin = await models.Admin.findOne({ where: { email } });
@@ -138,7 +139,9 @@ const resolvers = {
         throw new Error("Invalid credentials");
       }
 
-      const { accessToken, refreshToken } = generateAdminTokens(admin);
+      const { accessToken, refreshToken } = await generateAdminTokens(admin);
+      res.cookie('adminAccessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'lax' });
+      res.cookie('adminRefreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'lax' });
 
       return {
         token: accessToken,
@@ -153,9 +156,12 @@ const resolvers = {
         },
       };
     },
-    refreshToken: async (_, { refreshToken }) => {
+    refreshToken: async (_, { refreshToken }, { res, refreshToken: ctxToken }) => {
       try {
-        const tokens = await refreshTokens(refreshToken);
+        const usedToken = refreshToken || ctxToken;
+        const tokens = await refreshTokens(usedToken);
+        res.cookie('accessToken', tokens.accessToken, { httpOnly: true, secure: true, sameSite: 'lax' });
+        res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: true, sameSite: 'lax' });
         return {
           token: tokens.accessToken,
           refreshToken: tokens.refreshToken,
@@ -165,9 +171,12 @@ const resolvers = {
       }
     },
 
-    refreshAdminToken: async (_, { refreshToken }) => {
+    refreshAdminToken: async (_, { refreshToken }, { res, adminRefreshToken }) => {
       try {
-        const tokens = await refreshAdminTokens(refreshToken);
+        const usedToken = refreshToken || adminRefreshToken;
+        const tokens = await refreshAdminTokens(usedToken);
+        res.cookie('adminAccessToken', tokens.accessToken, { httpOnly: true, secure: true, sameSite: 'lax' });
+        res.cookie('adminRefreshToken', tokens.refreshToken, { httpOnly: true, secure: true, sameSite: 'lax' });
         return {
           token: tokens.accessToken,
           refreshToken: tokens.refreshToken,

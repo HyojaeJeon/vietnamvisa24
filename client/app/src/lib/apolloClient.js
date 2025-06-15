@@ -5,12 +5,14 @@ import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
 import { Observable } from "@apollo/client/utilities";
+import { store } from "../store";
+import { logout, updateTokens } from "../store/authSlice";
 
 // GraphQL mutations for token refresh
 import { gql } from "@apollo/client";
 
 const REFRESH_TOKEN_MUTATION = gql`
-  mutation RefreshToken($refreshToken: String!) {
+  mutation RefreshToken($refreshToken: String) {
     refreshToken(refreshToken: $refreshToken) {
       token
       refreshToken
@@ -19,7 +21,7 @@ const REFRESH_TOKEN_MUTATION = gql`
 `;
 
 const REFRESH_ADMIN_TOKEN_MUTATION = gql`
-  mutation RefreshAdminToken($refreshToken: String!) {
+  mutation RefreshAdminToken($refreshToken: String) {
     refreshAdminToken(refreshToken: $refreshToken) {
       token
       refreshToken
@@ -100,11 +102,11 @@ const tokenManager = {
 
 // Token refresh function
 const refreshTokensAsync = async (isAdmin = false) => {
-  const refreshToken = isAdmin ? tokenManager.getAdminRefreshToken() : tokenManager.getRefreshToken();
+  const refreshToken = isAdmin
+    ? tokenManager.getAdminRefreshToken()
+    : tokenManager.getRefreshToken();
 
-  if (!refreshToken) {
-    throw new Error("No refresh token available");
-  }
+  const variables = refreshToken ? { refreshToken } : {};
 
   try {
     const mutation = isAdmin ? REFRESH_ADMIN_TOKEN_MUTATION : REFRESH_TOKEN_MUTATION;
@@ -114,13 +116,13 @@ const refreshTokensAsync = async (isAdmin = false) => {
     // Use fetch instead of Apollo Client to avoid circular dependencies
     const response = await fetch(GRAPHQL_ENDPOINT, {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        credentials: "include",
       },
       body: JSON.stringify({
         query: mutation.loc.source.body,
-        variables: { refreshToken },
+        variables,
       }),
     });
 
@@ -140,6 +142,11 @@ const refreshTokensAsync = async (isAdmin = false) => {
         tokenManager.setTokens(data.token, data.refreshToken);
       }
 
+      // Update Redux store
+      store.dispatch(
+        updateTokens({ token: data.token, refreshToken: data.refreshToken })
+      );
+
       console.log(`✅ ${isAdmin ? "admin" : "user"} token refreshed successfully!`);
       return data.token;
     }
@@ -151,16 +158,14 @@ const refreshTokensAsync = async (isAdmin = false) => {
     // Clear tokens and redirect to login
     if (isAdmin) {
       tokenManager.clearAdminTokens();
-      if (typeof window !== "undefined") {
-        // Don't redirect immediately, let the component handle this
-        console.log("🔄 Admin tokens cleared, component should handle login redirect");
-      }
     } else {
       tokenManager.clearTokens();
-      if (typeof window !== "undefined") {
-        // Don't redirect immediately, let the component handle this
-        console.log("🔄 User tokens cleared, component should handle login redirect");
-      }
+    }
+
+    store.dispatch(logout());
+
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
     }
 
     throw error;
