@@ -6,223 +6,383 @@ import { Button } from "../../src/components/ui/button";
 import { Input } from "../../src/components/ui/input";
 import { Textarea } from "../../src/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../src/components/ui/select";
-import { Globe, Calendar, Clock, Star, Shield, ArrowRight, ArrowLeft } from "lucide-react";
-import { validateStep, calculateVisaPrice, formatCurrency } from "./utils";
-import { VISA_TYPES, PROCESSING_TYPES } from "./types";
+import { RadioGroup, RadioGroupItem } from "../../src/components/ui/radio-group";
+import { Label } from "../../src/components/ui/label";
+import { Plane, Calendar, MapPin, Hotel, ArrowRight, ArrowLeft, Clock, Users, Building, Heart } from "lucide-react";
+import { validateStep } from "./utils";
 
-const TravelInfoStep = ({ formData, onUpdate, onNext, onPrev }) => {
+const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
   const handleInputChange = (field, value) => {
     onUpdate({ [field]: value });
   };
 
   const isValid = validateStep(3, formData);
-  const currentPrice = calculateVisaPrice(formData.visaType, formData.processingType);
 
-  const visaTypes = [
-    {
-      value: VISA_TYPES.GENERAL,
-      label: "일반 관광",
-      description: "관광 목적의 일반 비자",
-      icon: "🏖️",
-    },
-    {
-      value: VISA_TYPES.BUSINESS,
-      label: "비즈니스",
-      description: "출장 및 비즈니스 목적",
-      icon: "💼",
-    },
-    {
-      value: VISA_TYPES.TOURIST,
-      label: "단기 관광",
-      description: "단기간 관광 목적",
-      icon: "📸",
-    },
-    {
-      value: VISA_TYPES.TRANSIT,
-      label: "경유",
-      description: "경유 목적의 단기 체류",
-      icon: "✈️",
-    },
+  const purposeOfVisit = [
+    { value: "TOURISM", label: "관광", icon: "🏖️" },
+    { value: "BUSINESS", label: "비즈니스", icon: "💼" },
+    { value: "VISIT_RELATIVES", label: "친척 방문", icon: "👨‍👩‍👧‍👦" },
+    { value: "CONFERENCE", label: "회의/컨퍼런스", icon: "🏢" },
+    { value: "MEDICAL", label: "의료", icon: "🏥" },
+    { value: "EDUCATION", label: "교육", icon: "🎓" },
+    { value: "TRANSIT", label: "경유", icon: "✈️" },
+    { value: "OTHER", label: "기타", icon: "📋" },
   ];
 
-  const processingTypes = [
-    {
-      value: PROCESSING_TYPES.STANDARD,
-      label: "일반",
-      time: "5-7일",
-      icon: <Clock className="w-5 h-5" />,
-      color: "blue",
-    },
-    {
-      value: PROCESSING_TYPES.EXPRESS,
-      label: "급행",
-      time: "2-3일",
-      icon: <Star className="w-5 h-5" />,
-      color: "purple",
-    },
-    {
-      value: PROCESSING_TYPES.URGENT,
-      label: "긴급",
-      time: "1일",
-      icon: <Shield className="w-5 h-5" />,
-      color: "red",
-    },
+  const entryPorts = [
+    { value: "SGN", label: "호치민 (탄손녓 국제공항)" },
+    { value: "HAN", label: "하노이 (노이바이 국제공항)" },
+    { value: "DAD", label: "다낭 (다낭 국제공항)" },
+    { value: "CXR", label: "나트랑 (캄란 국제공항)" },
+    { value: "PQC", label: "푸꾸옥 (푸꾸옥 국제공항)" },
+    { value: "VDO", label: "반돈 (반돈 국제공항)" },
+    { value: "HPH", label: "하이퐁 (캣비 국제공항)" },
+    { value: "LAND_BORDER", label: "육로 국경" },
+    { value: "OTHER", label: "기타" },
   ];
 
-  const purposes = [
-    { value: "tourism", label: "관광" },
-    { value: "business", label: "출장" },
-    { value: "transit", label: "경유" },
-    { value: "family_visit", label: "가족 방문" },
-    { value: "conference", label: "회의 참석" },
-    { value: "other", label: "기타" },
+  const accommodationTypes = [
+    { value: "HOTEL", label: "호텔" },
+    { value: "RESORT", label: "리조트" },
+    { value: "HOMESTAY", label: "홈스테이" },
+    { value: "AIRBNB", label: "에어비앤비" },
+    { value: "RELATIVES_HOUSE", label: "친척/지인 집" },
+    { value: "COMPANY_ACCOMMODATION", label: "회사 숙소" },
+    { value: "OTHER", label: "기타" },
   ];
 
   return (
-    <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-purple-50/30">
-      <CardHeader className="pb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center">
-            <Globe className="w-6 h-6 text-white" />
+    <Card className="border-0 shadow-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 overflow-hidden">
+      <CardHeader className="pb-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white relative">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+            <Plane className="w-8 h-8 text-white" />
           </div>
           <div>
-            <CardTitle className="text-2xl bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">여행 정보</CardTitle>
-            <p className="text-gray-600 mt-1">베트남 방문 계획을 입력해주세요</p>
+            <CardTitle className="text-3xl font-bold mb-2">베트남 방문 정보</CardTitle>
+            <p className="text-blue-100 text-lg">베트남 여행 계획에 대한 정보를 입력해주세요</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* 비자 종류 선택 */}
-        <div className="space-y-3">
-          <label className="block text-lg font-semibold text-gray-800">비자 종류 *</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {visaTypes.map((visa) => (
-              <div
-                key={visa.value}
-                className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                  formData.visaType === visa.value ? "border-purple-500 bg-purple-50 shadow-lg" : "border-gray-200 hover:border-purple-300 hover:shadow-md"
-                }`}
-                onClick={() => handleInputChange("visaType", visa.value)}
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{visa.icon}</span>
-                  <div>
-                    <div className="font-semibold text-gray-800">{visa.label}</div>
-                    <div className="text-sm text-gray-600">{visa.description}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        {/* 처리 속도 선택 */}
-        <div className="space-y-3">
-          <label className="block text-lg font-semibold text-gray-800">처리 속도 *</label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {processingTypes.map((processing) => (
-              <div
-                key={processing.value}
-                className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                  formData.processingType === processing.value ? `border-${processing.color}-500 bg-${processing.color}-50 shadow-lg` : "border-gray-200 hover:border-gray-300 hover:shadow-md"
-                }`}
-                onClick={() => handleInputChange("processingType", processing.value)}
-              >
-                <div className="flex items-center gap-3">
-                  <div className={`text-${processing.color}-600`}>{processing.icon}</div>
-                  <div>
-                    <div className="font-semibold text-gray-800">{processing.label}</div>
-                    <div className="text-sm text-gray-600">{processing.time}</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 여행 날짜 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700">입국 예정일 *</label>
-            <Input
-              type="date"
-              value={formData.entryDate || ""}
-              onChange={(e) => handleInputChange("entryDate", e.target.value)}
-              className="border-2 border-gray-200 focus:border-purple-500 rounded-xl px-4 py-3 text-lg"
-              min={new Date().toISOString().split("T")[0]}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="block text-sm font-semibold text-gray-700">출국 예정일</label>
-            <Input
-              type="date"
-              value={formData.exitDate || ""}
-              onChange={(e) => handleInputChange("exitDate", e.target.value)}
-              className="border-2 border-gray-200 focus:border-purple-500 rounded-xl px-4 py-3 text-lg"
-              min={formData.entryDate || new Date().toISOString().split("T")[0]}
-            />
-          </div>
-        </div>
-
-        {/* 방문 목적 */}
-        <div className="space-y-2">
-          <label className="block text-sm font-semibold text-gray-700">방문 목적 *</label>
-          <Select value={formData.purpose || ""} onValueChange={(value) => handleInputChange("purpose", value)}>
-            <SelectTrigger className="border-2 border-gray-200 focus:border-purple-500 rounded-xl px-4 py-3 text-lg">
-              <SelectValue placeholder="방문 목적을 선택해주세요" />
-            </SelectTrigger>
-            <SelectContent>
-              {purposes.map((purpose) => (
-                <SelectItem key={purpose.value} value={purpose.value}>
-                  {purpose.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        {/* 이전 방문 경험 */}
-        <div className="space-y-3">
-          <label className="block text-sm font-semibold text-gray-700">베트남 방문 경험이 있으신가요?</label>
-          <div className="flex gap-4">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="previousVisit" checked={formData.previousVisit === true} onChange={() => handleInputChange("previousVisit", true)} className="w-4 h-4 text-purple-600" />
-              <span>예</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer">
-              <input type="radio" name="previousVisit" checked={formData.previousVisit === false} onChange={() => handleInputChange("previousVisit", false)} className="w-4 h-4 text-purple-600" />
-              <span>아니오</span>
-            </label>
-          </div>
-        </div>
-
-        {/* 가격 요약 */}
-        <div className="p-6 bg-gradient-to-r from-purple-600 to-pink-700 rounded-2xl text-white">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Calendar className="w-6 h-6" />
-              <span className="text-lg font-semibold">예상 비자 비용</span>
+      <CardContent className="p-8 space-y-8">
+        {/* 여행 일정 섹션 */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Calendar className="w-5 h-5 text-blue-600" />
             </div>
-            <div className="text-right">
-              <div className="text-3xl font-bold">{formatCurrency(currentPrice)}</div>
-              <div className="text-purple-200 text-sm">부가세 포함</div>
+            <h3 className="text-xl font-bold text-gray-800">여행 일정</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 입국 예정일 */}
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">베트남 입국 예정일 *</label>
+              <Input
+                type="date"
+                value={formData.travelInfo?.entryDate || ""}
+                onChange={(e) =>
+                  handleInputChange("travelInfo", {
+                    ...formData.travelInfo,
+                    entryDate: e.target.value,
+                  })
+                }
+                min={new Date().toISOString().split("T")[0]}
+                className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+              />
+              <p className="text-xs text-gray-500">오늘 이후 날짜를 선택하세요</p>
+            </div>
+
+            {/* 출국 예정일 */}
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">베트남 출국 예정일 *</label>
+              <Input
+                type="date"
+                value={formData.travelInfo?.exitDate || ""}
+                onChange={(e) =>
+                  handleInputChange("travelInfo", {
+                    ...formData.travelInfo,
+                    exitDate: e.target.value,
+                  })
+                }
+                min={formData.travelInfo?.entryDate || new Date().toISOString().split("T")[0]}
+                className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-200"
+              />
+              <p className="text-xs text-gray-500">입국일 이후 날짜를 선택하세요</p>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-between mt-8">
-          <Button variant="outline" onClick={onPrev} className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold transition-all duration-300">
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            이전
+        {/* 방문 목적 섹션 */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <Heart className="w-5 h-5 text-green-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800">방문 목적</h3>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {purposeOfVisit.map((purpose) => (
+              <div
+                key={purpose.value}
+                className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
+                  formData.travelInfo?.purpose === purpose.value
+                    ? "border-green-500 bg-gradient-to-br from-green-50 to-emerald-50 shadow-lg"
+                    : "border-gray-200 hover:border-green-300 hover:shadow-md bg-white"
+                }`}
+                onClick={() =>
+                  handleInputChange("travelInfo", {
+                    ...formData.travelInfo,
+                    purpose: purpose.value,
+                  })
+                }
+              >
+                <div className="text-center space-y-2">
+                  <div className="text-2xl">{purpose.icon}</div>
+                  <h4 className="text-sm font-bold text-gray-800">{purpose.label}</h4>
+                </div>
+
+                {formData.travelInfo?.purpose === purpose.value && (
+                  <div className="absolute top-2 right-2">
+                    <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* 기타 목적 상세 입력 */}
+          {formData.travelInfo?.purpose === "OTHER" && (
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">방문 목적 상세 *</label>
+              <Input
+                value={formData.travelInfo?.purposeDetail || ""}
+                onChange={(e) =>
+                  handleInputChange("travelInfo", {
+                    ...formData.travelInfo,
+                    purposeDetail: e.target.value,
+                  })
+                }
+                placeholder="구체적인 방문 목적을 입력해주세요"
+                className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-green-500 focus:ring-green-200"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* 입국 정보 섹션 */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+              <MapPin className="w-5 h-5 text-purple-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800">입국 정보</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 입국 공항/항구 */}
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">입국 공항/항구 *</label>
+              <Select
+                value={formData.travelInfo?.entryPort || ""}
+                onValueChange={(value) =>
+                  handleInputChange("travelInfo", {
+                    ...formData.travelInfo,
+                    entryPort: value,
+                  })
+                }
+              >
+                <SelectTrigger className="h-12 text-lg border-2 border-gray-200 focus:border-purple-500">
+                  <SelectValue placeholder="입국 공항/항구를 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  {entryPorts.map((port) => (
+                    <SelectItem key={port.value} value={port.value}>
+                      {port.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 출국 공항/항구 */}
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">출국 공항/항구 *</label>
+              <Select
+                value={formData.travelInfo?.exitPort || ""}
+                onValueChange={(value) =>
+                  handleInputChange("travelInfo", {
+                    ...formData.travelInfo,
+                    exitPort: value,
+                  })
+                }
+              >
+                <SelectTrigger className="h-12 text-lg border-2 border-gray-200 focus:border-purple-500">
+                  <SelectValue placeholder="출국 공항/항구를 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  {entryPorts.map((port) => (
+                    <SelectItem key={port.value} value={port.value}>
+                      {port.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* 숙박 정보 섹션 */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+              <Hotel className="w-5 h-5 text-orange-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800">숙박 정보</h3>
+          </div>
+
+          <div className="grid grid-cols-1 gap-6">
+            {/* 숙박 유형 */}
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">숙박 유형 *</label>
+              <Select
+                value={formData.travelInfo?.accommodationType || ""}
+                onValueChange={(value) =>
+                  handleInputChange("travelInfo", {
+                    ...formData.travelInfo,
+                    accommodationType: value,
+                  })
+                }
+              >
+                <SelectTrigger className="h-12 text-lg border-2 border-gray-200 focus:border-orange-500">
+                  <SelectValue placeholder="숙박 유형을 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  {accommodationTypes.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 숙박 장소명 */}
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">숙박 장소명 *</label>
+              <Input
+                value={formData.travelInfo?.accommodationName || ""}
+                onChange={(e) =>
+                  handleInputChange("travelInfo", {
+                    ...formData.travelInfo,
+                    accommodationName: e.target.value,
+                  })
+                }
+                placeholder="호텔명 또는 숙박 장소명을 입력하세요"
+                className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-orange-500 focus:ring-orange-200"
+              />
+            </div>
+
+            {/* 숙박 주소 */}
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">숙박 주소 *</label>
+              <Textarea
+                value={formData.travelInfo?.accommodationAddress || ""}
+                onChange={(e) =>
+                  handleInputChange("travelInfo", {
+                    ...formData.travelInfo,
+                    accommodationAddress: e.target.value,
+                  })
+                }
+                placeholder="숙박 장소의 상세 주소를 입력하세요"
+                className="min-h-[100px] text-lg font-medium border-2 border-gray-200 focus:border-orange-500 focus:ring-orange-200"
+                rows={3}
+              />
+              <p className="text-xs text-gray-500">정확한 주소를 영문으로 입력해주세요</p>
+            </div>
+          </div>
+        </div>
+
+        {/* 동반자 정보 섹션 */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-indigo-100 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 text-indigo-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800">동반자 정보</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* 동반자 여부 */}
+            <div className="space-y-3">
+              <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">동반자 여부</label>
+              <RadioGroup
+                value={formData.travelInfo?.hasCompanions || ""}
+                onValueChange={(value) =>
+                  handleInputChange("travelInfo", {
+                    ...formData.travelInfo,
+                    hasCompanions: value,
+                  })
+                }
+                className="flex space-x-6"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="yes" id="companions-yes" />
+                  <Label htmlFor="companions-yes" className="text-lg font-medium cursor-pointer">
+                    있음
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="no" id="companions-no" />
+                  <Label htmlFor="companions-no" className="text-lg font-medium cursor-pointer">
+                    없음 (단독 여행)
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+
+            {/* 동반자 수 */}
+            {formData.travelInfo?.hasCompanions === "yes" && (
+              <div className="space-y-3">
+                <label className="block text-sm font-bold text-gray-800 uppercase tracking-wide">동반자 수</label>
+                <Input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={formData.travelInfo?.companionCount || ""}
+                  onChange={(e) =>
+                    handleInputChange("travelInfo", {
+                      ...formData.travelInfo,
+                      companionCount: e.target.value,
+                    })
+                  }
+                  placeholder="동반자 수를 입력하세요"
+                  className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-indigo-500 focus:ring-indigo-200"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 네비게이션 버튼 */}
+        <div className="flex justify-between pt-8 border-t border-gray-200">
+          <Button onClick={onPrevious} variant="outline" className="px-8 py-4 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-bold text-lg rounded-2xl transition-all duration-300">
+            <ArrowLeft className="w-6 h-6 mr-3" />
+            <span>이전</span>
           </Button>
+
           <Button
             onClick={onNext}
             disabled={!isValid}
-            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-12 py-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white font-bold text-lg rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
           >
-            <span className="mr-2">다음</span>
-            <ArrowRight className="w-5 h-5" />
+            <span className="mr-3">다음</span>
+            <ArrowRight className="w-6 h-6" />
           </Button>
         </div>
       </CardContent>

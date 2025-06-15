@@ -1,143 +1,331 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
 import { Button } from "../../src/components/ui/button";
-import { CreditCard, ArrowRight, ArrowLeft } from "lucide-react";
-import { formatCurrency, calculateVisaPrice, validateStep } from "./utils";
+import { Input } from "../../src/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../src/components/ui/select";
+import { Alert, AlertDescription } from "../../src/components/ui/alert";
+import { CreditCard, ArrowRight, ArrowLeft, Shield, Lock, Check, Loader2, AlertCircle, Smartphone, Building } from "lucide-react";
+import { formatCurrency, calculateTotalPrice } from "./utils";
 
-const PaymentStep = ({ formData, onUpdate, onNext, onPrev }) => {
-  const handleInputChange = (field, value) => {
-    onUpdate({ [field]: value });
-  };
+const PaymentStep = ({ formData, onUpdate, onPaymentComplete, onPrevious, isSubmitting }) => {
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+  const [paymentData, setPaymentData] = useState({
+    cardNumber: "",
+    expiryDate: "",
+    cvv: "",
+    cardholderName: "",
+    billingAddress: "",
+  });
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const currentPrice = calculateVisaPrice(formData.visaType, formData.processingType);
-  const isValid = validateStep(6, formData);
+  const currentPrice = calculateTotalPrice(formData);
 
   const paymentMethods = [
     {
       id: "card",
       name: "신용카드",
-      icon: "💳",
-      description: "Visa, MasterCard, AMEX",
-    },
-    {
-      id: "bank",
-      name: "계좌이체",
-      icon: "🏦",
-      description: "실시간 계좌이체",
+      icon: <CreditCard className="w-6 h-6" />,
+      description: "Visa, MasterCard, AMEX 지원",
+      popular: true,
+      color: "blue",
     },
     {
       id: "kakao",
       name: "카카오페이",
-      icon: "💛",
-      description: "간편결제",
+      icon: <Smartphone className="w-6 h-6" />,
+      description: "간편하고 안전한 결제",
+      popular: true,
+      color: "yellow",
     },
     {
       id: "naver",
       name: "네이버페이",
-      icon: "💚",
-      description: "간편결제",
+      icon: <Smartphone className="w-6 h-6" />,
+      description: "네이버 간편결제",
+      popular: false,
+      color: "green",
+    },
+    {
+      id: "bank",
+      name: "실시간 계좌이체",
+      icon: <Building className="w-6 h-6" />,
+      description: "주요 은행 실시간 이체",
+      popular: false,
+      color: "gray",
     },
   ];
 
+  const handlePaymentDataChange = (field, value) => {
+    setPaymentData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handlePayment = async () => {
+    if (!selectedPaymentMethod) {
+      alert("결제 방법을 선택해주세요.");
+      return;
+    }
+
+    if (selectedPaymentMethod === "card") {
+      if (!paymentData.cardNumber || !paymentData.expiryDate || !paymentData.cvv || !paymentData.cardholderName) {
+        alert("카드 정보를 모두 입력해주세요.");
+        return;
+      }
+    }
+
+    setIsProcessing(true);
+
+    try {
+      // 결제 처리 시뮬레이션
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      const paymentInfo = {
+        method: selectedPaymentMethod,
+        amount: currentPrice,
+        currency: "USD",
+        transactionId: `TXN-${Date.now()}`,
+        paidAt: new Date().toISOString(),
+        ...paymentData,
+      };
+
+      await onPaymentComplete(paymentInfo);
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert("결제 처리 중 오류가 발생했습니다. 다시 시도해주세요.");
+      setIsProcessing(false);
+    }
+  };
+
   return (
-    <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-green-50/30">
-      <CardHeader className="pb-6">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-            <CreditCard className="w-6 h-6 text-white" />
+    <Card className="border-0 shadow-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30 overflow-hidden">
+      <CardHeader className="pb-8 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white relative">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+            <CreditCard className="w-8 h-8 text-white" />
           </div>
           <div>
-            <CardTitle className="text-2xl bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">결제 방법 선택</CardTitle>
-            <p className="text-gray-600 mt-1">안전한 결제를 진행해주세요</p>
+            <CardTitle className="text-3xl font-bold mb-2">결제</CardTitle>
+            <p className="text-indigo-100 text-lg">안전하고 빠른 결제로 신청을 완료하세요</p>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+
+      <CardContent className="p-8 space-y-8">
         {/* 결제 금액 요약 */}
-        <div className="p-6 bg-gradient-to-r from-green-600 to-emerald-700 rounded-xl text-white">
-          <div className="text-center">
-            <div className="text-sm text-green-200 mb-2">총 결제 금액</div>
-            <div className="text-4xl font-bold mb-2">{formatCurrency(currentPrice)}</div>
-            <div className="text-sm text-green-200">부가세 포함</div>
+        <div className="bg-gradient-to-r from-slate-800 via-gray-900 to-slate-800 rounded-3xl p-8 text-white relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-indigo-600/20 to-purple-600/20"></div>
+          <div className="relative z-10">
+            <h3 className="text-2xl font-bold mb-6 text-center">결제 금액</h3>
+            <div className="text-center">
+              <div className="text-5xl font-bold mb-2 text-indigo-400">{formatCurrency(currentPrice)}</div>
+              <p className="text-gray-300 text-lg">부가세 포함</p>
+            </div>
           </div>
         </div>
 
+        {/* 보안 안내 */}
+        <Alert>
+          <Shield className="h-4 w-4" />
+          <AlertDescription>
+            <div className="flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              <span>
+                <strong>안전한 결제</strong> - 모든 결제 정보는 SSL 암호화로 보호됩니다
+              </span>
+            </div>
+          </AlertDescription>
+        </Alert>
+
         {/* 결제 방법 선택 */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-gray-800">결제 방법을 선택해주세요</h3>
+        <div className="space-y-6">
+          <div className="text-center">
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">결제 방법 선택</h3>
+            <p className="text-gray-600">원하시는 결제 방법을 선택해주세요</p>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {paymentMethods.map((method) => (
               <div
                 key={method.id}
-                className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 ${
-                  formData.paymentMethod === method.id ? "border-green-500 bg-green-50 shadow-lg" : "border-gray-200 hover:border-green-300 hover:shadow-md"
+                className={`relative p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 ${
+                  selectedPaymentMethod === method.id
+                    ? `border-${method.color}-500 bg-gradient-to-br from-${method.color}-50 to-${method.color}-100 shadow-lg`
+                    : "border-gray-200 hover:border-gray-300 hover:shadow-md bg-white"
                 }`}
-                onClick={() => handleInputChange("paymentMethod", method.id)}
+                onClick={() => setSelectedPaymentMethod(method.id)}
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-2xl">{method.icon}</span>
-                  <div>
-                    <div className="font-semibold text-gray-800">{method.name}</div>
-                    <div className="text-sm text-gray-600">{method.description}</div>
+                {method.popular && (
+                  <div className="absolute -top-3 left-6">
+                    <span className="bg-gradient-to-r from-orange-400 to-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">인기</span>
+                  </div>
+                )}
+
+                <div className="flex items-center gap-4">
+                  <div className={`w-12 h-12 bg-gradient-to-r from-${method.color}-400 to-${method.color}-600 rounded-xl flex items-center justify-center text-white`}>{method.icon}</div>
+                  <div className="flex-1">
+                    <h4 className="text-lg font-bold text-gray-800">{method.name}</h4>
+                    <p className="text-sm text-gray-600">{method.description}</p>
                   </div>
                 </div>
+
+                {selectedPaymentMethod === method.id && (
+                  <div className="absolute top-4 right-4">
+                    <div className={`w-6 h-6 bg-${method.color}-500 rounded-full flex items-center justify-center`}>
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
 
-        {/* 이용약관 동의 */}
-        <div className="space-y-4">
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h4 className="font-semibold text-gray-800 mb-2">이용약관 및 개인정보 처리방침</h4>
-            <div className="text-sm text-gray-600 space-y-2 max-h-32 overflow-y-auto">
-              <p>• 개인정보는 비자 신청 처리 목적으로만 사용됩니다.</p>
-              <p>• 제출된 서류는 베트남 이민청에 전달됩니다.</p>
-              <p>• 비자 발급은 베트남 정부의 최종 승인에 따라 결정됩니다.</p>
-              <p>• 서비스 수수료는 처리 과정에서 발생하는 비용입니다.</p>
-              <p>• 취소 및 환불 정책은 별도 약관에 따릅니다.</p>
+        {/* 신용카드 정보 입력 (신용카드 선택 시) */}
+        {selectedPaymentMethod === "card" && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h3 className="text-xl font-bold text-gray-800 mb-2">카드 정보 입력</h3>
+              <p className="text-gray-600">안전하게 암호화되어 처리됩니다</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2">
+                <label className="block text-sm font-bold text-gray-800 mb-2">카드번호 *</label>
+                <Input
+                  value={paymentData.cardNumber}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").replace(/(\d{4})(?=\d)/g, "$1 ");
+                    if (value.length <= 19) {
+                      handlePaymentDataChange("cardNumber", value);
+                    }
+                  }}
+                  placeholder="1234 5678 9012 3456"
+                  className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-blue-500"
+                  maxLength={19}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-800 mb-2">만료일 *</label>
+                <Input
+                  value={paymentData.expiryDate}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").replace(/(\d{2})(?=\d)/, "$1/");
+                    if (value.length <= 5) {
+                      handlePaymentDataChange("expiryDate", value);
+                    }
+                  }}
+                  placeholder="MM/YY"
+                  className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-blue-500"
+                  maxLength={5}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-800 mb-2">보안코드 *</label>
+                <Input
+                  type="password"
+                  value={paymentData.cvv}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    if (value.length <= 4) {
+                      handlePaymentDataChange("cvv", value);
+                    }
+                  }}
+                  placeholder="123"
+                  className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-blue-500"
+                  maxLength={4}
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-bold text-gray-800 mb-2">카드소지자명 *</label>
+                <Input
+                  value={paymentData.cardholderName}
+                  onChange={(e) => handlePaymentDataChange("cardholderName", e.target.value.toUpperCase())}
+                  placeholder="HONG GIL DONG"
+                  className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-blue-500"
+                />
+              </div>
             </div>
           </div>
+        )}
 
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="agreement"
-              checked={formData.agreementAccepted || false}
-              onChange={(e) => handleInputChange("agreementAccepted", e.target.checked)}
-              className="w-5 h-5 text-green-600 rounded focus:ring-green-500"
-            />
-            <label htmlFor="agreement" className="text-sm text-gray-700 cursor-pointer">
-              위 내용을 모두 확인하였으며, 이용약관 및 개인정보 처리방침에 동의합니다. *
-            </label>
+        {/* 간편결제 안내 (카카오페이/네이버페이 선택 시) */}
+        {(selectedPaymentMethod === "kakao" || selectedPaymentMethod === "naver") && (
+          <div className="bg-blue-50 rounded-2xl p-6 text-center">
+            <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Smartphone className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">{selectedPaymentMethod === "kakao" ? "카카오페이" : "네이버페이"} 결제</h3>
+            <p className="text-gray-600">
+              결제 버튼을 클릭하면 {selectedPaymentMethod === "kakao" ? "카카오페이" : "네이버페이"}
+              결제 창이 열립니다.
+            </p>
           </div>
-        </div>
+        )}
 
-        {/* 보안 안내 */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="font-semibold text-blue-800 mb-2">🔒 보안 안내</h4>
-          <ul className="text-sm text-blue-700 space-y-1">
-            <li>• 모든 결제는 SSL 암호화로 보호됩니다</li>
-            <li>• 카드 정보는 저장되지 않습니다</li>
-            <li>• PG사를 통한 안전한 결제 시스템</li>
-          </ul>
-        </div>
+        {/* 계좌이체 안내 (계좌이체 선택 시) */}
+        {selectedPaymentMethod === "bank" && (
+          <div className="bg-gray-50 rounded-2xl p-6 text-center">
+            <div className="w-16 h-16 bg-gray-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Building className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">실시간 계좌이체</h3>
+            <p className="text-gray-600">결제 버튼을 클릭하면 은행 선택 및 이체 절차가 진행됩니다.</p>
+          </div>
+        )}
 
-        <div className="flex justify-between mt-8">
-          <Button variant="outline" onClick={onPrev} className="px-6 py-3 border-2 border-gray-300 hover:border-gray-400 rounded-xl font-semibold transition-all duration-300">
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            이전
-          </Button>
+        {/* 네비게이션 버튼 */}
+        <div className="flex justify-between pt-8 border-t border-gray-200">
           <Button
-            onClick={onNext}
-            disabled={!isValid}
-            className="px-8 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={onPrevious}
+            variant="outline"
+            disabled={isProcessing || isSubmitting}
+            className="px-8 py-4 border-2 border-gray-300 hover:border-gray-400 text-gray-700 font-bold text-lg rounded-2xl transition-all duration-300"
           >
-            <span className="mr-2">{formatCurrency(currentPrice)} 결제하기</span>
-            <ArrowRight className="w-5 h-5" />
+            <ArrowLeft className="w-6 h-6 mr-3" />
+            <span>이전</span>
           </Button>
+
+          <Button
+            onClick={handlePayment}
+            disabled={!selectedPaymentMethod || isProcessing || isSubmitting}
+            className="px-12 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white font-bold text-lg rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105"
+          >
+            {isProcessing || isSubmitting ? (
+              <>
+                <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+                <span>처리 중...</span>
+              </>
+            ) : (
+              <>
+                <span className="mr-3">{formatCurrency(currentPrice)} 결제</span>
+                <ArrowRight className="w-6 h-6" />
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* 결제 약관 */}
+        <div className="text-center text-sm text-gray-500 pt-4 border-t border-gray-200">
+          <p>
+            결제를 진행함으로써{" "}
+            <a href="#" className="text-blue-600 hover:underline">
+              이용약관
+            </a>{" "}
+            및{" "}
+            <a href="#" className="text-blue-600 hover:underline">
+              개인정보처리방침
+            </a>
+            에 동의하게 됩니다.
+          </p>
+          <p className="mt-2">문의사항이 있으시면 고객센터(1588-1234)로 연락해주세요.</p>
         </div>
       </CardContent>
     </Card>
