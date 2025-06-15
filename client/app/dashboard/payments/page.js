@@ -7,10 +7,10 @@ import {
   GET_PAYMENTS, 
   UPDATE_PAYMENT, 
   GENERATE_INVOICE 
-} from '../../src/lib/graphql';
-import { Card, CardContent, CardHeader, CardTitle } from '../../src/components/ui/card';
-import { Button } from '../../src/components/ui/button';
-import { Badge } from '../../src/components/ui/badge';
+} from '@/lib/graphql';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   CreditCard,
   FileText,

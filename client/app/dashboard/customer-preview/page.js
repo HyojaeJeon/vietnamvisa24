@@ -3,10 +3,10 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_VISA_APPLICATIONS } from '../../src/lib/graphql';
-import { Card, CardContent, CardHeader, CardTitle } from '../../src/components/ui/card';
-import { Button } from '../../src/components/ui/button';
-import { Badge } from '../../src/components/ui/badge';
+import { GET_VISA_APPLICATIONS } from '@/lib/graphql';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Eye,
   Settings,

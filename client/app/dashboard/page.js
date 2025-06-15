@@ -3,8 +3,8 @@
 
 import React from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_VISA_APPLICATIONS, GET_ADMIN_ME_QUERY } from '../../lib/graphql';
-import { Card, CardContent, CardHeader, CardTitle } from '../src/components/ui/card';
+import { GET_VISA_APPLICATIONS, GET_ADMIN_ME_QUERY } from '@/lib/graphql';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   FileText,
   Users,

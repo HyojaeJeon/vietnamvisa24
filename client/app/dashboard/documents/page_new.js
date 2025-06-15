@@ -8,17 +8,17 @@ import {
   Image, File, Trash2, Edit3, Calendar, User, FileCheck,
   Loader2, Plus, RefreshCw
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '../../src/components/ui/card';
-import { Button } from '../../src/components/ui/button';
-import { Input } from '../../src/components/ui/input';
-import { Badge } from '../../src/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../src/components/ui/select';
+} from '@/components/ui/select';
 import { 
   Dialog,
   DialogContent,
@@ -26,32 +26,32 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../../src/components/ui/dialog';
-import { Textarea } from '../../src/components/ui/textarea';
-import { Alert, AlertDescription } from '../../src/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../src/components/ui/tabs';
-import { Checkbox } from '../../src/components/ui/checkbox';
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../../src/components/ui/dropdown-menu';
+} from '@/components/ui/dropdown-menu';
 
 // GraphQL imports
 import { 
   GET_DOCUMENTS, 
   GET_DOCUMENT_STATISTICS,
   GET_DOCUMENT_TYPES 
-} from '../../src/lib/graphql/query/documents';
+} from '@/lib/graphql/query/documents';
 import { 
   UPDATE_DOCUMENT_STATUS,
   BULK_UPDATE_DOCUMENT_STATUS,
   DELETE_DOCUMENT 
-} from '../../src/lib/graphql/mutation/documents';
+} from '@/lib/graphql/mutation/documents';
 
 // Components
-import FileUpload from '../../src/components/FileUpload';
+import FileUpload from '@/components/FileUpload';
 
 export default function DocumentsManagement() {
   const [searchTerm, setSearchTerm] = useState('');

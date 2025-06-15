@@ -2,11 +2,11 @@
 
 import React, { useState } from "react";
 import { useQuery } from "@apollo/client";
-import { Card, CardContent } from "../../src/components/ui/card";
-import { Button } from "../../src/components/ui/button";
-import { Input } from "../../src/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { MessageSquare, Phone, Search, Filter, Eye, Reply, CheckCircle, Clock, Star, User, Calendar, MessageCircle, Mail, Plus } from "lucide-react";
-import { GET_CONSULTATIONS } from "../../src/lib/graphql/query/consultations/index.js";
+import { GET_CONSULTATIONS } from "@/lib/graphql/query/consultations/index.js";
 
 export default function ConsultationsManagement() {
   const [searchTerm, setSearchTerm] = useState("");

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@apollo/client";
-import { GET_ADMIN_ME_QUERY } from "../../src/lib/graphql";
+import { GET_ADMIN_ME_QUERY } from "@/lib/graphql";
 import ServicesManagement from "./ServicesManagement";
 
 export default function ServicesPage() {

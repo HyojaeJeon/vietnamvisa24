@@ -4,10 +4,10 @@
 import React, { useState, useEffect } from 'react';
 import { useMutation } from '@apollo/client';
 import { useRouter } from 'next/navigation';
-import { ADMIN_LOGIN_MUTATION } from '../../../lib/graphql';
-import { Button } from '../../src/components/ui/button';
-import { Input } from '../../src/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '../../src/components/ui/card';
+import { ADMIN_LOGIN_MUTATION } from '@/lib/graphql';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Eye, EyeOff, Shield } from 'lucide-react';
 
 export default function AdminLogin() {
