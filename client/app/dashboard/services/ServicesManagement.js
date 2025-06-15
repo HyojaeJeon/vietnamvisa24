@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { Plus, Edit, Eye, Search } from "lucide-react";
-import { GET_ALL_PRICING_DATA } from "../../src/lib/graphql";
-import { GET_ADMIN_ME_QUERY } from "../../src/lib/graphql";
-import { CREATE_E_VISA_PRICE, UPDATE_E_VISA_PRICE, CREATE_VISA_RUN_PRICE, UPDATE_VISA_RUN_PRICE, CREATE_FAST_TRACK_PRICE, UPDATE_FAST_TRACK_PRICE } from "../../src/lib/graphql";
+import { GET_ALL_PRICING_DATA } from "@/lib/graphql";
+import { GET_ADMIN_ME_QUERY } from "@/lib/graphql";
+import { CREATE_E_VISA_PRICE, UPDATE_E_VISA_PRICE, CREATE_VISA_RUN_PRICE, UPDATE_VISA_RUN_PRICE, CREATE_FAST_TRACK_PRICE, UPDATE_FAST_TRACK_PRICE } from "@/lib/graphql";
 import ServiceModal from "./ServiceModal";
 
 export default function ServicesManagement() {

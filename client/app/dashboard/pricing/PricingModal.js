@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "@apollo/client";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { CREATE_E_VISA_PRICE, UPDATE_E_VISA_PRICE, CREATE_VISA_RUN_PRICE, UPDATE_VISA_RUN_PRICE, CREATE_FAST_TRACK_PRICE, UPDATE_FAST_TRACK_PRICE } from "../../src/lib/graphql";
+import { CREATE_E_VISA_PRICE, UPDATE_E_VISA_PRICE, CREATE_VISA_RUN_PRICE, UPDATE_VISA_RUN_PRICE, CREATE_FAST_TRACK_PRICE, UPDATE_FAST_TRACK_PRICE } from "@/lib/graphql";
 
 export default function PricingModal({
   isOpen,

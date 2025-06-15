@@ -2,14 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, gql } from "@apollo/client";
-import { CREATE_WORKFLOW_TEMPLATE } from "../../src/lib/graphql/mutation/workflows";
-import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
-import { Button } from "../../src/components/ui/button";
-import { Badge } from "../../src/components/ui/badge";
+import { CREATE_WORKFLOW_TEMPLATE } from "@/lib/graphql/mutation/workflows";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { CheckSquare, Plus, Settings, Play, FileText, Zap, Trash, Clock } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-import Seo from "../../src/lib/seo";
+import Seo from "@/lib/seo";
 import { useTranslation } from "react-i18next";
 import { v4 as uuidv4 } from "uuid";
 import PropTypes from "prop-types";

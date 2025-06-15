@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { GET_VISA_APPLICATIONS, GET_APPLICATION_MEMOS } from "../../src/lib/graphql/query/applications";
+import { GET_VISA_APPLICATIONS, GET_APPLICATION_MEMOS } from "@/lib/graphql/query/applications";
 import {
   UPDATE_APPLICATION_STATUS_MUTATION,
   SEND_EMAIL_MUTATION,
@@ -11,10 +11,10 @@ import {
   DELETE_MEMO_MUTATION,
   UPDATE_APPLICATION_INFO_MUTATION,
   DOWNLOAD_DOCUMENTS_MUTATION,
-} from "../../src/lib/graphql/mutation/applications";
-import { Card, CardContent } from "../../src/components/ui/card";
-import { Button } from "../../src/components/ui/button";
-import { Input } from "../../src/components/ui/input";
+} from "@/lib/graphql/mutation/applications";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { FileText, Search, Filter, Eye, Edit, CheckCircle, XCircle, Clock, AlertTriangle, Download, Send, User, Calendar, Globe, Phone, Mail } from "lucide-react";
 
 export default function ApplicationsManagement() {

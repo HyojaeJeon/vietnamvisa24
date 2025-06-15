@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import { useQuery, useMutation } from '@apollo/client';
-import { Card, CardContent, CardHeader, CardTitle } from '../../src/components/ui/card';
-import { Button } from '../../src/components/ui/button';
-import { Input } from '../../src/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { 
   MessageSquare,
   Phone,
@@ -21,11 +21,11 @@ import {
   Mail,
   Plus
 } from 'lucide-react';
-import { GET_CONSULTATIONS } from '../../src/lib/graphql/query/consultations/index.js';
+import { GET_CONSULTATIONS } from '@/lib/graphql/query/consultations/index.js';
 import { 
   UPDATE_CONSULTATION_STATUS_MUTATION, 
   DELETE_CONSULTATION_MUTATION 
-} from '../../src/lib/graphql/mutation/consultations/index.js';
+} from '@/lib/graphql/mutation/consultations/index.js';
 
 export default function ConsultationsManagement() {
   const [searchTerm, setSearchTerm] = useState('');

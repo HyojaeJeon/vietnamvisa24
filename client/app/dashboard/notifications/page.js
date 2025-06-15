@@ -375,10 +375,10 @@
 
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { GET_ALL_NOTIFICATIONS_QUERY, MARK_NOTIFICATION_AS_READ_MUTATION, MARK_ALL_NOTIFICATIONS_AS_READ } from "../../src/lib/graphql";
-import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
-import { Button } from "../../src/components/ui/button";
-import { Input } from "../../src/components/ui/input";
+import { GET_ALL_NOTIFICATIONS_QUERY, MARK_NOTIFICATION_AS_READ_MUTATION, MARK_ALL_NOTIFICATIONS_AS_READ } from "@/lib/graphql";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Bell,
   Search,

@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import { PlusIcon, PencilIcon, TrashIcon, BanknotesIcon, CurrencyDollarIcon, GlobeAltIcon, ClockIcon, UserGroupIcon, BuildingOfficeIcon } from "@heroicons/react/24/outline";
-import { GET_ALL_PRICING_DATA } from "../../src/lib/graphql";
-import { DELETE_E_VISA_PRICE, DELETE_VISA_RUN_PRICE, DELETE_FAST_TRACK_PRICE } from "../../src/lib/graphql";
+import { GET_ALL_PRICING_DATA } from "@/lib/graphql";
+import { DELETE_E_VISA_PRICE, DELETE_VISA_RUN_PRICE, DELETE_FAST_TRACK_PRICE } from "@/lib/graphql";
 import PricingModal from "./PricingModal";
 
 export default function PricingManagement() {

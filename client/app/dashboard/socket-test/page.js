@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useMutation, gql } from '@apollo/client';
-import useSocket from '../../src/hooks/useSocket';
-import NotificationCenter from '../../src/components/NotificationCenter';
-import { Button } from '../../src/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../src/components/ui/card';
+import useSocket from '@/hooks/useSocket';
+import NotificationCenter from '@/components/NotificationCenter';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const UPDATE_APPLICATION_STATUS = gql`
   mutation UpdateApplicationStatus($id: ID!, $status: ApplicationStatus!) {

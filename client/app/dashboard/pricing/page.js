@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ProtectedRoute from "../../../app/src/components/auth/ProtectedRoute";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import PricingManagement from "./PricingManagement";
 
 export default function PricingPage() {

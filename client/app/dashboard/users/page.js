@@ -7,10 +7,10 @@ import {
   CREATE_ADMIN_MUTATION,
   UPDATE_ADMIN_ROLE_MUTATION,
   DEACTIVATE_ADMIN_MUTATION 
-} from '../../src/lib/graphql';
-import { Card, CardContent, CardHeader, CardTitle } from '../../src/components/ui/card';
-import { Button } from '../../src/components/ui/button';
-import { Input } from '../../src/components/ui/input';
+} from '@/lib/graphql';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { 
   Users, 
   Plus, 

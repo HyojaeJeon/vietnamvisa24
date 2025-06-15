@@ -4,9 +4,9 @@ import React, { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useQuery } from "@apollo/client";
 import { Toaster } from "react-hot-toast";
-import { GET_ADMIN_ME_QUERY } from "../../lib/graphql";
-import useSocket from "../src/hooks/useSocket";
-import NotificationCenter from "../src/components/NotificationCenter";
+import { GET_ADMIN_ME_QUERY } from "@/lib/graphql";
+import useSocket from "@/hooks/useSocket";
+import NotificationCenter from "@/components/NotificationCenter";
 import {
   LayoutDashboard,
   FileText,
