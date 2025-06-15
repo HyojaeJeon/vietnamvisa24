@@ -22,6 +22,7 @@ db.ApplicationStatusHistory = require("./applicationStatusHistory")(sequelize, S
 db.Payment = require("./payment")(sequelize, Sequelize.DataTypes);
 db.WorkflowTemplate = require("./workflowTemplate")(sequelize, Sequelize.DataTypes);
 db.ApplicationWorkflow = require("./applicationWorkflow")(sequelize, Sequelize.DataTypes);
+db.RefreshToken = require("./refreshToken")(sequelize, Sequelize.DataTypes);
 
 // 가격표 모델들 추가
 db.EVisaPrice = require("./eVisaPrice")(sequelize, Sequelize.DataTypes);

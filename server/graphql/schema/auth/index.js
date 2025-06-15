@@ -195,8 +195,8 @@ const authTypeDefs = gql`
     userRegister(input: RegisterInput!): AuthResponse!
     userLogin(input: LoginInput!): AuthResponse!
     adminLogin(input: AdminLoginInput!): AdminAuthResponse!
-    refreshToken(refreshToken: String!): RefreshTokenResponse!
-    refreshAdminToken(refreshToken: String!): RefreshTokenResponse!
+    refreshToken(refreshToken: String): RefreshTokenResponse!
+    refreshAdminToken(refreshToken: String): RefreshTokenResponse!
     createDocument(input: DocumentInput!): Document!
     updateDocumentStatus(id: ID!, status: DocumentStatus!, notes: String): Document!
     createNotification(input: NotificationInput!): Notification!

@@ -29,7 +29,9 @@
     "nodemailer": "^7.0.3",
     "sequelize": "^6.37.3",
     "socket.io": "^4.8.1",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "cookie-parser": "^1.4.6",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"

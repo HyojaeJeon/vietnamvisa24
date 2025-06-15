@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 // Token refresh mutations
 export const REFRESH_TOKEN_MUTATION = gql`
-  mutation RefreshToken($refreshToken: String!) {
+  mutation RefreshToken($refreshToken: String) {
     refreshToken(refreshToken: $refreshToken) {
       token
       refreshToken
@@ -11,7 +11,7 @@ export const REFRESH_TOKEN_MUTATION = gql`
 `;
 
 export const REFRESH_ADMIN_TOKEN_MUTATION = gql`
-  mutation RefreshAdminToken($refreshToken: String!) {
+  mutation RefreshAdminToken($refreshToken: String) {
     refreshAdminToken(refreshToken: $refreshToken) {
       token
       refreshToken

@@ -1,160 +1,84 @@
-const jwt = require("jsonwebtoken");
-const { models } = require("../database");
-const { AuthenticationError, TokenExpiredError } = require("./errorTypes");
+const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
+const { models } = require('../database');
+const { AuthenticationError, TokenExpiredError } = require('./errorTypes');
 
-const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
-const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "your-refresh-secret-key";
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'your-refresh-secret-key';
+const ACCESS_EXPIRES_IN = process.env.ACCESS_TOKEN_EXPIRES_IN || '15m';
+const REFRESH_EXPIRES_DAYS = parseInt(process.env.REFRESH_TOKEN_EXPIRES_DAYS || '7', 10);
 
-/**
- * JWT 토큰 생성 (사용자용)
- */
-const generateTokens = (user) => {
-  const accessToken = jwt.sign({ userId: user.id, email: user.email }, JWT_SECRET, { expiresIn: "30s" }); // 테스트용으로 30초
+const createRefreshRecord = async (payload, isAdmin = false) => {
+  const expiresAt = new Date(Date.now() + REFRESH_EXPIRES_DAYS * 24 * 60 * 60 * 1000);
+  const tokenId = uuidv4();
+  await models.RefreshToken.create({
+    token: tokenId,
+    user_id: isAdmin ? null : payload.id,
+    admin_id: isAdmin ? payload.id : null,
+    expires_at: expiresAt,
+  });
+  const refreshToken = jwt.sign({ jti: tokenId, id: payload.id, admin: isAdmin }, REFRESH_TOKEN_SECRET, { expiresIn: `${REFRESH_EXPIRES_DAYS}d` });
+  return { refreshToken, expiresAt };
+};
 
-  const refreshToken = jwt.sign({ userId: user.id, email: user.email, tokenVersion: user.tokenVersion || 0 }, REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
-
+const generateTokens = async (user) => {
+  const accessToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: ACCESS_EXPIRES_IN });
+  const { refreshToken } = await createRefreshRecord({ id: user.id }, false);
   return { accessToken, refreshToken };
 };
 
-/**
- * JWT 토큰 생성 (관리자용)
- */
-const generateAdminTokens = (admin) => {
-  const accessToken = jwt.sign({ adminId: admin.id, email: admin.email, role: admin.role }, JWT_SECRET, { expiresIn: "30s" }); // 테스트용으로 30초
-
-  const refreshToken = jwt.sign({ adminId: admin.id, email: admin.email, role: admin.role, tokenVersion: admin.tokenVersion || 0 }, REFRESH_TOKEN_SECRET, { expiresIn: "24h" });
-
+const generateAdminTokens = async (admin) => {
+  const accessToken = jwt.sign({ adminId: admin.id, role: admin.role }, JWT_SECRET, { expiresIn: ACCESS_EXPIRES_IN });
+  const { refreshToken } = await createRefreshRecord({ id: admin.id }, true);
   return { accessToken, refreshToken };
 };
 
-/**
- * 토큰에서 사용자 정보 추출
- */
 const getUserFromToken = async (token) => {
-  if (!token) {
-    throw new AuthenticationError();
-  }
-
+  if (!token) throw new AuthenticationError();
   try {
-    const cleanToken = token.replace("Bearer ", "");
-    const decoded = jwt.verify(cleanToken, JWT_SECRET);
-
+    const clean = token.replace('Bearer ', '');
+    const decoded = jwt.verify(clean, JWT_SECRET);
     const user = await models.User.findByPk(decoded.userId);
-    if (!user) {
-      throw new AuthenticationError("User not found");
-    }
-
+    if (!user) throw new AuthenticationError('User not found');
     return user;
-  } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      throw new TokenExpiredError();
-    }
-    if (error.name === "JsonWebTokenError") {
-      throw new AuthenticationError("Invalid token");
-    }
-    throw error;
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') throw new TokenExpiredError();
+    throw new AuthenticationError('Invalid token');
   }
 };
 
-/**
- * 관리자 토큰에서 사용자 정보 추출
- */
 const getAdminFromToken = async (token) => {
-  if (!token) {
-    throw new AuthenticationError();
-  }
-
+  if (!token) throw new AuthenticationError();
   try {
-    const cleanToken = token.replace("Bearer ", "");
-    const decoded = jwt.verify(cleanToken, JWT_SECRET);
-
-    const admin = await models.Admin.findOne({
-      where: { id: decoded.adminId, is_active: true },
-    });
-
-    if (!admin) {
-      throw new AuthenticationError("Admin not found");
-    }
-
+    const clean = token.replace('Bearer ', '');
+    const decoded = jwt.verify(clean, JWT_SECRET);
+    const admin = await models.Admin.findOne({ where: { id: decoded.adminId, is_active: true } });
+    if (!admin) throw new AuthenticationError('Admin not found');
     return admin;
-  } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      throw new TokenExpiredError();
-    }
-    if (error.name === "JsonWebTokenError") {
-      throw new AuthenticationError("Invalid token");
-    }
-    throw error;
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') throw new TokenExpiredError();
+    throw new AuthenticationError('Invalid token');
   }
 };
 
-/**
- * 토큰 갱신 (사용자용)
- */
-const refreshTokens = async (refreshToken) => {
-  if (!refreshToken) {
-    throw new AuthenticationError("Refresh token required");
-  }
-
+const rotateToken = async (token, isAdmin = false) => {
+  if (!token) throw new AuthenticationError('Refresh token required');
   try {
-    const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-    const user = await models.User.findByPk(decoded.userId);
-
-    if (!user) {
-      throw new AuthenticationError("User not found");
-    }
-
-    // Check token version (optional security feature)
-    if (decoded.tokenVersion !== (user.tokenVersion || 0)) {
-      throw new AuthenticationError("Invalid refresh token");
-    }
-
-    return generateTokens(user);
-  } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      throw new AuthenticationError("Refresh token expired");
-    }
-    if (error.name === "JsonWebTokenError") {
-      throw new AuthenticationError("Invalid refresh token");
-    }
-    throw error;
+    const decoded = jwt.verify(token, REFRESH_TOKEN_SECRET);
+    const record = await models.RefreshToken.findOne({ where: { token: decoded.jti, revoked: false } });
+    if (!record || record.expires_at < new Date()) throw new AuthenticationError('Invalid refresh token');
+    await record.update({ revoked: true });
+    const target = isAdmin ? await models.Admin.findByPk(decoded.id) : await models.User.findByPk(decoded.id);
+    if (!target) throw new AuthenticationError('User not found');
+    return isAdmin ? generateAdminTokens(target) : generateTokens(target);
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') throw new AuthenticationError('Refresh token expired');
+    throw new AuthenticationError('Invalid refresh token');
   }
 };
 
-/**
- * 관리자 토큰 갱신
- */
-const refreshAdminTokens = async (refreshToken) => {
-  if (!refreshToken) {
-    throw new AuthenticationError("Refresh token required");
-  }
-
-  try {
-    const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET);
-    const admin = await models.Admin.findOne({
-      where: { id: decoded.adminId, is_active: true },
-    });
-
-    if (!admin) {
-      throw new AuthenticationError("Admin not found");
-    }
-
-    // Check token version (optional security feature)
-    if (decoded.tokenVersion !== (admin.tokenVersion || 0)) {
-      throw new AuthenticationError("Invalid refresh token");
-    }
-
-    return generateAdminTokens(admin);
-  } catch (error) {
-    if (error.name === "TokenExpiredError") {
-      throw new AuthenticationError("Refresh token expired");
-    }
-    if (error.name === "JsonWebTokenError") {
-      throw new AuthenticationError("Invalid refresh token");
-    }
-    throw error;
-  }
-};
+const refreshTokens = async (refreshToken) => rotateToken(refreshToken, false);
+const refreshAdminTokens = async (refreshToken) => rotateToken(refreshToken, true);
 
 module.exports = {
   generateTokens,
