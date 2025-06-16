@@ -15,7 +15,9 @@ dist
 .next
 out
 build
-./uploads
+./server/uploads
+server/uploads
+.server/uploads
 
 
 
