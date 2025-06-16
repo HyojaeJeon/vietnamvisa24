@@ -15,6 +15,9 @@ dist
 .next
 out
 build
+./uploads
+
+
 
 # Environment variables
 .env.local

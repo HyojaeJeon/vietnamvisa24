@@ -1,5 +1,7 @@
 // Utility functions for the apply form
 
+import { ADDITIONAL_SERVICES } from "./types.js";
+
 export const formatCurrency = (amount, currency = "KRW") => {
   return new Intl.NumberFormat("ko-KR", {
     style: "currency",
@@ -17,7 +19,7 @@ export const validateEmail = (email) => {
 };
 
 export const validatePhone = (phone) => {
-  const phoneRegex = /^[\d\-\+\(\)\s]+$/;
+  const phoneRegex = /^[\d\-+()\s]+$/;
   return phoneRegex.test(phone) && phone.length >= 10;
 };
 
@@ -54,7 +56,7 @@ export const getStepTitle = (step) => {
     5: "서류 업로드",
     6: "신청 내용 확인",
     7: "결제",
-    8: "신청 완료"
+    8: "신청 완료",
   };
   return titles[step] || `단계 ${step}`;
 };
@@ -63,31 +65,240 @@ export const getStepDescription = (step) => {
   const descriptions = {
     1: "원하시는 서비스를 선택해주세요",
     2: "개인정보를 입력해주세요",
-    3: "연락처 정보를 입력해주세요", 
+    3: "연락처 정보를 입력해주세요",
     4: "여행 정보를 입력해주세요",
     5: "필수 서류를 업로드해주세요",
     6: "입력하신 정보를 확인해주세요",
     7: "결제를 진행해주세요",
-    8: "신청이 완료되었습니다"
+    8: "신청이 완료되었습니다",
   };
   return descriptions[step] || "";
 };
 
 export const validateStep = (step, formData) => {
+  console.log("formData : ", formData);
   switch (step) {
     case 1:
-      return formData.firstName && formData.lastName && formData.birthDate && formData.nationality && formData.passportNumber && formData.passportExpiry && formData.gender;
+      if (formData.visaType == "e-visa_urgent") {
+        return formData.processingType && formData.processingType !== "e-visa_general";
+      }
+      return formData.visaType;
+    case 2:
+      return (
+        formData?.personalInfo?.email &&
+        formData?.personalInfo?.phone &&
+        formData?.personalInfo?.address &&
+        validateEmail(formData?.personalInfo?.email) &&
+        validatePhone(formData?.personalInfo?.phone) &&
+        formData?.personalInfo?.phoneOfFriend
+      );
     case 3:
-      return formData.email && formData.phone && formData.address && validateEmail(formData.email) && validatePhone(formData.phone);
-    case 4:
-      return formData.visaType && formData.processingType && formData.entryDate && formData.purpose;
+      return formData?.travelInfo?.entryDate && formData?.travelInfo?.entryPort;
+    case 4: {
+      // 서류 업로드 단계: passport와 photo가 필수
+      const documents = formData.documents || {};
+      return documents.passport && documents.photo;
+    }
     case 5:
-      return formData.documents && formData.documents.length >= 2; // passport + photo minimum
-    case 6:
       return true; // Review step
     case 7:
       return formData.paymentMethod && formData.agreementAccepted;
     default:
       return false;
   }
+};
+
+// Safe localStorage wrapper for SSR compatibility
+export const safeLocalStorage = {
+  getItem: (key) => {
+    if (typeof window !== "undefined") {
+      try {
+        return localStorage.getItem(key);
+      } catch (error) {
+        console.error("LocalStorage getItem error:", error);
+        return null;
+      }
+    }
+    return null;
+  },
+  setItem: (key, value) => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem(key, value);
+      } catch (error) {
+        console.error("LocalStorage setItem error:", error);
+      }
+    }
+  },
+  removeItem: (key) => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.removeItem(key);
+      } catch (error) {
+        console.error("LocalStorage removeItem error:", error);
+      }
+    }
+  },
+};
+
+// Generate unique application ID
+export const generateApplicationId = () => {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  return `VN${timestamp}${random.toUpperCase()}`;
+};
+
+// Calculate total price including base price and additional services
+export const calculateTotalPrice = (formData) => {
+  let basePrice = calculateVisaPrice(formData.visaType, formData.processingType);
+
+  // Add additional services
+  if (formData.additionalServices && formData.additionalServices.length > 0) {
+    const additionalServicesPrice = formData.additionalServices.reduce((total, serviceId) => {
+      // Find service price from ADDITIONAL_SERVICES
+      const service = ADDITIONAL_SERVICES?.find((s) => s.id === serviceId);
+      return total + (service?.price || 0);
+    }, 0);
+    basePrice += additionalServicesPrice;
+  }
+
+  return basePrice;
+};
+
+// Validation helper functions
+const validateEmailField = (value) => {
+  const errors = [];
+  if (!validateEmail(value)) {
+    errors.push("올바른 이메일 형식이 아닙니다.");
+  }
+  return errors;
+};
+
+const validatePhoneField = (value) => {
+  const errors = [];
+  if (!validatePhone(value)) {
+    errors.push("올바른 전화번호 형식이 아닙니다.");
+  }
+  return errors;
+};
+
+const validatePassportField = (value) => {
+  const errors = [];
+  if (!validatePassport(value)) {
+    errors.push("여권번호는 6-12자리여야 합니다.");
+  }
+  return errors;
+};
+
+const validatePassportExpiryField = (value) => {
+  const errors = [];
+  if (value) {
+    const expiryDate = new Date(value);
+    const sixMonthsFromNow = new Date();
+    sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
+    if (expiryDate < sixMonthsFromNow) {
+      errors.push("여권 만료일이 6개월 이상 남아있어야 합니다.");
+    }
+  }
+  return errors;
+};
+
+const validateBirthDateField = (value) => {
+  const errors = [];
+  if (value) {
+    const birthDate = new Date(value);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    if (age < 0 || age > 120) {
+      errors.push("올바른 생년월일을 입력해주세요.");
+    }
+  }
+  return errors;
+};
+
+// Get field validation errors
+export const getFieldErrors = (field, value, formData = {}) => {
+  switch (field) {
+    case "email":
+      return validateEmailField(value);
+    case "phone":
+      return validatePhoneField(value);
+    case "passportNumber":
+      return validatePassportField(value);
+    case "passportExpiry":
+      return validatePassportExpiryField(value);
+    case "birthDate":
+      return validateBirthDateField(value);
+    default:
+      return [];
+  }
+};
+
+// 파일 업로드 관련 유틸리티 함수들
+export const convertBase64ToFile = (base64String, fileName, fileType) => {
+  const arr = base64String.split(",");
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+
+  return new File([u8arr], fileName, { type: fileType || mime });
+};
+
+// 서버에 파일 업로드하는 함수 (최종 제출 시 사용)
+export const uploadFileToServer = async (file, documentType, applicationId) => {
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("documentType", documentType);
+  formData.append("applicationId", applicationId);
+
+  try {
+    const response = await fetch("/api/upload-document", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`업로드 실패: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result.fileUrl; // 서버에서 반환하는 파일 URL
+  } catch (error) {
+    console.error("파일 업로드 오류:", error);
+    throw error;
+  }
+};
+
+// 모든 임시 문서를 서버에 업로드하는 함수
+export const uploadAllDocuments = async (documents, applicationId) => {
+  const uploadPromises = [];
+  const documentUrls = {};
+
+  for (const [documentType, documentData] of Object.entries(documents)) {
+    if (documentData.isTemporary && documentData.file) {
+      const file = convertBase64ToFile(documentData.file, documentData.fileName, documentData.fileType);
+
+      const uploadPromise = uploadFileToServer(file, documentType, applicationId).then((fileUrl) => {
+        documentUrls[documentType] = {
+          ...documentData,
+          fileUrl,
+          isTemporary: false,
+          uploadedToServer: true,
+        };
+      });
+
+      uploadPromises.push(uploadPromise);
+    } else {
+      // 이미 서버에 업로드된 파일은 그대로 유지
+      documentUrls[documentType] = documentData;
+    }
+  }
+
+  await Promise.all(uploadPromises);
+  return documentUrls;
 };

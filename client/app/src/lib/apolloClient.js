@@ -31,7 +31,7 @@ const REFRESH_ADMIN_TOKEN_MUTATION = gql`
 
 // ----------------------------------------------------------------------
 // 개발 환경에서는 직접 서버 URL 사용 (CORS 문제 해결을 위해)
-const GRAPHQL_ENDPOINT = "http://localhost:5001/graphql";
+const GRAPHQL_ENDPOINT = "http://localhost:5002/graphql";
 
 console.log("🔧 Apollo Client - GraphQL Endpoint:", GRAPHQL_ENDPOINT);
 

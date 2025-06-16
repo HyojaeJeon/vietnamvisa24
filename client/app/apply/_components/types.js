@@ -1,16 +1,17 @@
 // Types and interfaces for the apply form
 
 export const VISA_TYPES = {
-  GENERAL: "general",
-  BUSINESS: "business",
-  TOURIST: "tourist",
-  TRANSIT: "transit",
+  E_VISA_GENERAL: "e-visa_general",
+  E_VISA_URGENT: "e-visa_urgent",
+  E_VISA_TRANSIT: "e-visa_transit",
 };
 
 export const PROCESSING_TYPES = {
-  STANDARD: "standard",
-  EXPRESS: "express",
-  URGENT: "urgent",
+  URGENT_1HOUR: "1시간",
+  URGENT_2HOUR: "2시간",
+  URGENT_4HOUR: "4시간",
+  URGENT_1DAY: "1일",
+  URGENT_2DAY: "2일",
 };
 
 export const DOCUMENT_TYPES = {
@@ -43,12 +44,68 @@ export const VISA_DURATION_TYPES = {
   MULTIPLE_90: "multiple_90",
 };
 
+export const VISIT_PURPOSES = [
+  { value: "tourist", label: "관광/여행", description: "관광, 레저, 개인 여행 목적" },
+  { value: "business", label: "상용/출장", description: "비즈니스 미팅, 컨퍼런스, 업무 목적" },
+  { value: "family", label: "가족 방문", description: "가족, 친척 방문 목적" },
+  { value: "friend", label: "친구 방문", description: "친구, 지인 방문 목적" },
+  { value: "medical", label: "의료/치료", description: "의료 서비스, 치료 목적" },
+  { value: "education", label: "교육/연수", description: "교육, 연수, 워크샵 참석" },
+  { value: "transit", label: "경유/환승", description: "다른 국가로의 경유 목적" },
+  { value: "other", label: "기타", description: "기타 목적" },
+];
+
+export const ADDITIONAL_SERVICES = [
+  {
+    id: "fast_track",
+    name: "공항 패스트트랙",
+    description: "입출국 시 빠른 통과 서비스",
+    price: 50000,
+    category: "airport",
+  },
+  {
+    id: "airport_pickup",
+    name: "공항 픽업 서비스",
+    description: "공항에서 호텔까지 픽업 서비스",
+    price: 80000,
+    category: "transport",
+  },
+  {
+    id: "hotel_booking",
+    name: "호텔 예약 대행",
+    description: "베트남 현지 호텔 예약 서비스",
+    price: 30000,
+    category: "accommodation",
+  },
+  {
+    id: "sim_card",
+    name: "현지 SIM 카드",
+    description: "베트남 현지 데이터 SIM 카드",
+    price: 25000,
+    category: "communication",
+  },
+  {
+    id: "currency_exchange",
+    name: "환전 서비스",
+    description: "우대 환율로 베트남 동 환전",
+    price: 15000,
+    category: "finance",
+  },
+  {
+    id: "travel_insurance",
+    name: "여행자 보험",
+    description: "베트남 여행 전용 보험",
+    price: 40000,
+    category: "insurance",
+  },
+];
+
 export const initialFormData = {
   // Service Selection
   serviceType: "e_visa",
   visaDurationType: "single_90",
   processingType: "standard",
-  
+
   // Personal Information
   firstName: "",
   lastName: "",

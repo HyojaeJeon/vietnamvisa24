@@ -110,26 +110,24 @@ const nextConfig = {
     const isReplit = Boolean(process.env.REPLIT || process.env.REPLIT_ID);
 
     if (isReplit) {
-      // Replit 환경: 같은 호스트의 5000 포트로 프록시
+      // Replit 환경: 같은 호스트의 5002 포트로 프록시
       return [
         {
           source: "/graphql",
-          destination:
-            "https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:5000/graphql",
+          destination: "https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:5002/graphql",
         },
         {
           source: "/api/documents/:path*",
-          destination:
-            "https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:5000/api/documents/:path*",
+          destination: "https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:5002/api/documents/:path*",
         },
       ];
     }
     if (process.env.NODE_ENV === "development") {
-      // 로컬 개발 환경: localhost:5000으로 프록시
+      // 로컬 개발 환경: localhost:5002으로 프록시
       return [
         {
           source: "/graphql",
-          destination: "http://localhost:5000/graphql",
+          destination: "http://localhost:5002/graphql",
         },
       ];
     }
