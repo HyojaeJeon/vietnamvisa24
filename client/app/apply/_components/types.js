@@ -57,47 +57,82 @@ export const VISIT_PURPOSES = [
 
 export const ADDITIONAL_SERVICES = [
   {
-    id: "fast_track",
-    name: "공항 패스트트랙",
-    description: "입출국 시 빠른 통과 서비스",
-    price: 50000,
+    id: "fast_track_arrival",
+    name: "공항 패스트트랙 - 입국",
+    description: "입국 시 빠른 통과 서비스",
+    price: 20 * 1350, // $20 USD
     category: "airport",
   },
   {
-    id: "airport_pickup",
-    name: "공항 픽업 서비스",
-    description: "공항에서 호텔까지 픽업 서비스",
-    price: 80000,
+    id: "fast_track_arrival_premium",
+    name: "공항 패스트트랙 - 프리미엄 입국",
+    description: "프리미엄 입국 빠른 통과 서비스",
+    price: 30 * 1350, // $30 USD
+    category: "airport",
+  },
+  // {
+  //   id: "fast_track_departure",
+  //   name: "공항 패스트트랙 - 출국",
+  //   description: "출국 시 빠른 통과 서비스",
+  //   price: 25 * 1350, // $25 USD
+  //   category: "airport",
+  // },
+  {
+    id: "airport_pickup_sedan_district1",
+    name: "공항 픽업 서비스 - 4인승 세단 (1,3,푸년군)",
+    description: "공항에서 호텔까지 픽업 서비스 (1~3인 탑승)",
+    price: 25 * 1350, // $25 USD
     category: "transport",
   },
   {
-    id: "hotel_booking",
-    name: "호텔 예약 대행",
-    description: "베트남 현지 호텔 예약 서비스",
-    price: 30000,
-    category: "accommodation",
+    id: "airport_pickup_sedan_district2",
+    name: "공항 픽업 서비스 - 4인승 세단 (2,7,빈탄군)",
+    description: "공항에서 호텔까지 픽업 서비스 (1~3인 탑승)",
+    price: 30 * 1350, // $30 USD
+    category: "transport",
   },
   {
-    id: "sim_card",
-    name: "현지 SIM 카드",
-    description: "베트남 현지 데이터 SIM 카드",
-    price: 25000,
-    category: "communication",
+    id: "airport_pickup_suv_district1",
+    name: "공항 픽업 서비스 - 7인승 SUV (1,3,푸년군)",
+    description: "공항에서 호텔까지 픽업 서비스 (4~5인 탑승)",
+    price: 35 * 1350, // $35 USD
+    category: "transport",
   },
   {
-    id: "currency_exchange",
-    name: "환전 서비스",
-    description: "우대 환율로 베트남 동 환전",
-    price: 15000,
-    category: "finance",
+    id: "airport_pickup_suv_district2",
+    name: "공항 픽업 서비스 - 7인승 SUV (2,7,빈탄군)",
+    description: "공항에서 호텔까지 픽업 서비스 (4~5인 탑승)",
+    price: 40 * 1350, // $40 USD
+    category: "transport",
   },
-  {
-    id: "travel_insurance",
-    name: "여행자 보험",
-    description: "베트남 여행 전용 보험",
-    price: 40000,
-    category: "insurance",
-  },
+  // {
+  //   id: "hotel_booking",
+  //   name: "호텔 예약 대행",
+  //   description: "베트남 현지 호텔 예약 서비스",
+  //   price: 30000,
+  //   category: "accommodation",
+  // },
+  // {
+  //   id: "sim_card",
+  //   name: "현지 SIM 카드",
+  //   description: "베트남 현지 데이터 SIM 카드",
+  //   price: 25000,
+  //   category: "communication",
+  // },
+  // {
+  //   id: "currency_exchange",
+  //   name: "환전 서비스",
+  //   description: "우대 환율로 베트남 동 환전",
+  //   price: 15000,
+  //   category: "finance",
+  // },
+  // {
+  //   id: "travel_insurance",
+  //   name: "여행자 보험",
+  //   description: "베트남 여행 전용 보험",
+  //   price: 40000,
+  //   category: "insurance",
+  // },
 ];
 
 export const initialFormData = {

@@ -12,6 +12,8 @@ import { validateStep } from "./utils";
 const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
   const [uploadingFiles, setUploadingFiles] = useState({});
   const [previewFile, setPreviewFile] = useState(null);
+  const [extractedPassportInfo, setExtractedPassportInfo] = useState(null);
+  const [editingPassportInfo, setEditingPassportInfo] = useState(null);
 
   const documentRequirements = [
     {
@@ -177,7 +179,162 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
   //     }
   //   },
   //   [formData.documents, onUpdate]
-  // );
+  // );  // 여권 정보를 formData.personalInfo로 매핑하는 함수 (개선된 버전)
+  const mapPassportDataToPersonalInfo = (ocrResult) => {
+    if (!ocrResult) return {};
+
+    console.log("OCR 결과 매핑 시작:", ocrResult);
+
+    // 생년월일 형식 변환 (YYMMDD -> YYYY-MM-DD)
+    const formatBirthDate = (dateStr) => {
+      if (!dateStr) return "";
+
+      // 6자리 숫자인 경우 (YYMMDD)
+      if (dateStr.length === 6 && /^\d{6}$/.test(dateStr)) {
+        const yy = dateStr.substring(0, 2);
+        const mm = dateStr.substring(2, 4);
+        const dd = dateStr.substring(4, 6);
+
+        // 2000년대/1900년대 판단 (90-99는 1900년대, 00-89는 2000년대)
+        const year = parseInt(yy) >= 90 ? `19${yy}` : `20${yy}`;
+        return `${year}-${mm}-${dd}`;
+      }
+
+      // 이미 YYYY-MM-DD 형식인 경우
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        return dateStr;
+      }
+
+      return "";
+    };
+
+    // 성별 변환 (M/F를 남성/여성으로)
+    const formatGender = (sex) => {
+      if (!sex) return "";
+      const sexUpper = sex.toUpperCase();
+      if (sexUpper === "M" || sexUpper === "MALE") return "남성";
+      if (sexUpper === "F" || sexUpper === "FEMALE") return "여성";
+      return sex; // 원본 그대로 반환
+    };
+
+    // 국적 코드를 한국어로 변환
+    const formatNationality = (nationality) => {
+      if (!nationality) return "";
+      const nationalityMap = {
+        KOR: "대한민국",
+        USA: "미국",
+        CHN: "중국",
+        JPN: "일본",
+        GBR: "영국",
+        FRA: "프랑스",
+        DEU: "독일",
+        AUS: "호주",
+        CAN: "캐나다",
+        VNM: "베트남",
+      };
+      return nationalityMap[nationality.toUpperCase()] || nationality;
+    };
+
+    const personalInfo = {};
+
+    // 이름 매핑
+    if (ocrResult["Surname"]) {
+      personalInfo.lastName = ocrResult["Surname"].trim();
+    }
+    if (ocrResult["Given names"]) {
+      personalInfo.firstName = ocrResult["Given names"].trim();
+    }
+
+    // 생년월일 매핑
+    if (ocrResult["Date of birth"]) {
+      const formattedDate = formatBirthDate(ocrResult["Date of birth"]);
+      if (formattedDate) {
+        personalInfo.birthDate = formattedDate;
+      }
+    }
+
+    // 성별 매핑
+    if (ocrResult["Sex"]) {
+      personalInfo.gender = formatGender(ocrResult["Sex"]);
+    }
+
+    // 국적 매핑
+    if (ocrResult["Nationality"]) {
+      personalInfo.nationality = formatNationality(ocrResult["Nationality"]);
+    } // 여권번호 매핑
+    if (ocrResult["Passport No."]) {
+      personalInfo.passportNumber = ocrResult["Passport No."].trim();
+    }
+
+    // 발급일 매핑 (추가)
+    if (ocrResult["Issuing date"]) {
+      // 발급일 형식 변환 (필요한 경우)
+      personalInfo.passportIssueDate = ocrResult["Issuing date"].trim();
+    }
+
+    // 만료일 매핑 (추가)
+    if (ocrResult["Date of expiry"]) {
+      personalInfo.passportExpiryDate = ocrResult["Date of expiry"].trim();
+    }
+
+    // 한글성명이 있는 경우 이름 필드에 우선 적용
+    if (ocrResult["한글성명"]) {
+      const koreanName = ocrResult["한글성명"].trim();
+      // 한글성명을 성과 이름으로 분리 (첫 글자는 성, 나머지는 이름)
+      if (koreanName.length >= 2) {
+        personalInfo.lastName = koreanName.charAt(0);
+        personalInfo.firstName = koreanName.substring(1);
+      }
+    }
+
+    console.log("매핑된 개인정보:", personalInfo);
+    return personalInfo;
+  };
+
+  // 편집된 여권 정보를 저장하고 formData에 적용하는 함수
+  const handleSavePassportInfo = useCallback(() => {
+    if (!extractedPassportInfo || !extractedPassportInfo.mapped) {
+      console.warn("저장할 여권 정보가 없습니다.");
+      return;
+    }
+
+    // 편집된 정보가 있으면 편집된 정보를, 없으면 원본 추출 정보를 사용
+    const finalPassportInfo = editingPassportInfo || extractedPassportInfo.mapped;
+
+    // 기존 personalInfo와 병합 (빈 값이 아닌 경우에만 업데이트)
+    const currentPersonalInfo = { ...(formData.personalInfo || {}) };
+
+    Object.keys(finalPassportInfo).forEach((key) => {
+      const value = finalPassportInfo[key];
+      if (value && value.toString().trim() !== "") {
+        currentPersonalInfo[key] = value;
+      }
+    });
+
+    console.log("저장할 여권 정보:", finalPassportInfo);
+    console.log("업데이트된 개인정보:", currentPersonalInfo);
+
+    // formData 업데이트
+    onUpdate({ personalInfo: currentPersonalInfo });
+
+    // 성공 메시지 표시
+    const updatedFields = [];
+    if (finalPassportInfo.firstName) updatedFields.push("이름");
+    if (finalPassportInfo.lastName) updatedFields.push("성");
+    if (finalPassportInfo.birthDate) updatedFields.push("생년월일");
+    if (finalPassportInfo.gender) updatedFields.push("성별");
+    if (finalPassportInfo.nationality) updatedFields.push("국적");
+    if (finalPassportInfo.passportNumber) updatedFields.push("여권번호");
+    if (finalPassportInfo.passportIssueDate) updatedFields.push("여권발급일");
+    if (finalPassportInfo.passportExpiryDate) updatedFields.push("여권만료일");
+
+    if (updatedFields.length > 0) {
+      alert(`다음 정보가 개인정보 입력 단계에 적용되었습니다:\n\n${updatedFields.join(", ")}\n\n개인정보 입력 단계에서 최종 확인해주세요.`);
+    }
+
+    // 편집 모드 종료
+    setEditingPassportInfo(null);
+  }, [extractedPassportInfo, editingPassportInfo, formData.personalInfo, onUpdate]);
 
   const handleFileUpload = useCallback(
     async (documentType, file) => {
@@ -205,7 +362,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
         // 3) 실제 서버 업로드
         const form = new FormData();
         form.append("image", file);
-
+        console.log("업로드할 파일:", file);
         const res = await fetch("http://localhost:5002/api/extract_passport", {
           method: "POST",
           body: form,
@@ -213,10 +370,21 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
 
         if (!res.ok) {
           throw new Error(`서버 오류: ${res.status}`);
-        }
-
-        // 4) 서버에서 리턴된 OCR/MRZ 결과
+        } // 4) 서버에서 리턴된 OCR/MRZ 결과
         const ocrResult = await res.json();
+        console.log("여권 추출 결과:", ocrResult);
+
+        // OCR 결과를 더 자세히 로깅
+        console.log("OCR 결과 상세:", {
+          "발급일(Issuing date)": ocrResult["Issuing date"],
+          "만료일(Date of expiry)": ocrResult["Date of expiry"],
+          여권번호: ocrResult["Passport No."],
+          성: ocrResult["Surname"],
+          이름: ocrResult["Given names"],
+          생년월일: ocrResult["Date of birth"],
+          성별: ocrResult["Sex"],
+          국적: ocrResult["Nationality"],
+        });
 
         // 5) 업로드 진행률 마무리
         setUploadingFiles((prev) => ({ ...prev, [documentType]: 100 }));
@@ -237,8 +405,60 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           uploadedAt: new Date().toISOString(),
           isTemporary: true,
           ocrResult, // ← 여기에 Python 스크립트 결과를 붙여 둡니다
-        };
-        onUpdate({ documents: docs });
+        }; // 7) 여권 정보인 경우 personalInfo에도 자동 매핑
+        const updateData = { documents: docs };
+        if (documentType === "passport" && ocrResult && !ocrResult.error) {
+          const extractedPersonalInfo = mapPassportDataToPersonalInfo(ocrResult);
+
+          // 추출된 여권 정보를 상태에 저장
+          setExtractedPassportInfo({
+            raw: ocrResult,
+            mapped: extractedPersonalInfo,
+          });
+
+          // 유효한 정보가 추출된 경우에만 업데이트
+          if (Object.keys(extractedPersonalInfo).length > 0) {
+            // 기존 personalInfo 복사 및 새 데이터 병합 (빈 값이 아닌 경우에만)
+            const currentPersonalInfo = { ...(formData.personalInfo || {}) };
+
+            // 추출된 데이터 중 실제 값이 있는 것만 병합
+            Object.keys(extractedPersonalInfo).forEach((key) => {
+              const value = extractedPersonalInfo[key];
+              if (value && value.trim && value.trim() !== "") {
+                currentPersonalInfo[key] = value;
+              } else if (value && typeof value !== "string") {
+                currentPersonalInfo[key] = value;
+              }
+            });
+
+            updateData.personalInfo = currentPersonalInfo;
+
+            console.log("기존 개인정보:", formData.personalInfo);
+            console.log("추출된 개인정보:", extractedPersonalInfo);
+            console.log("병합된 개인정보:", currentPersonalInfo); // 추출된 정보 요약 생성
+            const extractedFields = [];
+            if (extractedPersonalInfo.firstName && extractedPersonalInfo.firstName.trim()) extractedFields.push("이름");
+            if (extractedPersonalInfo.lastName && extractedPersonalInfo.lastName.trim()) extractedFields.push("성");
+            if (extractedPersonalInfo.birthDate && extractedPersonalInfo.birthDate.trim()) extractedFields.push("생년월일");
+            if (extractedPersonalInfo.gender && extractedPersonalInfo.gender.trim()) extractedFields.push("성별");
+            if (extractedPersonalInfo.nationality && extractedPersonalInfo.nationality.trim()) extractedFields.push("국적");
+            if (extractedPersonalInfo.passportNumber && extractedPersonalInfo.passportNumber.trim()) extractedFields.push("여권번호");
+            if (extractedPersonalInfo.passportIssueDate && extractedPersonalInfo.passportIssueDate.trim()) extractedFields.push("여권발급일");
+            if (extractedPersonalInfo.passportExpiryDate && extractedPersonalInfo.passportExpiryDate.trim()) extractedFields.push("여권만료일");
+
+            // 사용자에게 자동 입력 알림
+            if (extractedFields.length > 0) {
+              alert(`여권에서 다음 정보가 자동으로 추출되어 입력되었습니다:\n\n${extractedFields.join(", ")}\n\n개인정보 입력 단계에서 내용을 확인하고 수정할 수 있습니다.`);
+            }
+          } else {
+            console.warn("여권에서 유효한 개인정보를 추출하지 못했습니다.");
+          }
+        } else if (documentType === "passport" && ocrResult && ocrResult.error) {
+          console.warn("여권 OCR 처리 중 오류:", ocrResult.error);
+          alert("여권 정보를 자동으로 읽는 중 문제가 발생했습니다. 개인정보는 수동으로 입력해주세요.");
+        }
+
+        onUpdate(updateData);
       } catch (err) {
         console.error("추출 오류:", err);
         alert("서버에 업로드하거나 OCR을 수행하는 중 오류가 발생했습니다.");
@@ -249,7 +469,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
         });
       }
     },
-    [formData.documents, onUpdate]
+    [formData.documents, formData.personalInfo, onUpdate]
   );
 
   const handleFileRemove = useCallback(
@@ -378,12 +598,30 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                         <div className="flex items-center justify-between p-3 bg-white border rounded-lg">
                           <div className="flex items-center gap-3">
                             <CheckCircle className="w-5 h-5 text-green-500" />
-                            <div>
+                            <div className="flex-1">
                               <p className="text-sm font-medium text-gray-800">{uploadedDocuments[doc.type].fileName}</p>
-                              <div className="flex items-center gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
                                 <p className="text-xs text-gray-500">{Math.round(uploadedDocuments[doc.type].fileSize / 1024)} KB</p>
                                 {uploadedDocuments[doc.type].isTemporary && <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded-full">임시저장됨</span>}
+                                {/* 여권 OCR 결과가 있는 경우 추가 정보 표시 */}
+                                {doc.type === "passport" && uploadedDocuments[doc.type].ocrResult && !uploadedDocuments[doc.type].ocrResult.error && (
+                                  <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">정보 자동추출됨</span>
+                                )}
+                                {doc.type === "passport" && uploadedDocuments[doc.type].ocrResult && uploadedDocuments[doc.type].ocrResult.error && (
+                                  <span className="px-2 py-1 text-xs text-orange-700 bg-orange-100 rounded-full">수동입력 필요</span>
+                                )}
                               </div>
+                              {/* OCR 추출 정보 미리보기 */}
+                              {doc.type === "passport" && uploadedDocuments[doc.type].ocrResult && !uploadedDocuments[doc.type].ocrResult.error && (
+                                <div className="mt-1 text-xs text-gray-600">
+                                  {uploadedDocuments[doc.type].ocrResult["Given names"] && uploadedDocuments[doc.type].ocrResult["Surname"] && (
+                                    <span>
+                                      이름: {uploadedDocuments[doc.type].ocrResult["Surname"]} {uploadedDocuments[doc.type].ocrResult["Given names"]} |{" "}
+                                    </span>
+                                  )}
+                                  {uploadedDocuments[doc.type].ocrResult["Passport No."] && <span>여권번호: {uploadedDocuments[doc.type].ocrResult["Passport No."]}</span>}
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
@@ -430,8 +668,183 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                 </CardContent>
               </Card>
             );
-          })}
+          })}{" "}
         </div>
+        {/* 여권 정보 편집 섹션 */}
+        {extractedPassportInfo && (
+          <Card className="border-2 border-blue-200 bg-blue-50/50">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center gap-2 text-lg text-blue-800">
+                <FileText className="w-5 h-5" />
+                추출된 여권 정보 확인 및 수정
+              </CardTitle>
+              <p className="text-sm text-blue-600">자동으로 추출된 정보를 확인하고 필요시 수정해주세요. 수정된 내용은 개인정보 입력 단계에 반영됩니다.</p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                {/* 성 */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">성 (Surname)</label>
+                  <input
+                    type="text"
+                    value={editingPassportInfo?.lastName || extractedPassportInfo.mapped?.lastName || ""}
+                    onChange={(e) =>
+                      setEditingPassportInfo((prev) => ({
+                        ...prev,
+                        lastName: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="성을 입력하세요"
+                  />
+                </div>
+
+                {/* 이름 */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">이름 (Given Names)</label>
+                  <input
+                    type="text"
+                    value={editingPassportInfo?.firstName || extractedPassportInfo.mapped?.firstName || ""}
+                    onChange={(e) =>
+                      setEditingPassportInfo((prev) => ({
+                        ...prev,
+                        firstName: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="이름을 입력하세요"
+                  />
+                </div>
+
+                {/* 생년월일 */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">생년월일</label>
+                  <input
+                    type="date"
+                    value={editingPassportInfo?.birthDate || extractedPassportInfo.mapped?.birthDate || ""}
+                    onChange={(e) =>
+                      setEditingPassportInfo((prev) => ({
+                        ...prev,
+                        birthDate: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* 성별 */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">성별</label>
+                  <select
+                    value={editingPassportInfo?.gender || extractedPassportInfo.mapped?.gender || ""}
+                    onChange={(e) =>
+                      setEditingPassportInfo((prev) => ({
+                        ...prev,
+                        gender: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                    <option value="">선택하세요</option>
+                    <option value="남성">남성</option>
+                    <option value="여성">여성</option>
+                  </select>
+                </div>
+
+                {/* 국적 */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">국적</label>
+                  <input
+                    type="text"
+                    value={editingPassportInfo?.nationality || extractedPassportInfo.mapped?.nationality || ""}
+                    onChange={(e) =>
+                      setEditingPassportInfo((prev) => ({
+                        ...prev,
+                        nationality: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="국적을 입력하세요"
+                  />
+                </div>
+
+                {/* 여권번호 */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">여권번호</label>
+                  <input
+                    type="text"
+                    value={editingPassportInfo?.passportNumber || extractedPassportInfo.mapped?.passportNumber || ""}
+                    onChange={(e) =>
+                      setEditingPassportInfo((prev) => ({
+                        ...prev,
+                        passportNumber: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="여권번호를 입력하세요"
+                  />
+                </div>
+
+                {/* 여권 발급일 */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">여권 발급일</label>
+                  <input
+                    type="date"
+                    value={editingPassportInfo?.passportIssueDate || extractedPassportInfo.mapped?.passportIssueDate || ""}
+                    onChange={(e) =>
+                      setEditingPassportInfo((prev) => ({
+                        ...prev,
+                        passportIssueDate: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+
+                {/* 여권 만료일 */}
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">여권 만료일</label>
+                  <input
+                    type="date"
+                    value={editingPassportInfo?.passportExpiryDate || extractedPassportInfo.mapped?.passportExpiryDate || ""}
+                    onChange={(e) =>
+                      setEditingPassportInfo((prev) => ({
+                        ...prev,
+                        passportExpiryDate: e.target.value,
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* 저장 버튼 */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-blue-200">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setEditingPassportInfo(null);
+                    setExtractedPassportInfo(null);
+                  }}
+                  className="px-4 py-2"
+                >
+                  취소
+                </Button>
+                <Button onClick={handleSavePassportInfo} className="px-6 py-2 text-white bg-blue-600 hover:bg-blue-700">
+                  정보 저장 및 적용
+                </Button>
+              </div>
+
+              {/* 원본 OCR 데이터 미리보기 (개발자용) */}
+              {process.env.NODE_ENV === "development" && (
+                <details className="mt-4">
+                  <summary className="text-xs text-gray-500 cursor-pointer">원본 OCR 데이터 보기 (개발용)</summary>
+                  <pre className="p-2 mt-2 overflow-auto text-xs bg-gray-100 rounded">{JSON.stringify(extractedPassportInfo.raw, null, 2)}</pre>
+                </details>
+              )}
+            </CardContent>
+          </Card>
+        )}
         {/* 네비게이션 버튼 */}
         <div className="flex justify-between pt-8 border-t border-gray-200">
           <Button onClick={onPrevious} variant="outline" className="px-8 py-4 text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-2xl">
