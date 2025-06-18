@@ -11,16 +11,8 @@ build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
 
 [[ports]]
-localPort = 3000
-externalPort = 3000
-
-[[ports]]
 localPort = 3002
 externalPort = 3002
-
-[[ports]]
-localPort = 5000
-externalPort = 5000
 
 [[ports]]
 localPort = 5002
@@ -74,7 +66,7 @@ args = "cd server && npm run dev "
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "sleep 1"
+args = "sleep 3"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
