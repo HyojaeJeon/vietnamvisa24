@@ -27,7 +27,7 @@ localPort = 5002
 externalPort = 80
 
 [workflows]
-runButton = "Start application"
+runButton = "Run Full Stack Safe"
 
 [[workflows.workflow]]
 name = "Project"

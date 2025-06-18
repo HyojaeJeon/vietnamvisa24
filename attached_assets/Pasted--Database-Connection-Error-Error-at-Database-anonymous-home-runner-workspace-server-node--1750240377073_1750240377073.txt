@@ -1,0 +1,51 @@
+❌ Database Connection Error: Error
+    at Database.<anonymous> (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:185:27)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:50
+    at new Promise (<anonymous>)
+    at Query.run (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:12)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at async SQLiteQueryInterface.changeColumn (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query-interface.js:43:7)
+    at async User.sync (/home/runner/workspace/server/node_modules/sequelize/lib/model.js:984:11)
+    at async Sequelize.sync (/home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:377:9)
+    at async connectDB (/home/runner/workspace/server/database.js:24:5)
+    at async startServer (/home/runner/workspace/server/index.js:47:3) {
+  name: 'SequelizeDatabaseError',
+  parent: [Error: SQLITE_ERROR: table users_backup has 11 columns but 16 values were supplied] {
+    errno: 1,
+    code: 'SQLITE_ERROR',
+    sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `token_version`, `created_at`, `updated_at`, `role`, `refresh_token`, `refresh_token_expires`, `tokenVersion`, `createdAt`, `updatedAt`, `refreshToken`, `refreshTokenExpires` FROM `users`;'
+  },
+  original: [Error: SQLITE_ERROR: table users_backup has 11 columns but 16 values were supplied] {
+    errno: 1,
+    code: 'SQLITE_ERROR',
+    sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `token_version`, `created_at`, `updated_at`, `role`, `refresh_token`, `refresh_token_expires`, `tokenVersion`, `createdAt`, `updatedAt`, `refreshToken`, `refreshTokenExpires` FROM `users`;'
+  },
+  sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `token_version`, `created_at`, `updated_at`, `role`, `refresh_token`, `refresh_token_expires`, `tokenVersion`, `createdAt`, `updatedAt`, `refreshToken`, `refreshTokenExpires` FROM `users`;',
+  parameters: {}
+}
+❌ Failed to start server: Error
+    at Database.<anonymous> (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:185:27)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:50
+    at new Promise (<anonymous>)
+    at Query.run (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:12)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at async SQLiteQueryInterface.changeColumn (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query-interface.js:43:7)
+    at async User.sync (/home/runner/workspace/server/node_modules/sequelize/lib/model.js:984:11)
+    at async Sequelize.sync (/home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:377:9)
+    at async connectDB (/home/runner/workspace/server/database.js:24:5)
+    at async startServer (/home/runner/workspace/server/index.js:47:3) {
+  name: 'SequelizeDatabaseError',
+  parent: [Error: SQLITE_ERROR: table users_backup has 11 columns but 16 values were supplied] {
+    errno: 1,
+    code: 'SQLITE_ERROR',
+    sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `token_version`, `created_at`, `updated_at`, `role`, `refresh_token`, `refresh_token_expires`, `tokenVersion`, `createdAt`, `updatedAt`, `refreshToken`, `refreshTokenExpires` FROM `users`;'
+  },
+  original: [Error: SQLITE_ERROR: table users_backup has 11 columns but 16 values were supplied] {
+    errno: 1,
+    code: 'SQLITE_ERROR',
+    sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `token_version`, `created_at`, `updated_at`, `role`, `refresh_token`, `refresh_token_expires`, `tokenVersion`, `createdAt`, `updatedAt`, `refreshToken`, `refreshTokenExpires` FROM `users`;'
+  },
+  sql: 'INSERT INTO `users_backup` SELECT `id`, `email`, `password`, `name`, `phone`, `token_version`, `created_at`, `updated_at`, `role`, `refresh_token`, `refresh_token_expires`, `tokenVersion`, `createdAt`, `updatedAt`, `refreshToken`, `refreshTokenExpires` FROM `users`;',
+  parameters: {}
+}
+[nodemon] app crashed - waiting for file changes before starting...

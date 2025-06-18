@@ -26,7 +26,7 @@ const db = {};
 // Import models
 db.User = require("./user")(sequelize);
 db.VisaApplication = require("./visaApplication")(sequelize);
-db.Document = require("./Document")(sequelize);
+db.Document = require("./document")(sequelize);
 db.Notification = require("./notification")(sequelize);
 db.Consultation = require("./consultation")(sequelize);
 db.ApplicationStatusHistory = require("./applicationStatusHistory")(sequelize);
