@@ -25,7 +25,7 @@ import {
   Timer,
 } from "lucide-react";
 import { validateStep } from "./utils";
-import { VISA_TYPES, PROCESSING_TYPES } from "./types";
+import { VISA_TYPES, PROCESSING_TYPES, VISA_DURATION_TYPES } from "./types";
 
 const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
   const handleVisaTypeChange = (value) => {
@@ -39,7 +39,11 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
     onUpdate({ processingType: value });
   };
 
-  const isValid = formData.visaType && 
+  const handleVisaDurationChange = (value) => {
+    onUpdate({ visaDurationType: value });
+  };
+
+  const isValid = formData.visaType && formData.visaDurationType &&
     (formData.visaType !== VISA_TYPES.E_VISA_URGENT || formData.processingType);
 
   const visaTypeOptions = [
@@ -240,8 +244,116 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
             </RadioGroup>
           </div>
 
+          {/* 비자 기간 타입 선택 (모든 E-VISA 타입에 적용) */}
+          {formData.visaType && (
+            <div className="space-y-6">
+              <div className="text-center">
+                <h4 className="mb-2 text-xl font-bold text-gray-800">
+                  입국 횟수 선택
+                </h4>
+                <p className="text-gray-600">
+                  단수 입국 또는 복수 입국을 선택해주세요
+                </p>
+              </div>
+
+              <RadioGroup
+                value={formData.visaDurationType || ""}
+                onValueChange={handleVisaDurationChange}
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+              >
+                <div className="relative">
+                  <RadioGroupItem
+                    value="single_90"
+                    id="single_90"
+                    className="sr-only peer"
+                  />
+                  <Label
+                    htmlFor="single_90"
+                    className={`
+                      relative block p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300
+                      ${
+                        formData.visaDurationType === "single_90"
+                          ? "border-green-500 bg-green-50 shadow-lg ring-2 ring-green-200"
+                          : "border-gray-200 bg-white hover:border-green-300 hover:shadow-md"
+                      }
+                    `}
+                  >
+                    <div className="flex flex-col items-center text-center space-y-3">
+                      <div
+                        className={`
+                        flex items-center justify-center w-12 h-12 rounded-xl transition-colors
+                        ${formData.visaDurationType === "single_90" ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white" : "bg-gray-100 text-gray-600"}
+                      `}
+                      >
+                        <Globe className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h5 className="mb-1 text-lg font-bold text-gray-800">
+                          단수 입국 (90일)
+                        </h5>
+                        <p className="mb-2 text-sm font-semibold text-green-600">
+                          1회 입국 가능
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          90일간 1회 입국 후 재입국 불가
+                        </p>
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+
+                <div className="relative">
+                  <RadioGroupItem
+                    value="multiple_90"
+                    id="multiple_90"
+                    className="sr-only peer"
+                  />
+                  <Label
+                    htmlFor="multiple_90"
+                    className={`
+                      relative block p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300
+                      ${
+                        formData.visaDurationType === "multiple_90"
+                          ? "border-blue-500 bg-blue-50 shadow-lg ring-2 ring-blue-200"
+                          : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-md"
+                      }
+                    `}
+                  >
+                    <div className="absolute -top-2 left-4">
+                      <span className="inline-flex items-center px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full">
+                        <Star className="w-3 h-3 mr-1" />
+                        인기
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-center text-center space-y-3">
+                      <div
+                        className={`
+                        flex items-center justify-center w-12 h-12 rounded-xl transition-colors
+                        ${formData.visaDurationType === "multiple_90" ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white" : "bg-gray-100 text-gray-600"}
+                      `}
+                      >
+                        <Globe className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h5 className="mb-1 text-lg font-bold text-gray-800">
+                          복수 입국 (90일)
+                        </h5>
+                        <p className="mb-2 text-sm font-semibold text-blue-600">
+                          여러 번 입국 가능
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          90일간 자유로운 출입국 가능
+                        </p>
+                      </div>
+                    </div>
+                  </Label>
+                </div>
+              </RadioGroup>
+            </div>
+          )}
+
           {/* 급행 비자 처리 옵션 */}
-          {formData.visaType === VISA_TYPES.E_VISA_URGENT && (
+          {formData.visaType === VISA_TYPES.E_VISA_URGENT && formData.visaDurationType && (
             <div className="space-y-6">
               <div className="text-center">
                 <h4 className="mb-2 text-xl font-bold text-gray-800">

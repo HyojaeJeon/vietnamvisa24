@@ -45,6 +45,11 @@ export const VISA_DURATION_TYPES = {
   MULTIPLE_90: "multiple_90",
 };
 
+export const VISA_DURATION_LABELS = {
+  single_90: "단수 입국 (90일)",
+  multiple_90: "복수 입국 (90일)",
+};
+
 export const VISIT_PURPOSES = [
   { value: "tourist", label: "관광/여행", description: "관광, 레저, 개인 여행 목적" },
   { value: "business", label: "상용/출장", description: "비즈니스 미팅, 컨퍼런스, 업무 목적" },
