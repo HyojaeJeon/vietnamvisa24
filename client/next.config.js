@@ -128,19 +128,19 @@ const nextConfig = {
       ];
     }
     if (process.env.NODE_ENV === "development") {
-      // 로컬 개발 환경: localhost:5002으로 프록시
+      // Replit 개발 환경: 0.0.0.0:5002로 프록시
       return [
         {
           source: "/graphql",
-          destination: "http://localhost:5002/graphql",
+          destination: "http://0.0.0.0:5002/graphql",
         },
         {
           source: "/api/documents/:path*",
-          destination: `http://localhost:5002/api/documents/:path*`,
+          destination: `http://0.0.0.0:5002/api/documents/:path*`,
         },
         {
           source: "/api/:path*",
-          destination: `http://localhost:5002/api/:path*`,
+          destination: `http://0.0.0.0:5002/api/:path*`,
         },
       ];
     }

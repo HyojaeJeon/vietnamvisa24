@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
+    "dev": "PORT=5002 nodemon index.js",
     "db:setup": "bash scripts/setup-db.sh",
     "db:setup:win": "scripts\\setup-db.bat",
     "db:start": "echo MySQL should be running as a service on Windows",
