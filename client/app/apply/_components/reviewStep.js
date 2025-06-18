@@ -29,6 +29,7 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
       dateOfExpiry: formData.personalInfo?.passportExpiryDate || "",
       type: formData.personalInfo?.passportType || "",
       authority: formData.personalInfo?.authority || "",
+      personalNo: formData.personalInfo?.personalNo || "",
     });
     setIsEditingPassport(true);
   };
@@ -50,6 +51,7 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
         passportExpiryDate: editedPassportInfo.dateOfExpiry,
         passportType: editedPassportInfo.type,
         authority: editedPassportInfo.authority,
+        personalNo: editedPassportInfo.personalNo,
       }
     });
     setIsEditingPassport(false);
@@ -311,6 +313,15 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">개인번호</label>
+                        <input
+                          type="text"
+                          value={editedPassportInfo.personalNo}
+                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, personalNo: e.target.value})}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                      </div>
                     </div>
                     <div className="flex gap-3 pt-4 border-t">
                       <Button onClick={savePassportInfo} className="bg-emerald-600 hover:bg-emerald-700 text-white">
@@ -370,6 +381,10 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                     <div className="bg-white p-4 rounded-lg shadow-sm">
                       <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">발급 기관</p>
                       <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.authority || "-"}</p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">개인번호</p>
+                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.personalNo || "-"}</p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
                       <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">이메일</p>
