@@ -7,6 +7,9 @@ const config = require("../config/config.js")[
 let sequelize;
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
+} else if (config.dialect === "sqlite") {
+  // SQLite의 경우 database, username, password 파라미터가 필요하지 않음
+  sequelize = new Sequelize(config);
 } else {
   sequelize = new Sequelize(
     config.database,
@@ -15,6 +18,8 @@ if (config.use_env_variable) {
     config,
   );
 }
+
+console.log("🔧 Models - Sequelize initialized with:", config.dialect);
 
 const db = {};
 
