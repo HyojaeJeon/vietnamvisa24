@@ -28,17 +28,28 @@ const connectDB = async () => {
 
     let syncOptions;
     if (isReplit && isSQLite) {
-      // Replit SQLite 환경: 깨끗하게 시작
-      syncOptions = { force: true };
-      console.log("🔄 SQLite in Replit: Using force sync (recreating tables)");
+      // Replit SQLite 환경: 안전한 동기화로 변경
+      syncOptions = { alter: true };
+      console.log("🔄 SQLite in Replit: Using alter sync (preserving data)");
     } else if (isSQLite) {
       // 로컬 SQLite 환경: 기존 데이터 보존
-      syncOptions = { force: false };
-      console.log("🔄 SQLite locally: Using safe sync (preserving data)");
+      syncOptions = { alter: true };
+      console.log("🔄 SQLite locally: Using alter sync (preserving data)");
     } else {
       // MySQL 환경: 더 안전한 동기화 (alter 대신 safe sync)
       syncOptions = { force: false };
       console.log("🔄 MySQL: Using safe sync (preserving existing structure)");
+    }
+
+    // SQLite 최적화 설정
+    if (dbDialect === "sqlite") {
+      console.log("🔧 Applying SQLite optimizations...");
+      await models.sequelize.query("PRAGMA foreign_keys = ON;");
+      await models.sequelize.query("PRAGMA journal_mode = WAL;");
+      await models.sequelize.query("PRAGMA synchronous = NORMAL;");
+      await models.sequelize.query("PRAGMA cache_size = 1000;");
+      await models.sequelize.query("PRAGMA temp_store = memory;");
+      console.log("✅ SQLite PRAGMA settings applied");
     }
 
     // 데이터베이스 동기화 (테이블 생성/업데이트)

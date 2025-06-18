@@ -53,11 +53,19 @@ const sqliteConfig = {
   storage: process.env.DB_STORAGE || "./vietnam_visa.db",
   define: {
     timestamps: true,
-    underscored: true,
-    createdAt: "created_at",
-    updatedAt: "updated_at",
+    underscored: false, // SQLite에서는 camelCase 사용
+    createdAt: "createdAt",
+    updatedAt: "updatedAt",
   },
-  ...commonConfig,
+  dialectOptions: {
+    // SQLite에서 foreign key 제약조건 활성화
+    foreignKeys: true,
+    // SQLite 최적화 옵션
+    busyTimeout: 30000,
+  },
+  // SQLite는 pool 설정이 필요하지 않음
+  pool: undefined,
+  logging: process.env.NODE_ENV === "development" ? console.log : false,
 };
 
 // MySQL 설정 (로컬 환경)

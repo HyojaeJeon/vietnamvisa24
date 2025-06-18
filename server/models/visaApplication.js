@@ -8,6 +8,149 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        allowNull: false,
+      },
+      applicationId: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true,
+      },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        references: {
+          model: "Users",
+          key: "id",
+        },
+      },
+      status: {
+        type: DataTypes.ENUM(
+          "pending",
+          "processing",
+          "document_review",
+          "submitted_to_authority",
+          "approved",
+          "rejected",
+          "completed"
+        ),
+        allowNull: false,
+        defaultValue: "pending",
+      },
+      processingType: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      visaType: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      totalPrice: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0,
+      },
+      // Personal Info
+      firstName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      lastName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      fullName: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        validate: {
+          isEmail: true,
+        },
+      },
+      phone: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      address: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      phoneOfFriend: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      // Travel Info
+      entryDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
+      arrivalDate: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
+      entryPort: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      notes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+    },
+    {
+      tableName: "visa_applications",
+      timestamps: true,
+      underscored: false,
+      createdAt: "createdAt",
+      updatedAt: "updatedAt",
+    }
+  );
+
+  VisaApplication.associate = (models) => {
+    // User와의 관계
+    VisaApplication.belongsTo(models.User, {
+      foreignKey: "userId",
+      as: "user",
+    });
+
+    // Documents와의 관계
+    VisaApplication.hasMany(models.Document, {
+      foreignKey: "applicationId",
+      as: "documents",
+    });
+
+    // AdditionalServices와의 관계 (Many-to-Many)
+    VisaApplication.belongsToMany(models.AdditionalService, {
+      through: models.ApplicationAdditionalService,
+      foreignKey: "applicationId",
+      otherKey: "serviceId",
+      as: "additionalServices",
+    });
+  };
+
+  return VisaApplication;
+};
+
+module.exports = (sequelize) => {
+  const VisaApplication = sequelize.define(
+    "VisaApplication",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
       },
       userId: {
         type: DataTypes.INTEGER,

@@ -8,6 +8,84 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
+        allowNull: false,
+      },
+      applicationId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "visa_applications",
+          key: "id",
+        },
+      },
+      type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      fileName: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      fileSize: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
+      fileType: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      fileData: {
+        type: DataTypes.TEXT("long"),
+        allowNull: true,
+      },
+      extractedInfo: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      uploadedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+      },
+    },
+    {
+      tableName: "documents",
+      timestamps: true,
+      underscored: false,
+      createdAt: "createdAt",
+      updatedAt: "updatedAt",
+    }
+  );
+
+  Document.associate = (models) => {
+    Document.belongsTo(models.VisaApplication, {
+      foreignKey: "applicationId",
+      as: "application",
+    });
+  };
+
+  return Document;
+};
+
+module.exports = (sequelize) => {
+  const Document = sequelize.define(
+    "Document",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
       },
       applicationId: {
         type: DataTypes.INTEGER,
