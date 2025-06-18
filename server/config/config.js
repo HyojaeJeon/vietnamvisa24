@@ -14,7 +14,8 @@ const isReplit = !!(
 const useSQLite = isReplit || process.env.DB_FORCE_SQLITE === "true";
 // 명시적으로 MySQL 사용하고 싶다면 DB_FORCE_MYSQL=true 설정
 const useMySQL =
-  process.env.DB_FORCE_MYSQL === "true" || (!useSQLite && !isReplit);
+  process.env.DB_FORCE_MYSQL === "true" &&
+  process.env.DB_FORCE_SQLITE !== "true";
 
 console.log("🔧 Config - Environment:", isReplit ? "Replit" : "Local");
 console.log("🔧 Config - Database:", useSQLite ? "SQLite" : "MySQL");

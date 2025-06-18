@@ -1,5 +1,6 @@
+const { DataTypes } = require("sequelize");
 // models/visaRunPrice.js - 목바이 비자런 가격 모델 정의
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize) => {
   const VisaRunPrice = sequelize.define(
     "VisaRunPrice",
     {

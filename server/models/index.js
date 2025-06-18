@@ -24,41 +24,25 @@ console.log("🔧 Models - Sequelize initialized with:", config.dialect);
 const db = {};
 
 // Import models
-db.User = require("./user")(sequelize, Sequelize.DataTypes);
-db.VisaApplication = require("./visaApplication")(
-  sequelize,
-  Sequelize.DataTypes,
-);
-db.Document = require("./document")(sequelize, Sequelize.DataTypes);
-db.Notification = require("./notification")(sequelize, Sequelize.DataTypes);
-db.Consultation = require("./consultation")(sequelize, Sequelize.DataTypes);
-db.ApplicationStatusHistory = require("./applicationStatusHistory")(
-  sequelize,
-  Sequelize.DataTypes,
-);
-db.Payment = require("./payment")(sequelize, Sequelize.DataTypes);
-db.WorkflowTemplate = require("./workflowTemplate")(
-  sequelize,
-  Sequelize.DataTypes,
-);
-db.ApplicationWorkflow = require("./applicationWorkflow")(
-  sequelize,
-  Sequelize.DataTypes,
-);
+db.User = require("./user")(sequelize);
+db.VisaApplication = require("./visaApplication")(sequelize);
+db.Document = require("./Document")(sequelize);
+db.Notification = require("./notification")(sequelize);
+db.Consultation = require("./consultation")(sequelize);
+db.ApplicationStatusHistory = require("./applicationStatusHistory")(sequelize);
+db.Payment = require("./payment")(sequelize);
+db.WorkflowTemplate = require("./workflowTemplate")(sequelize);
+db.ApplicationWorkflow = require("./applicationWorkflow")(sequelize);
 
 // 가격표 모델들 추가
-db.EVisaPrice = require("./eVisaPrice")(sequelize, Sequelize.DataTypes);
-db.VisaRunPrice = require("./visaRunPrice")(sequelize, Sequelize.DataTypes);
-db.FastTrackPrice = require("./fastTrackPrice")(sequelize, Sequelize.DataTypes);
+db.EVisaPrice = require("./eVisaPrice")(sequelize);
+db.VisaRunPrice = require("./visaRunPrice")(sequelize);
+db.FastTrackPrice = require("./fastTrackPrice")(sequelize);
 
 // 새로운 모델들 추가
-db.AdditionalService = require("./AdditionalService")(
-  sequelize,
-  Sequelize.DataTypes,
-);
+db.AdditionalService = require("./AdditionalService")(sequelize);
 db.ApplicationAdditionalService = require("./ApplicationAdditionalService")(
   sequelize,
-  Sequelize.DataTypes,
 );
 
 // Define associations

@@ -34,14 +34,6 @@ module.exports = (sequelize) => {
         defaultValue: 0,
         allowNull: false,
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-      },
       role: {
         type: DataTypes.ENUM("SUPER_ADMIN", "MANAGER", "STAFF", "USER"),
         defaultValue: "USER",
@@ -56,7 +48,13 @@ module.exports = (sequelize) => {
         allowNull: true,
       },
     },
-    { tableName: "users", timestamps: false, underscored: false },
+    {
+      tableName: "users",
+      timestamps: true,
+      underscored: false,
+      createdAt: "createdAt",
+      updatedAt: "updatedAt",
+    },
   );
   User.associate = (models) => {
     User.hasMany(models.VisaApplication, {

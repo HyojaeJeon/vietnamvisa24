@@ -1,4 +1,6 @@
-module.exports = (sequelize, DataTypes) => {
+const { DataTypes } = require("sequelize");
+
+module.exports = (sequelize) => {
   const VisaApplication = sequelize.define(
     "VisaApplication",
     {
@@ -116,24 +118,19 @@ module.exports = (sequelize, DataTypes) => {
       phoneOfFriend: {
         type: DataTypes.STRING(20),
         allowNull: true,
-      }, // Travel info additional fields
+      },
+      // Travel info additional fields
       entryPort: {
         type: DataTypes.STRING(100),
         allowNull: true,
       },
-      createdAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-      },
-      updatedAt: {
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-      },
     },
     {
       tableName: "visa_applications",
-      timestamps: false,
+      timestamps: true,
       underscored: false,
+      createdAt: "createdAt",
+      updatedAt: "updatedAt",
     },
   );
   VisaApplication.associate = function (models) {

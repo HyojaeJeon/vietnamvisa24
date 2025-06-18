@@ -25,6 +25,11 @@ const isOnlineIDE = !!(
   process.cwd().includes("/sandbox")
 );
 
+// Environment variables debugging
+console.log("🔧 Environment Variables:");
+console.log("  - DB_FORCE_SQLITE:", process.env.DB_FORCE_SQLITE);
+console.log("  - DB_FORCE_MYSQL:", process.env.DB_FORCE_MYSQL);
+
 // SQLite 사용 조건: 온라인 환경이거나 명시적으로 SQLite 강제 설정
 const useSQLite =
   (isReplit || isOnlineIDE || process.env.DB_FORCE_SQLITE === "true") &&
@@ -86,14 +91,18 @@ const sqliteConfig = {
   dialectOptions: {
     // SQLite에서 foreign key 제약조건 활성화
     foreignKeys: true,
+    // SQLite 최적화 옵션
+    busyTimeout: 30000,
   },
   // SQLite는 pool 설정이 필요하지 않음
   pool: undefined,
-  ...commonConfig,
+  // 로깅 설정
+  logging: process.env.NODE_ENV === "development" ? console.log : false,
   // SQLite에서는 retry 로직을 단순화
   retry: {
     max: 1,
-  },
+  }, // SQLite 연결 후 PRAGMA 설정
+  dialectModule: require("sqlite3"),
 };
 
 // MySQL 설정 (로컬 환경)

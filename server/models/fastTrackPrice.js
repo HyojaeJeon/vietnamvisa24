@@ -1,5 +1,6 @@
+const { DataTypes } = require("sequelize");
 // models/fastTrackPrice.js - 패스트트랙 가격 모델 정의
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize) => {
   const FastTrackPrice = sequelize.define(
     "FastTrackPrice",
     {

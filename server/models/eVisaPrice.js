@@ -1,5 +1,6 @@
+const { DataTypes } = require("sequelize");
 // models/eVisaPrice.js - E-VISA 가격 모델 정의
-module.exports = (sequelize, DataTypes) => {
+module.exports = (sequelize) => {
   const EVisaPrice = sequelize.define(
     "EVisaPrice",
     {
