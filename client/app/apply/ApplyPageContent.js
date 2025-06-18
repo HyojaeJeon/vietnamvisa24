@@ -87,7 +87,8 @@ export default function ApplyPageContent() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [applicationId, setApplicationId] = useState("");
 
-  console.log("Form data : ", formData)
+  console.log("Form data : ", formData);
+
   // 개발 모드에서만 토큰 테스트 기능 추가
   const [showTokenTest, setShowTokenTest] = useState(false);
 
@@ -487,3 +488,4 @@ export default function ApplyPageContent() {
     </div>
   );
 }
+```Fixed syntax error in ApplyPageContent.js by correcting console.log and ensuring proper formatting.

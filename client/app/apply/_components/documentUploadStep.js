@@ -1648,7 +1648,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* 블러 백그라운드 */}
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-          
+
           {/* 모달 컨텐츠 */}
           <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
             <div className="text-center">
@@ -1661,7 +1661,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   </div>
                 </div>
               </div>
-              
+
               {/* 로딩 메시지 */}
               <h3 className="text-xl font-bold text-gray-800 mb-2">
                 처리 중입니다
@@ -1669,7 +1669,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
               <p className="text-gray-600 mb-6">
                 {loadingMessage}
               </p>
-              
+
               {/* 프로그레스 바 (여권의 경우) */}
               {ocrProcessing && (
                 <div className="space-y-2">
@@ -1681,7 +1681,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <p className="text-sm text-gray-500 mt-2">{ocrStatus}</p>
                 </div>
               )}
-              
+
               {/* 안내 메시지 */}
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                 <div className="flex items-center justify-center gap-2 text-sm text-blue-700">
