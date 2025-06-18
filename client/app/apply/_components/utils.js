@@ -84,10 +84,10 @@ export const validateStep = (step, formData) => {
   console.log("formData : ", formData);
   switch (step) {
     case 1:
-      if (formData.visaType == "e-visa_urgent") {
-        return formData.processingType && formData.processingType !== "e-visa_general";
-      }
-      return formData.visaType;
+      // Step 1에서는 serviceType, visaDurationType(E-visa인 경우), processingType이 필요
+      if (!formData.serviceType) return false;
+      if (formData.serviceType === "e_visa" && !formData.visaDurationType) return false;
+      return formData.processingType;
     case 2:
       return (
         formData?.personalInfo?.email &&

@@ -149,7 +149,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
                 onValueChange={(value) =>
                   handleServiceChange("serviceType", value)
                 }
-                className="grid grid-cols-1 gap-4 md:grid-cols-3"
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
               >
                 {serviceTypes.map((service) => {
                   const IconComponent = service.icon;
@@ -242,7 +242,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
                 onValueChange={(value) =>
                   handleServiceChange("visaDurationType", value)
                 }
-                className="grid grid-cols-1 gap-4 md:grid-cols-2"
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
               >
                 {visaDurationTypes.map((duration) => {
                   const isSelected = formData.visaDurationType === duration.id;
@@ -306,7 +306,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
                 onValueChange={(value) =>
                   handleServiceChange("processingType", value)
                 }
-                className="grid grid-cols-1 gap-4 md:grid-cols-3"
+                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
               >
                 {processingTypes.map((processing) => {
                   const IconComponent = processing.icon;

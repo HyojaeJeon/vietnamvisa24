@@ -130,11 +130,13 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             <h3 className="text-2xl font-bold text-gray-800">입국 정보</h3>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-1 lg:grid-cols-2">
             {/* 입국 예정일 */}
             <div className="space-y-3">
-              <label htmlFor="entryDate" className="block text-sm font-bold tracking-wide text-gray-800 uppercase">
-                입국 예정일 *
+              <label htmlFor="entryDate" className="flex items-center gap-2 text-sm font-bold tracking-wide text-gray-800 uppercase">
+                <Calendar className="w-4 h-4 text-indigo-500" />
+                입국 예정일 
+                <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Calendar className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
@@ -167,8 +169,10 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
 
             {/* 입국 공항 */}
             <div className="space-y-3">
-              <label htmlFor="entryPort" className="block text-sm font-bold tracking-wide text-gray-800 uppercase">
-                입국 공항 *
+              <label htmlFor="entryPort" className="flex items-center gap-2 text-sm font-bold tracking-wide text-gray-800 uppercase">
+                <MapPin className="w-4 h-4 text-pink-500" />
+                입국 공항 
+                <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <MapPin className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2 z-10" />

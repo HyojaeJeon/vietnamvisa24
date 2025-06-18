@@ -127,11 +127,13 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             <h3 className="text-2xl font-bold text-gray-800">연락처 정보</h3>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-1 lg:grid-cols-2">
             {/* 이메일 */}
             <div className="space-y-3">
-              <label htmlFor="email" className="block text-sm font-bold tracking-wide text-gray-800 uppercase">
-                이메일 주소 *
+              <label htmlFor="email" className="flex items-center gap-2 text-sm font-bold tracking-wide text-gray-800 uppercase">
+                <Mail className="w-4 h-4 text-blue-500" />
+                이메일 주소 
+                <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Mail className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
@@ -164,8 +166,10 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
 
             {/* 휴대폰 번호 */}
             <div className="space-y-3">
-              <label htmlFor="phone" className="block text-sm font-bold tracking-wide text-gray-800 uppercase">
-                휴대폰 번호 *
+              <label htmlFor="phone" className="flex items-center gap-2 text-sm font-bold tracking-wide text-gray-800 uppercase">
+                <Phone className="w-4 h-4 text-green-500" />
+                휴대폰 번호 
+                <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Phone className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
@@ -210,8 +214,10 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           <div className="grid grid-cols-1 gap-6">
             {/* 현재 거주 주소 */}
             <div className="space-y-3">
-              <label htmlFor="address" className="block text-sm font-bold tracking-wide text-gray-800 uppercase">
-                한국 주소 (영문) *
+              <label htmlFor="address" className="flex items-center gap-2 text-sm font-bold tracking-wide text-gray-800 uppercase">
+                <MapPin className="w-4 h-4 text-purple-500" />
+                한국 주소 (영문) 
+                <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <MapPin className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
@@ -243,8 +249,10 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
 
             {/* 현지 지인이나 가족 전화번호 */}
             <div className="space-y-3">
-              <label htmlFor="phoneOfFriend" className="block text-sm font-bold tracking-wide text-gray-800 uppercase">
-                베트남 현지 연락처 *
+              <label htmlFor="phoneOfFriend" className="flex items-center gap-2 text-sm font-bold tracking-wide text-gray-800 uppercase">
+                <Phone className="w-4 h-4 text-orange-500" />
+                베트남 현지 연락처 
+                <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <Phone className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
