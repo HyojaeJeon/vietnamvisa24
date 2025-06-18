@@ -16,98 +16,119 @@ import {
 import { Label } from "../../src/components/ui/label";
 import {
   Globe,
-  Plane,
-  Car,
   Clock,
   ArrowRight,
   CheckCircle,
   Star,
   Zap,
   Shield,
-  Users,
+  Timer,
 } from "lucide-react";
 import { validateStep } from "./utils";
+import { VISA_TYPES, PROCESSING_TYPES } from "./types";
 
 const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
-  const handleServiceChange = (field, value) => {
-    onUpdate({ [field]: value });
+  const handleVisaTypeChange = (value) => {
+    onUpdate({ 
+      visaType: value,
+      processingType: "" // 비자 타입 변경 시 처리 유형 초기화
+    });
   };
 
-  const isValid = validateStep(1, formData);
+  const handleProcessingTypeChange = (value) => {
+    onUpdate({ processingType: value });
+  };
 
-  const serviceTypes = [
+  const isValid = formData.visaType && 
+    (formData.visaType !== VISA_TYPES.E_VISA_URGENT || formData.processingType);
+
+  const visaTypeOptions = [
     {
-      id: "e_visa",
+      id: VISA_TYPES.E_VISA_GENERAL,
       icon: Globe,
-      title: "E-Visa",
-      subtitle: "온라인 비자 신청",
-      description: "간편하고 빠른 온라인 신청",
-      features: ["온라인 완료", "24시간 접수", "빠른 처리"],
+      title: "E-VISA(전자비자)",
+      subtitle: "일반(3~4일 소요)",
+      description: "표준 처리 속도로 안정적인 발급",
+      features: ["온라인 신청", "3-4일 처리", "안정적 발급"],
       recommended: true,
+      gradient: "from-blue-500 to-indigo-600"
     },
     {
-      id: "arrival_visa",
-      icon: Plane,
-      title: "도착 비자",
-      subtitle: "공항에서 발급",
-      description: "공항 도착 후 현장 발급",
-      features: ["현장 발급", "즉시 처리", "공항 서비스"],
-      recommended: false,
-    },
-    {
-      id: "visa_run",
-      icon: Car,
-      title: "비자런",
-      subtitle: "국경 통과 서비스",
-      description: "국경을 통한 비자 연장",
-      features: ["국경 통과", "연장 서비스", "전문 가이드"],
-      recommended: false,
-    },
-  ];
-
-  const visaDurationTypes = [
-    {
-      id: "single_90",
-      title: "90일 단수",
-      subtitle: "1회 입국 가능",
-      description: "90일간 1회 입국",
-      popular: true,
-      price: "25,000원~",
-    },
-    {
-      id: "multiple_90",
-      title: "90일 복수",
-      subtitle: "여러 번 입국 가능",
-      description: "90일간 무제한 입출국",
-      popular: false,
-      price: "35,000원~",
-    },
-  ];
-
-  const processingTypes = [
-    {
-      id: "standard",
-      icon: Clock,
-      title: "일반",
-      subtitle: "3-5일",
-      description: "일반적인 처리 속도",
-      multiplier: "1x",
-    },
-    {
-      id: "express",
+      id: VISA_TYPES.E_VISA_URGENT,
       icon: Zap,
-      title: "급행",
-      subtitle: "1-2일",
-      description: "빠른 처리",
-      multiplier: "1.5x",
+      title: "E-VISA(전자비자)",
+      subtitle: "급행",
+      description: "빠른 처리가 필요한 경우",
+      features: ["온라인 신청", "빠른 처리", "다양한 옵션"],
+      recommended: false,
+      gradient: "from-orange-500 to-red-600"
     },
     {
-      id: "urgent",
-      icon: Shield,
-      title: "초급행",
-      subtitle: "당일",
+      id: VISA_TYPES.E_VISA_TRANSIT,
+      icon: Timer,
+      title: "목바이 경유 E-VISA(전자비자)",
+      subtitle: "당일 발급",
+      description: "목바이 경유를 통한 당일 발급",
+      features: ["목바이 경유", "당일 발급", "최고 속도"],
+      recommended: false,
+      gradient: "from-purple-500 to-pink-600"
+    },
+  ];
+
+  const urgentProcessingOptions = [
+    {
+      id: PROCESSING_TYPES.EXPRESS_1HOUR,
+      title: "1시간",
+      subtitle: "긴급 처리",
       description: "최우선 처리",
+      icon: Shield,
+      multiplier: "5x",
+      gradient: "from-red-500 to-red-600"
+    },
+    {
+      id: PROCESSING_TYPES.EXPRESS_2HOUR,
+      title: "2시간", 
+      subtitle: "긴급 처리",
+      description: "우선 처리",
+      icon: Zap,
+      multiplier: "4x",
+      gradient: "from-orange-500 to-red-500"
+    },
+    {
+      id: PROCESSING_TYPES.EXPRESS_4HOUR,
+      title: "4시간",
+      subtitle: "긴급 처리", 
+      description: "빠른 처리",
+      icon: Timer,
+      multiplier: "3x",
+      gradient: "from-yellow-500 to-orange-500"
+    },
+    {
+      id: PROCESSING_TYPES.EXPRESS_1DAY,
+      title: "1일",
+      subtitle: "급행",
+      description: "당일 처리",
+      icon: Clock,
+      multiplier: "2.5x",
+      gradient: "from-green-500 to-yellow-500"
+    },
+    {
+      id: PROCESSING_TYPES.EXPRESS_2DAY,
+      title: "2일",
+      subtitle: "급행",
+      description: "2일 처리", 
+      icon: Clock,
       multiplier: "2x",
+      gradient: "from-blue-500 to-green-500"
+    },
+    {
+      id: PROCESSING_TYPES.STANDARD,
+      title: "3~4일",
+      subtitle: "일반 처리",
+      description: "표준 처리",
+      icon: Clock,
+      multiplier: "1x",
+      gradient: "from-gray-500 to-blue-500"
     },
   ];
 
@@ -131,184 +152,112 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
         </CardHeader>
 
         <CardContent className="p-8 space-y-10">
-          {/* 서비스 종류 선택 */}
+          {/* 비자 종류 선택 */}
           <div className="space-y-6">
             <div className="text-center">
               <h3 className="mb-2 text-2xl font-bold text-gray-800">
-                서비스 선택
+                비자 종류 선택
               </h3>
               <p className="text-lg text-gray-600">
-                원하시는 서비스와 기본정보를 선택해주세요
+                원하시는 비자 종류를 선택해주세요
               </p>
             </div>
 
-            <div className="space-y-4">
-              <h4 className="text-lg font-bold text-gray-700">서비스 종류</h4>
-              <RadioGroup
-                value={formData.serviceType || ""}
-                onValueChange={(value) =>
-                  handleServiceChange("serviceType", value)
-                }
-                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-              >
-                {serviceTypes.map((service) => {
-                  const IconComponent = service.icon;
-                  const isSelected = formData.serviceType === service.id;
+            <RadioGroup
+              value={formData.visaType || ""}
+              onValueChange={handleVisaTypeChange}
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+            >
+              {visaTypeOptions.map((visa) => {
+                const IconComponent = visa.icon;
+                const isSelected = formData.visaType === visa.id;
 
-                  return (
-                    <div key={service.id} className="relative">
-                      <RadioGroupItem
-                        value={service.id}
-                        id={service.id}
-                        className="sr-only peer"
-                      />
-                      <Label
-                        htmlFor={service.id}
-                        className={`
-                          relative block p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 
-                          ${
-                            isSelected
-                              ? "border-blue-500 bg-blue-50 shadow-lg ring-2 ring-blue-200"
-                              : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-md"
-                          }
+                return (
+                  <div key={visa.id} className="relative">
+                    <RadioGroupItem
+                      value={visa.id}
+                      id={visa.id}
+                      className="sr-only peer"
+                    />
+                    <Label
+                      htmlFor={visa.id}
+                      className={`
+                        relative block p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300 
+                        ${
+                          isSelected
+                            ? "border-blue-500 bg-blue-50 shadow-lg ring-2 ring-blue-200"
+                            : "border-gray-200 bg-white hover:border-blue-300 hover:shadow-md"
+                        }
+                      `}
+                    >
+                      {visa.recommended && (
+                        <div className="absolute -top-2 left-4">
+                          <span className="inline-flex items-center px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-full">
+                            <Star className="w-3 h-3 mr-1" />
+                            추천
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="flex flex-col items-center text-center space-y-3">
+                        <div
+                          className={`
+                          flex items-center justify-center w-16 h-16 rounded-2xl transition-colors
+                          ${isSelected ? `bg-gradient-to-r ${visa.gradient} text-white` : "bg-gray-100 text-gray-600"}
                         `}
-                      >
-                        {service.recommended && (
-                          <div className="absolute -top-2 left-4">
-                            <span className="inline-flex items-center px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-full">
-                              <Star className="w-3 h-3 mr-1" />
-                              추천
-                            </span>
-                          </div>
-                        )}
+                        >
+                          <IconComponent className="w-8 h-8" />
+                        </div>
 
-                        <div className="flex flex-col items-center text-center space-y-3">
-                          <div
-                            className={`
-                            flex items-center justify-center w-16 h-16 rounded-2xl transition-colors
-                            ${isSelected ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-600"}
-                          `}
-                          >
-                            <IconComponent className="w-8 h-8" />
-                          </div>
+                        <div>
+                          <h5 className="text-lg font-bold text-gray-800 mb-1">
+                            {visa.title}
+                          </h5>
+                          <p className="mb-2 text-sm font-semibold text-blue-600">
+                            {visa.subtitle}
+                          </p>
+                          <p className="mb-3 text-sm text-gray-600">
+                            {visa.description}
+                          </p>
 
-                          <div>
-                            <div className="flex items-center justify-center gap-2 mb-1">
-                              <span className="text-xl font-bold text-gray-800">
-                                {service.icon === Globe
-                                  ? "🌐"
-                                  : service.icon === Plane
-                                    ? "✈️"
-                                    : "🚗"}
-                              </span>
-                              <h5 className="text-lg font-bold text-gray-800">
-                                {service.title}
-                              </h5>
-                            </div>
-                            <p className="mb-2 text-sm font-semibold text-blue-600">
-                              {service.subtitle}
-                            </p>
-                            <p className="mb-3 text-sm text-gray-600">
-                              {service.description}
-                            </p>
-
-                            <div className="space-y-1">
-                              {service.features.map((feature, index) => (
-                                <div
-                                  key={index}
-                                  className="flex items-center justify-center gap-1 text-xs text-gray-500"
-                                >
-                                  <CheckCircle className="w-3 h-3 text-green-500" />
-                                  <span>{feature}</span>
-                                </div>
-                              ))}
-                            </div>
+                          <div className="space-y-1">
+                            {visa.features.map((feature, index) => (
+                              <div
+                                key={index}
+                                className="flex items-center justify-center gap-1 text-xs text-gray-500"
+                              >
+                                <CheckCircle className="w-3 h-3 text-green-500" />
+                                <span>{feature}</span>
+                              </div>
+                            ))}
                           </div>
                         </div>
-                      </Label>
-                    </div>
-                  );
-                })}
-              </RadioGroup>
-            </div>
+                      </div>
+                    </Label>
+                  </div>
+                );
+              })}
+            </RadioGroup>
           </div>
 
-          {/* 비자 유형 선택 */}
-          {formData.serviceType === "e_visa" && (
+          {/* 급행 비자 처리 옵션 */}
+          {formData.visaType === VISA_TYPES.E_VISA_URGENT && (
             <div className="space-y-6">
-              <h4 className="text-lg font-bold text-gray-700">비자 유형</h4>
-              <RadioGroup
-                value={formData.visaDurationType || ""}
-                onValueChange={(value) =>
-                  handleServiceChange("visaDurationType", value)
-                }
-                className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
-              >
-                {visaDurationTypes.map((duration) => {
-                  const isSelected = formData.visaDurationType === duration.id;
+              <div className="text-center">
+                <h4 className="mb-2 text-xl font-bold text-gray-800">
+                  처리 속도 선택
+                </h4>
+                <p className="text-gray-600">
+                  원하시는 처리 속도를 선택해주세요
+                </p>
+              </div>
 
-                  return (
-                    <div key={duration.id} className="relative">
-                      <RadioGroupItem
-                        value={duration.id}
-                        id={duration.id}
-                        className="sr-only peer"
-                      />
-                      <Label
-                        htmlFor={duration.id}
-                        className={`
-                          relative block p-6 rounded-2xl border-2 cursor-pointer transition-all duration-300
-                          ${
-                            isSelected
-                              ? "border-emerald-500 bg-emerald-50 shadow-lg ring-2 ring-emerald-200"
-                              : "border-gray-200 bg-white hover:border-emerald-300 hover:shadow-md"
-                          }
-                        `}
-                      >
-                        {duration.popular && (
-                          <div className="absolute -top-2 left-4">
-                            <span className="inline-flex items-center px-3 py-1 text-xs font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full">
-                              인기
-                            </span>
-                          </div>
-                        )}
-
-                        <div className="text-center space-y-3">
-                          <div>
-                            <h5 className="mb-1 text-xl font-bold text-gray-800">
-                              {duration.title}
-                            </h5>
-                            <p className="mb-2 text-sm font-semibold text-emerald-600">
-                              {duration.subtitle}
-                            </p>
-                            <p className="mb-3 text-sm text-gray-600">
-                              {duration.description}
-                            </p>
-                            <p className="text-lg font-bold text-blue-600">
-                              {duration.price}
-                            </p>
-                          </div>
-                        </div>
-                      </Label>
-                    </div>
-                  );
-                })}
-              </RadioGroup>
-            </div>
-          )}
-
-          {/* 처리 속도 선택 */}
-          {formData.serviceType && (
-            <div className="space-y-6">
-              <h4 className="text-lg font-bold text-gray-700">처리 속도</h4>
               <RadioGroup
                 value={formData.processingType || ""}
-                onValueChange={(value) =>
-                  handleServiceChange("processingType", value)
-                }
+                onValueChange={handleProcessingTypeChange}
                 className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
               >
-                {processingTypes.map((processing) => {
+                {urgentProcessingOptions.map((processing) => {
                   const IconComponent = processing.icon;
                   const isSelected = formData.processingType === processing.id;
 
@@ -334,7 +283,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
                           <div
                             className={`
                             flex items-center justify-center w-12 h-12 rounded-xl transition-colors
-                            ${isSelected ? "bg-purple-500 text-white" : "bg-gray-100 text-gray-600"}
+                            ${isSelected ? `bg-gradient-to-r ${processing.gradient} text-white` : "bg-gray-100 text-gray-600"}
                           `}
                           >
                             <IconComponent className="w-6 h-6" />
@@ -369,7 +318,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
               <h4 className="mb-2 text-lg font-bold text-gray-800">
                 예상 결제 금액
               </h4>
-              <p className="text-3xl font-bold text-blue-600">0₩</p>
+              <p className="text-3xl font-bold text-blue-600">계산 중...</p>
               <p className="text-sm text-gray-500">부가세 포함</p>
             </div>
           )}
@@ -393,8 +342,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
 
 ServiceSelectionStep.propTypes = {
   formData: PropTypes.shape({
-    serviceType: PropTypes.string,
-    visaDurationType: PropTypes.string,
+    visaType: PropTypes.string,
     processingType: PropTypes.string,
   }).isRequired,
   onUpdate: PropTypes.func.isRequired,

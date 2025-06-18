@@ -7,11 +7,12 @@ export const VISA_TYPES = {
 };
 
 export const PROCESSING_TYPES = {
-  URGENT_1HOUR: "1시간",
-  URGENT_2HOUR: "2시간",
-  URGENT_4HOUR: "4시간",
-  URGENT_1DAY: "1일",
-  URGENT_2DAY: "2일",
+  EXPRESS_1HOUR: "1시간",
+  EXPRESS_2HOUR: "2시간", 
+  EXPRESS_4HOUR: "4시간",
+  EXPRESS_1DAY: "1일",
+  EXPRESS_2DAY: "2일",
+  STANDARD: "3~4일",
 };
 
 export const DOCUMENT_TYPES = {
