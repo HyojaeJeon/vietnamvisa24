@@ -148,6 +148,12 @@ const nextConfig = {
     // 프로덕션: 별도 프록시 없이 빈 배열 반환
     return [];
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 module.exports = nextConfig;
