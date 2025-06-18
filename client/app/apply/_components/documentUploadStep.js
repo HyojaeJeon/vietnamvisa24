@@ -37,6 +37,8 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
   const [ocrStatus, setOcrStatus] = useState("");
   const [toastMessage, setToastMessage] = useState(null);
   const [toastType, setToastType] = useState("success");
+  const [showLoadingModal, setShowLoadingModal] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("");
 
   // 파일을 base64로 변환하는 함수
   const fileToBase64 = (file) => {
@@ -317,6 +319,8 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
 
         if (documentType === "passport") {
           // 여권 OCR 처리
+          setShowLoadingModal(true);
+          setLoadingMessage("AI가 여권에서 필요한 정보를 추출하는 중입니다..");
           setOcrProcessing(true);
           setOcrProgress(20);
           setOcrStatus("전처리 중...");
@@ -329,6 +333,8 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           setOcrStatus("완료!");
         } else if (documentType === "photo") {
           // 증명사진 적합성 검사
+          setShowLoadingModal(true);
+          setLoadingMessage("AI가 증명사진의 적합성을 검사하는 중입니다..");
           showToast("증명사진 적합성 검사 중...", "info");
 
           const form = new FormData();
@@ -349,6 +355,8 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             setOcrProgress(0);
             setOcrStatus("");
           }
+          setShowLoadingModal(false);
+          setLoadingMessage("");
         }, 300);
 
         // 문서 정보 저장
@@ -430,6 +438,8 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           delete q[documentType];
           return q;
         });
+        setShowLoadingModal(false);
+        setLoadingMessage("");
 
         if (documentType === "photo") {
           showToast("증명사진 검증 중 오류가 발생했습니다", "error");
@@ -1628,6 +1638,57 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
               >
                 <X className="w-4 h-4" />
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 전체 화면 로딩 모달 */}
+      {showLoadingModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* 블러 백그라운드 */}
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+          
+          {/* 모달 컨텐츠 */}
+          <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+            <div className="text-center">
+              {/* 로딩 스피너 */}
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  <div className="w-16 h-16 border-4 border-blue-200 rounded-full animate-spin border-t-blue-600"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Sparkles className="w-6 h-6 text-blue-600 animate-pulse" />
+                  </div>
+                </div>
+              </div>
+              
+              {/* 로딩 메시지 */}
+              <h3 className="text-xl font-bold text-gray-800 mb-2">
+                처리 중입니다
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {loadingMessage}
+              </p>
+              
+              {/* 프로그레스 바 (여권의 경우) */}
+              {ocrProcessing && (
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>진행률</span>
+                    <span>{ocrProgress}%</span>
+                  </div>
+                  <Progress value={ocrProgress} className="h-2 bg-gray-200" />
+                  <p className="text-sm text-gray-500 mt-2">{ocrStatus}</p>
+                </div>
+              )}
+              
+              {/* 안내 메시지 */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <div className="flex items-center justify-center gap-2 text-sm text-blue-700">
+                  <Info className="w-4 h-4" />
+                  <span>잠시만 기다려주세요. 처리가 완료되면 자동으로 닫힙니다.</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
