@@ -22,7 +22,10 @@ const initializeSocket = (httpServer) => {
     }
 
     try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || "your-secret-key");
+      const decoded = jwt.verify(
+        token,
+        process.env.JWT_SECRET || "your-secret-key",
+      );
       socket.userId = decoded.userId;
       socket.userRole = decoded.role;
       next();
@@ -41,20 +44,28 @@ const initializeSocket = (httpServer) => {
     }
 
     // 관리자인 경우 관리자 룸 참가
-    if (socket.userRole === "admin" || socket.userRole === "manager" || socket.userRole === "super_admin") {
+    if (
+      socket.userRole === "admin" ||
+      socket.userRole === "manager" ||
+      socket.userRole === "super_admin"
+    ) {
       socket.join("admins");
     }
 
     // 애플리케이션별 룸 참가
     socket.on("join_application", (applicationId) => {
       socket.join(`application_${applicationId}`);
-      console.log(`User ${socket.userId} joined application room: ${applicationId}`);
+      console.log(
+        `User ${socket.userId} joined application room: ${applicationId}`,
+      );
     });
 
     // 애플리케이션 룸 떠나기
     socket.on("leave_application", (applicationId) => {
       socket.leave(`application_${applicationId}`);
-      console.log(`User ${socket.userId} left application room: ${applicationId}`);
+      console.log(
+        `User ${socket.userId} left application room: ${applicationId}`,
+      );
     });
 
     // 연결 해제
@@ -82,7 +93,12 @@ const socketNotifications = {
   },
 
   // 애플리케이션 상태 변경 알림 (고객에게)
-  notifyApplicationStatusChange: (userId, application, previousStatus, newStatus) => {
+  notifyApplicationStatusChange: (
+    userId,
+    application,
+    previousStatus,
+    newStatus,
+  ) => {
     if (io) {
       const statusMessages = {
         pending: "신청이 접수되었습니다",
@@ -100,7 +116,7 @@ const socketNotifications = {
         message: statusMessages[newStatus] || "상태가 변경되었습니다",
         data: {
           applicationId: application.id,
-          applicationNumber: application.application_number,
+          applicationNumber: application.applicationNumber,
           previousStatus,
           newStatus,
           application,
@@ -235,7 +251,9 @@ const socketNotifications = {
           message: consultationData.message,
           created_at: consultationData.created_at,
         });
-        console.log(`📢 New consultation notification sent: ${consultationData.name}`);
+        console.log(
+          `📢 New consultation notification sent: ${consultationData.name}`,
+        );
       }
     } catch (error) {
       console.error("❌ Failed to send consultation notification:", error);
@@ -248,13 +266,15 @@ const socketNotifications = {
       if (io) {
         io.emit("new_application", {
           id: applicationData.id,
-          application_number: applicationData.application_number,
-          full_name: applicationData.full_name,
+          application_number: applicationData.applicationNumber,
+          full_name: applicationData.fullName,
           email: applicationData.email,
-          visa_type: applicationData.visa_type,
-          created_at: applicationData.created_at,
+          visa_type: applicationData.visaType,
+          created_at: applicationData.createdAt,
         });
-        console.log(`📢 New application notification sent: ${applicationData.application_number}`);
+        console.log(
+          `📢 New application notification sent: ${applicationData.applicationNumber}`,
+        );
       }
     } catch (error) {
       console.error("❌ Failed to send application notification:", error);

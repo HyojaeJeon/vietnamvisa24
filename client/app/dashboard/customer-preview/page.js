@@ -1,75 +1,62 @@
+"use client";
 
-'use client';
-
-import React, { useState } from 'react';
-import { useQuery } from '@apollo/client';
-import { GET_VISA_APPLICATIONS } from '@/lib/graphql';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-  Eye,
-  Settings,
-  Bell,
-  BellOff,
-  FileText,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-  User,
-  Phone,
-  Mail
-} from 'lucide-react';
+import React, { useState } from "react";
+import { useQuery } from "@apollo/client";
+import { GET_VISA_APPLICATIONS } from "../../src/lib/graphql";
+import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
+import { Button } from "../../src/components/ui/button";
+import { Badge } from "../../src/components/ui/badge";
+import { Eye, Settings, Bell, BellOff, FileText, Clock, CheckCircle, AlertTriangle, User, Phone, Mail } from "lucide-react";
 
 export default function CustomerPreview() {
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [previewMode, setPreviewMode] = useState(false);
 
   const { data: applicationsData, loading } = useQuery(GET_VISA_APPLICATIONS, {
-    errorPolicy: 'all'
+    errorPolicy: "all",
   });
 
   const getStatusInfo = (status) => {
     const statusMap = {
-      'pending': { 
-        label: '접수 완료', 
-        color: 'bg-blue-100 text-blue-800',
+      pending: {
+        label: "접수 완료",
+        color: "bg-blue-100 text-blue-800",
         icon: Clock,
-        description: '신청서가 접수되어 검토 중입니다.'
+        description: "신청서가 접수되어 검토 중입니다.",
       },
-      'processing': { 
-        label: '처리 중', 
-        color: 'bg-yellow-100 text-yellow-800',
+      processing: {
+        label: "처리 중",
+        color: "bg-yellow-100 text-yellow-800",
         icon: Clock,
-        description: '서류 검토 및 처리가 진행 중입니다.'
+        description: "서류 검토 및 처리가 진행 중입니다.",
       },
-      'document_review': { 
-        label: '서류 검토', 
-        color: 'bg-orange-100 text-orange-800',
+      document_review: {
+        label: "서류 검토",
+        color: "bg-orange-100 text-orange-800",
         icon: FileText,
-        description: '제출하신 서류를 면밀히 검토하고 있습니다.'
+        description: "제출하신 서류를 면밀히 검토하고 있습니다.",
       },
-      'submitted_to_authority': { 
-        label: '기관 제출', 
-        color: 'bg-purple-100 text-purple-800',
+      submitted_to_authority: {
+        label: "기관 제출",
+        color: "bg-purple-100 text-purple-800",
         icon: FileText,
-        description: '베트남 관련 기관에 신청서가 제출되었습니다.'
+        description: "베트남 관련 기관에 신청서가 제출되었습니다.",
       },
-      'approved': { 
-        label: '승인 완료', 
-        color: 'bg-green-100 text-green-800',
+      approved: {
+        label: "승인 완료",
+        color: "bg-green-100 text-green-800",
         icon: CheckCircle,
-        description: '비자 승인이 완료되었습니다.'
+        description: "비자 승인이 완료되었습니다.",
       },
-      'rejected': { 
-        label: '승인 거부', 
-        color: 'bg-red-100 text-red-800',
+      rejected: {
+        label: "승인 거부",
+        color: "bg-red-100 text-red-800",
         icon: AlertTriangle,
-        description: '비자 신청이 거부되었습니다.'
-      }
+        description: "비자 신청이 거부되었습니다.",
+      },
     };
 
-    return statusMap[status] || statusMap['pending'];
+    return statusMap[status] || statusMap["pending"];
   };
 
   // 고객 화면 미리보기 컴포넌트
@@ -87,12 +74,8 @@ export default function CustomerPreview() {
               <p className="text-gray-600 mt-1">신청번호: VN-{application.id}</p>
             </div>
             <div className="text-right">
-              <Badge className={statusInfo.color}>
-                {statusInfo.label}
-              </Badge>
-              <p className="text-sm text-gray-500 mt-1">
-                신청일: {new Date(application.created_at).toLocaleDateString('ko-KR')}
-              </p>
+              <Badge className={statusInfo.color}>{statusInfo.label}</Badge>
+              <p className="text-sm text-gray-500 mt-1">신청일: {new Date(application.created_at).toLocaleDateString("ko-KR")}</p>
             </div>
           </div>
         </div>
@@ -125,7 +108,7 @@ export default function CustomerPreview() {
                 <span className="text-sm text-gray-500">60%</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '60%' }}></div>
+                <div className="bg-blue-600 h-2 rounded-full" style={{ width: "60%" }}></div>
               </div>
             </div>
           </CardContent>
@@ -156,15 +139,11 @@ export default function CustomerPreview() {
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">도착 예정일</label>
-                <p className="text-gray-900">
-                  {new Date(application.arrival_date).toLocaleDateString('ko-KR')}
-                </p>
+                <p className="text-gray-900">{new Date(application.arrival_date).toLocaleDateString("ko-KR")}</p>
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-500">출발 예정일</label>
-                <p className="text-gray-900">
-                  {new Date(application.departure_date).toLocaleDateString('ko-KR')}
-                </p>
+                <p className="text-gray-900">{new Date(application.departure_date).toLocaleDateString("ko-KR")}</p>
               </div>
             </div>
           </CardContent>
@@ -184,9 +163,7 @@ export default function CustomerPreview() {
                 <div>
                   <p className="font-medium text-gray-900">신청서 접수 완료</p>
                   <p className="text-sm text-gray-600">온라인 신청서가 성공적으로 접수되었습니다.</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    {new Date(application.created_at).toLocaleString('ko-KR')}
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">{new Date(application.created_at).toLocaleString("ko-KR")}</p>
                 </div>
               </div>
 
@@ -261,10 +238,8 @@ export default function CustomerPreview() {
                     </div>
 
                     <div className="flex items-center space-x-3">
-                      <Badge className={getStatusInfo(application.status).color}>
-                        {getStatusInfo(application.status).label}
-                      </Badge>
-                      
+                      <Badge className={getStatusInfo(application.status).color}>{getStatusInfo(application.status).label}</Badge>
+
                       <div className="flex items-center space-x-2">
                         <Button
                           size="sm"
@@ -277,7 +252,7 @@ export default function CustomerPreview() {
                           <Eye className="h-4 w-4 mr-1" />
                           미리보기
                         </Button>
-                        
+
                         <Button size="sm" variant="outline">
                           <Settings className="h-4 w-4 mr-1" />
                           설정

@@ -5,136 +5,130 @@ const typeDefs = gql`
   scalar JSON
 
   type Query {
+    getVisaApplications: [VisaApplication]
+    getVisaApplication(id: ID): VisaApplication
     _empty: String
   }
-
   type Mutation {
+    updateApplicationStatus(
+      id: ID!
+      status: ApplicationStatus!
+    ): StatusUpdateResponse
+    sendEmailToCustomer(
+      applicationId: ID
+      emailType: String
+      content: String
+    ): SuccessResponse
+    sendNotificationEmail(
+      applicationId: ID!
+      emailType: EmailType!
+      customMessage: String
+    ): EmailResponse
+    generateApplicationPDF(applicationId: ID!): PDFResponse
+    addApplicationMemo(applicationId: ID, content: String): Memo
+    updateApplicationInfo(id: ID, input: VisaApplicationInput): VisaApplication
+    downloadApplicationDocuments(applicationId: ID): DownloadResponse
     _empty: String
   }
-
   type User {
-    id: ID!
-    email: String!
-    name: String!
+    id: ID
+    email: String
+    name: String
     phone: String
-    created_at: String
+    createdAt: String
     tokenVersion: Int
+    role: UserRole
+    isActive: Boolean
   }
-
-  type Admin {
-    id: ID!
-    email: String!
-    name: String!
-    role: AdminRole!
-    created_at: String!
-    is_active: Boolean!
-  }
-
   type VisaApplication {
-    id: ID!
-    application_number: String
-    user_id: ID
-    full_name: String!
-    passport_number: String!
-    nationality: String!
-    birth_date: String
-    phone: String!
-    email: String!
-    visa_type: String!
-    arrival_date: String!
-    departure_date: String!
+    id: ID
+    applicationNumber: String
+    userId: ID
+    fullName: String
+    passportNumber: String
+    nationality: String
+    birthDate: String
+    phone: String
+    email: String
+    visaType: String
+    arrivalDate: String
+    departureDate: String
     purpose: String
-    status: ApplicationStatus!
+    status: ApplicationStatus
     priority: String
-    created_at: String!
-    updated_at: String!
+    createdAt: String
+    updatedAt: String
     user: User
-    assignedAdmin: Admin
-    documents: [Document!]!
-    consultations: [Consultation!]!
+    assignedUser: User
+    documents: [Document]
+    consultations: [Consultation]
   }
-
   type Document {
-    id: ID!
-    application_id: String!
-    customer_name: String!
-    document_type: String!
-    document_name: String!
-    file_size: String!
-    status: DocumentStatus!
-    uploaded_at: String!
-    reviewed_at: String
+    id: ID
+    applicationId: String
+    customerName: String
+    documentType: String
+    documentName: String
+    type: String
+    fileName: String
+    fileSize: Int
+    fileType: String
+    status: DocumentStatus
+    uploadedAt: String
+    reviewedAt: String
     reviewer: String
     notes: String
     application: VisaApplication
   }
-  type Consultation {
-    id: ID!
-    application_id: ID
-    customer_name: String!
-    phone: String!
-    email: String!
-    service_type: String!
-    status: String!
-    notes: String
-    created_at: String!
-    updated_at: String!
-    application: VisaApplication
-    applicant: User
-    assignedAdmin: Admin
-  }
-
   type ApplicationStatusHistory {
-    id: ID!
-    application_id: ID!
-    previous_status: ApplicationStatus
-    new_status: ApplicationStatus!
-    changed_by: ID
-    change_reason: String
-    created_at: String!
+    id: ID
+    applicationId: ID
+    previousStatus: ApplicationStatus
+    newStatus: ApplicationStatus
+    changedBy: ID
+    changeReason: String
+    createdAt: String
     application: VisaApplication
-    changedBy: Admin
+    changedByUser: User
   }
-
   type Notification {
-    id: ID!
-    type: NotificationType!
-    title: String!
-    message: String!
-    recipient: String!
-    status: NotificationStatus!
-    priority: NotificationPriority!
-    created_at: String!
-    related_id: String
-    is_read: Boolean!
+    id: ID
+    type: NotificationType
+    title: String
+    message: String
+    recipient: String
+    status: NotificationStatus
+    priority: NotificationPriority
+    createdAt: String
+    relatedId: String
+    isRead: Boolean
   }
-
   type Payment {
-    id: ID!
-    application_id: ID!
-    amount: Float!
-    currency: String!
-    status: PaymentStatus!
-    payment_method: String
-    transaction_id: String
-    paid_at: String
-    created_at: String!
+    id: ID
+    applicationId: ID
+    amount: Float
+    currency: String
+    status: PaymentStatus
+    paymentMethod: String
+    transactionId: String
+    paidAt: String
+    createdAt: String
     application: VisaApplication
   }
-
   type WorkflowTemplate {
-    id: ID!
-    name: String!
+    id: ID
+    name: String
     description: String
-    steps: String!
-    is_active: Boolean!
-    created_at: String!
+    steps: String
+    isActive: Boolean
+    createdAt: String
   }
 
-  enum AdminRole {
+  enum UserRole {
     SUPER_ADMIN
     MANAGER
     STAFF
+    USER
   }
   enum ApplicationStatus {
     PENDING
@@ -180,179 +174,162 @@ const typeDefs = gql`
   }
 
   type SuccessResponse {
-    success: Boolean!
+    success: Boolean
     message: String
   }
 
   type DashboardStats {
-    totalApplications: Int!
-    newApplicationsToday: Int!
-    completedToday: Int!
-    pendingReview: Int!
-  }
-
-  input AdminInput {
-    email: String!
-    password: String!
-    name: String!
-    role: AdminRole!
+    totalApplications: Int
+    newApplicationsToday: Int
+    completedToday: Int
+    pendingReview: Int
   }
 
   input RegisterInput {
-    email: String!
-    password: String!
-    name: String!
+    email: String
+    password: String
+    name: String
     phone: String
+    role: UserRole
   }
 
   input LoginInput {
-    email: String!
-    password: String!
+    email: String
+    password: String
     rememberMe: Boolean
     autoLogin: Boolean
   }
 
-  input AdminLoginInput {
-    email: String!
-    password: String!
-  }
-
   input VisaApplicationInput {
-    visa_type: String!
-    full_name: String!
-    passport_number: String!
-    nationality: String!
-    birth_date: String
-    phone: String!
-    email: String!
-    arrival_date: String!
-    departure_date: String!
+    visaType: String
+    fullName: String
+    passportNumber: String
+    nationality: String
+    birthDate: String
+    phone: String
+    email: String
+    arrivalDate: String
+    departureDate: String
     purpose: String
   }
 
   input NotificationInput {
-    type: NotificationType!
-    title: String!
-    message: String!
-    recipient: String!
+    type: NotificationType
+    title: String
+    message: String
+    recipient: String
     priority: NotificationPriority
-    related_id: String
+    relatedId: String
   }
 
   input DocumentInput {
-    application_id: String!
-    customer_name: String!
-    document_type: String!
-    document_name: String!
-    file_size: String!
+    applicationId: String
+    customerName: String
+    documentType: String
+    documentName: String
+    fileSize: String
   }
 
   input ConsultationInput {
-    customer_name: String!
-    phone: String!
-    email: String!
-    service_type: String!
+    customerName: String
+    phone: String
+    email: String
+    serviceType: String
     notes: String
   }
-
   type AuthResponse {
-    token: String!
+    accessToken: String
     refreshToken: String
-    user: User!
-  }
-
-  type AdminAuthResponse {
-    token: String!
-    admin: Admin!
+    user: User
   }
 
   type RefreshTokenResponse {
-    token: String!
-    refreshToken: String!
+    accessToken: String
+    refreshToken: String
   }
 
   type ReportsData {
-    overviewStats: OverviewStats!
-    visaTypeStats: [VisaTypeStats!]!
-    monthlyTrends: [MonthlyTrends!]!
+    overviewStats: OverviewStats
+    visaTypeStats: [VisaTypeStats]
+    monthlyTrends: [MonthlyTrends]
   }
 
   type OverviewStats {
-    totalApplications: Int!
-    approvalRate: Float!
-    averageProcessingTime: Float!
-    totalRevenue: Float!
+    totalApplications: Int
+    approvalRate: Float
+    averageProcessingTime: Float
+    totalRevenue: Float
   }
 
   type VisaTypeStats {
-    type: String!
-    count: Int!
-    percentage: Float!
-    revenue: Float!
+    type: String
+    count: Int
+    percentage: Float
+    revenue: Float
   }
 
   type MonthlyTrends {
-    month: String!
-    applications: Int!
-    revenue: Float!
+    month: String
+    applications: Int
+    revenue: Float
   }
 
   # 가격표 관리 타입들
   type EVisaPrice {
-    id: ID!
-    type: EVisaType!
-    processingTime: ProcessingTime!
-    sellingPriceUsd: Float!
-    sellingPriceVnd: Float!
-    sellingPriceKrw: Float!
-    marginUsd: Float!
-    marginVnd: Float!
-    marginKrw: Float!
-    isActive: Boolean!
-    createdAt: String!
-    updatedAt: String!
+    id: ID
+    type: EVisaType
+    processingTime: ProcessingTime
+    sellingPriceUsd: Float
+    sellingPriceVnd: Float
+    sellingPriceKrw: Float
+    marginUsd: Float
+    marginVnd: Float
+    marginKrw: Float
+    isActive: Boolean
+    createdAt: String
+    updatedAt: String
     createdBy: ID
     updatedBy: ID
-    creator: Admin
-    updater: Admin
+    creator: User
+    updater: User
   }
 
   type VisaRunPrice {
-    id: ID!
-    visaType: VisaRunType!
-    peopleCount: Int!
-    sellingPriceUsd: Float!
-    sellingPriceVnd: Float!
-    sellingPriceKrw: Float!
-    marginUsd: Float!
-    marginVnd: Float!
-    marginKrw: Float!
-    isActive: Boolean!
-    createdAt: String!
-    updatedAt: String!
+    id: ID
+    visaType: VisaRunType
+    peopleCount: Int
+    sellingPriceUsd: Float
+    sellingPriceVnd: Float
+    sellingPriceKrw: Float
+    marginUsd: Float
+    marginVnd: Float
+    marginKrw: Float
+    isActive: Boolean
+    createdAt: String
+    updatedAt: String
     createdBy: ID
     updatedBy: ID
-    creator: Admin
-    updater: Admin
+    creator: User
+    updater: User
   }
 
   type FastTrackPrice {
-    id: ID!
-    serviceType: FastTrackServiceType!
-    airport: AirportCode!
-    sellingPriceUsd: Float!
-    sellingPriceVnd: Float!
-    sellingPriceKrw: Float!
-    marginUsd: Float!
-    marginVnd: Float!
-    marginKrw: Float!
-    isActive: Boolean!
-    createdAt: String!
-    updatedAt: String!
+    id: ID
+    serviceType: FastTrackServiceType
+    airport: AirportCode
+    sellingPriceUsd: Float
+    sellingPriceVnd: Float
+    sellingPriceKrw: Float
+    marginUsd: Float
+    marginVnd: Float
+    marginKrw: Float
+    isActive: Boolean
+    createdAt: String
+    updatedAt: String
     createdBy: ID
     updatedBy: ID
-    creator: Admin
-    updater: Admin
+    creator: User
+    updater: User
   }
 
   # 가격표 관련 Enum 타입들
@@ -388,38 +365,38 @@ const typeDefs = gql`
 
   # 가격표 입력 타입들
   input EVisaPriceInput {
-    type: EVisaType!
-    processingTime: ProcessingTime!
-    sellingPriceUsd: Float!
-    sellingPriceVnd: Float!
-    sellingPriceKrw: Float!
-    marginUsd: Float!
-    marginVnd: Float!
-    marginKrw: Float!
+    type: EVisaType
+    processingTime: ProcessingTime
+    sellingPriceUsd: Float
+    sellingPriceVnd: Float
+    sellingPriceKrw: Float
+    marginUsd: Float
+    marginVnd: Float
+    marginKrw: Float
     isActive: Boolean
   }
 
   input VisaRunPriceInput {
-    visaType: VisaRunType!
-    peopleCount: Int!
-    sellingPriceUsd: Float!
-    sellingPriceVnd: Float!
-    sellingPriceKrw: Float!
-    marginUsd: Float!
-    marginVnd: Float!
-    marginKrw: Float!
+    visaType: VisaRunType
+    peopleCount: Int
+    sellingPriceUsd: Float
+    sellingPriceVnd: Float
+    sellingPriceKrw: Float
+    marginUsd: Float
+    marginVnd: Float
+    marginKrw: Float
     isActive: Boolean
   }
 
   input FastTrackPriceInput {
-    serviceType: FastTrackServiceType!
-    airport: AirportCode!
-    sellingPriceUsd: Float!
-    sellingPriceVnd: Float!
-    sellingPriceKrw: Float!
-    marginUsd: Float!
-    marginVnd: Float!
-    marginKrw: Float!
+    serviceType: FastTrackServiceType
+    airport: AirportCode
+    sellingPriceUsd: Float
+    sellingPriceVnd: Float
+    sellingPriceKrw: Float
+    marginUsd: Float
+    marginVnd: Float
+    marginKrw: Float
     isActive: Boolean
   }
 
@@ -451,6 +428,46 @@ const typeDefs = gql`
     marginVnd: Float
     marginKrw: Float
     isActive: Boolean
+  }
+
+  type Memo {
+    id: ID
+    content: String
+    created_at: String
+    created_by: String
+  }
+  type DownloadResponse {
+    downloadUrl: String
+    fileName: String
+  }
+
+  # 새로운 응답 타입들
+  type StatusUpdateResponse {
+    id: ID!
+    status: ApplicationStatus!
+    message: String!
+  }
+
+  type EmailResponse {
+    success: Boolean!
+    message: String!
+    emailType: EmailType!
+    recipientEmail: String!
+  }
+
+  type PDFResponse {
+    success: Boolean!
+    message: String!
+    downloadUrl: String!
+    fileName: String!
+    generatedAt: String!
+  }
+
+  # 이메일 타입 열거형
+  enum EmailType {
+    STATUS_UPDATE
+    DOCUMENT_REQUEST
+    APPROVAL_NOTICE
   }
 `;
 

@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      user_id: {
+      userId: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
@@ -15,59 +15,69 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-      application_number: {
+      applicationNumber: {
         type: DataTypes.STRING(50),
         unique: true,
+        allowNull: true,
       },
-      visa_type: {
+      visaType: {
         type: DataTypes.STRING(50),
-        allowNull: false,
+        allowNull: true,
       },
-      full_name: {
+      fullName: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
-      passport_number: {
+      passportNumber: {
         type: DataTypes.STRING(50),
-        allowNull: false,
+        allowNull: true,
       },
       nationality: {
         type: DataTypes.STRING(50),
-        allowNull: false,
+        allowNull: true,
       },
-      birth_date: {
+      birthDate: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
+        allowNull: true,
       },
       phone: {
         type: DataTypes.STRING(20),
-        allowNull: false,
+        allowNull: true,
       },
       email: {
         type: DataTypes.STRING(255),
-        allowNull: false,
+        allowNull: true,
       },
-      arrival_date: {
+      arrivalDate: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
+        allowNull: true,
       },
-      departure_date: {
+      departureDate: {
         type: DataTypes.DATEONLY,
-        allowNull: false,
+        allowNull: true,
       },
       purpose: {
         type: DataTypes.STRING(255),
         allowNull: true,
       },
       status: {
-        type: DataTypes.ENUM("pending", "processing", "document_review", "submitted_to_authority", "approved", "rejected", "completed"),
+        type: DataTypes.ENUM(
+          "pending",
+          "processing",
+          "document_review",
+          "submitted_to_authority",
+          "approved",
+          "rejected",
+          "completed",
+        ),
         defaultValue: "pending",
+        allowNull: true,
       },
-      assigned_to: {
+      assignedTo: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-          model: "admins",
+          model: "users",
           key: "id",
         },
       },
@@ -75,55 +85,146 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      // New fields for enhanced application data
+      processingType: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+        defaultValue: "standard",
+      },
+      totalPrice: {
+        type: DataTypes.DECIMAL(10, 2),
+        allowNull: true,
+        defaultValue: 0,
+      },
+      applicationId: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+        unique: true,
+      }, // Personal info additional fields
+      firstName: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+      },
+      lastName: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+      },
+      address: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      phoneOfFriend: {
+        type: DataTypes.STRING(20),
+        allowNull: true,
+      }, // Travel info additional fields
+      entryPort: {
+        type: DataTypes.STRING(100),
+        allowNull: true,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
     },
     {
       tableName: "visa_applications",
-      timestamps: true,
-      underscored: true,
-    }
+      timestamps: false,
+      underscored: false,
+    },
   );
-
   VisaApplication.associate = function (models) {
     // User와의 관계 (신청자)
     VisaApplication.belongsTo(models.User, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "applicant",
     });
 
-    // Admin과의 관계 (담당자)
-    VisaApplication.belongsTo(models.Admin, {
-      foreignKey: "assigned_to",
-      as: "assignedAdmin",
+    // 담당자(User, role로 구분)
+    VisaApplication.belongsTo(models.User, {
+      foreignKey: "assignedTo",
+      as: "assignedUser",
     });
 
     // Documents와의 관계
     VisaApplication.hasMany(models.Document, {
-      foreignKey: "application_id",
+      foreignKey: "applicationId",
       as: "documents",
     });
 
     // Status History와의 관계
     VisaApplication.hasMany(models.ApplicationStatusHistory, {
-      foreignKey: "application_id",
+      foreignKey: "applicationId",
       as: "statusHistory",
     });
 
     // Payments와의 관계
     VisaApplication.hasMany(models.Payment, {
-      foreignKey: "application_id",
+      foreignKey: "applicationId",
       as: "payments",
     }); // Workflows와의 관계
     VisaApplication.hasMany(models.ApplicationWorkflow, {
-      foreignKey: "application_id",
+      foreignKey: "applicationId",
       as: "workflows",
-    });
-
-    // Consultations와의 관계
+    }); // Consultations와의 관계
     VisaApplication.hasMany(models.Consultation, {
-      foreignKey: "application_id",
+      foreignKey: "applicationId",
       as: "consultations",
     });
+
+    // Additional Services와의 Many-to-Many 관계
+    if (models.AdditionalService) {
+      VisaApplication.belongsToMany(models.AdditionalService, {
+        through: "ApplicationAdditionalServices",
+        foreignKey: "applicationId",
+        otherKey: "additionalServiceId",
+        as: "additionalServices",
+      });
+    }
   };
 
   return VisaApplication;
 };
+
+/*
+-- SQLite 마이그레이션: visa_applications 테이블의 NOT NULL 제약 해제용
+-- 아래 SQL을 SQLite CLI 또는 DB Browser for SQLite에서 실행하세요.
+
+-- 1. 기존 테이블 구조 확인
+.schema visa_applications
+
+-- 2. 새 테이블 생성 (NOT NULL 제거)
+CREATE TABLE visa_applications_new (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  application_number VARCHAR(50) UNIQUE,
+  visa_type VARCHAR(50),
+  full_name VARCHAR(255),
+  passport_number VARCHAR(50),
+  nationality VARCHAR(50),
+  birth_date DATE,
+  phone VARCHAR(20),
+  email VARCHAR(255),
+  arrival_date DATE,
+  departure_date DATE,
+  purpose VARCHAR(255),
+  status VARCHAR(50) DEFAULT 'pending',
+  assigned_to INTEGER,
+  notes TEXT,
+  created_at DATETIME,
+  updated_at DATETIME
+);
+
+-- 3. 데이터 이관
+INSERT INTO visa_applications_new
+SELECT * FROM visa_applications;
+
+-- 4. 기존 테이블 삭제
+DROP TABLE visa_applications;
+
+-- 5. 새 테이블 이름 변경
+ALTER TABLE visa_applications_new RENAME TO visa_applications;
+*/

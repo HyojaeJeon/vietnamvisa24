@@ -1,81 +1,66 @@
-'use client';
+"use client";
 
-import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation } from '@apollo/client';
-import { 
-  FileText, Search, Filter, Download, Eye, Check, X, Upload,
-  AlertCircle, Clock, CheckCircle, XCircle, MoreHorizontal,
-  Image, File, Trash2, Edit3, Calendar, User, FileCheck,
-  Loader2, Plus, RefreshCw
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Checkbox } from '@/components/ui/checkbox';
+import React, { useState, useMemo } from "react";
+import { useQuery, useMutation } from "@apollo/client";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  FileText,
+  Search,
+  Filter,
+  Download,
+  Eye,
+  Check,
+  X,
+  Upload,
+  AlertCircle,
+  Clock,
+  CheckCircle,
+  XCircle,
+  MoreHorizontal,
+  Image,
+  File,
+  Trash2,
+  Edit3,
+  Calendar,
+  User,
+  FileCheck,
+  Loader2,
+  Plus,
+  RefreshCw,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
+import { Button } from "../../src/components/ui/button";
+import { Input } from "../../src/components/ui/input";
+import { Badge } from "../../src/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../src/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "../../src/components/ui/dialog";
+import { Textarea } from "../../src/components/ui/textarea";
+import { Alert, AlertDescription } from "../../src/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../src/components/ui/tabs";
+import { Checkbox } from "../../src/components/ui/checkbox";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../../src/components/ui/dropdown-menu";
 
 // GraphQL imports
-import { 
-  GET_DOCUMENTS, 
-  GET_DOCUMENT_STATISTICS,
-  GET_DOCUMENT_TYPES 
-} from '@/lib/graphql/query/documents';
-import { 
-  UPDATE_DOCUMENT_STATUS,
-  BULK_UPDATE_DOCUMENT_STATUS,
-  DELETE_DOCUMENT 
-} from '@/lib/graphql/mutation/documents';
+import { GET_DOCUMENTS, GET_DOCUMENT_STATISTICS, GET_DOCUMENT_TYPES } from "../../src/lib/graphql/query/documents";
+import { UPDATE_DOCUMENT_STATUS, BULK_UPDATE_DOCUMENT_STATUS, DELETE_DOCUMENT } from "../../src/lib/graphql/mutation/documents";
 
 // Components
-import FileUpload from '@/components/FileUpload';
+import FileUpload from "../../src/components/FileUpload";
 
 export default function DocumentsManagement() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [typeFilter, setTypeFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("all");
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
-  const [reviewNotes, setReviewNotes] = useState('');
-  const [uploadApplicationId, setUploadApplicationId] = useState('');
+  const [reviewNotes, setReviewNotes] = useState("");
+  const [uploadApplicationId, setUploadApplicationId] = useState("");
 
   // GraphQL queries
-  const { 
-    data: documentsData, 
-    loading: documentsLoading, 
-    error: documentsError,
-    refetch: refetchDocuments 
-  } = useQuery(GET_DOCUMENTS);
+  const { data: documentsData, loading: documentsLoading, error: documentsError, refetch: refetchDocuments } = useQuery(GET_DOCUMENTS);
 
-  const { 
-    data: statisticsData,
-    loading: statisticsLoading 
-  } = useQuery(GET_DOCUMENT_STATISTICS);
+  const { data: statisticsData, loading: statisticsLoading } = useQuery(GET_DOCUMENT_STATISTICS);
 
   const { data: documentTypesData } = useQuery(GET_DOCUMENT_TYPES);
 
@@ -84,22 +69,22 @@ export default function DocumentsManagement() {
     onCompleted: () => {
       refetchDocuments();
       setShowDetailModal(false);
-      setReviewNotes('');
+      setReviewNotes("");
     },
     onError: (error) => {
-      console.error('문서 상태 업데이트 오류:', error);
-    }
+      console.error("문서 상태 업데이트 오류:", error);
+    },
   });
 
   const [bulkUpdateDocumentStatus] = useMutation(BULK_UPDATE_DOCUMENT_STATUS, {
     onCompleted: () => {
       refetchDocuments();
       setSelectedDocuments([]);
-      setReviewNotes('');
+      setReviewNotes("");
     },
     onError: (error) => {
-      console.error('일괄 문서 상태 업데이트 오류:', error);
-    }
+      console.error("일괄 문서 상태 업데이트 오류:", error);
+    },
   });
 
   const [deleteDocument] = useMutation(DELETE_DOCUMENT, {
@@ -108,82 +93,87 @@ export default function DocumentsManagement() {
       setShowDetailModal(false);
     },
     onError: (error) => {
-      console.error('문서 삭제 오류:', error);
-    }
+      console.error("문서 삭제 오류:", error);
+    },
   });
 
   // 데이터 처리
   const documents = documentsData?.getDocuments || [];
   const statistics = statisticsData?.getDocumentStatistics || {
-    total: 0, pending: 0, approved: 0, rejected: 0, review_rate: 0
+    total: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+    review_rate: 0,
   };
   const documentTypes = documentTypesData?.getDocumentTypes || [];
 
   // 필터링된 문서 목록
   const filteredDocuments = useMemo(() => {
-    return documents.filter(doc => {
-      const matchesSearch = searchTerm === '' || 
+    return documents.filter((doc) => {
+      const matchesSearch =
+        searchTerm === "" ||
         doc.document_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         doc.application?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         doc.application?.application_number?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = statusFilter === 'all' || doc.status === statusFilter;
-      const matchesType = typeFilter === 'all' || doc.document_type === typeFilter;
-      
+
+      const matchesStatus = statusFilter === "all" || doc.status === statusFilter;
+      const matchesType = typeFilter === "all" || doc.document_type === typeFilter;
+
       return matchesSearch && matchesStatus && matchesType;
     });
   }, [documents, searchTerm, statusFilter, typeFilter]);
 
   // 문서 타입 정보 가져오기
   const getDocumentTypeInfo = (type) => {
-    const typeInfo = documentTypes.find(t => t.value === type);
+    const typeInfo = documentTypes.find((t) => t.value === type);
     if (typeInfo) {
-      return { label: typeInfo.label, icon: FileText, color: 'text-blue-600' };
+      return { label: typeInfo.label, icon: FileText, color: "text-blue-600" };
     }
 
     // 기본 타입 정보
     switch (type) {
-      case 'passport':
-        return { label: '여권 사본', icon: FileText, color: 'text-blue-600' };
-      case 'photo':
-        return { label: '증명사진', icon: Image, color: 'text-green-600' };
-      case 'invitation':
-        return { label: '초청장', icon: File, color: 'text-purple-600' };
-      case 'health_certificate':
-        return { label: '건강증명서', icon: FileCheck, color: 'text-orange-600' };
-      case 'criminal_record':
-        return { label: '무범죄증명서', icon: FileText, color: 'text-red-600' };
+      case "passport":
+        return { label: "여권 사본", icon: FileText, color: "text-blue-600" };
+      case "photo":
+        return { label: "증명사진", icon: Image, color: "text-green-600" };
+      case "invitation":
+        return { label: "초청장", icon: File, color: "text-purple-600" };
+      case "health_certificate":
+        return { label: "건강증명서", icon: FileCheck, color: "text-orange-600" };
+      case "criminal_record":
+        return { label: "무범죄증명서", icon: FileText, color: "text-red-600" };
       default:
-        return { label: '기타 서류', icon: File, color: 'text-gray-600' };
+        return { label: "기타 서류", icon: File, color: "text-gray-600" };
     }
   };
 
   // 상태 배지 정보
   const getStatusInfo = (status) => {
     switch (status) {
-      case 'pending':
-        return { label: '검토 대기', color: 'bg-yellow-100 text-yellow-800', icon: Clock };
-      case 'approved':
-        return { label: '승인', color: 'bg-green-100 text-green-800', icon: CheckCircle };
-      case 'revision_required':
-        return { label: '수정 요청', color: 'bg-red-100 text-red-800', icon: XCircle };
+      case "pending":
+        return { label: "검토 대기", color: "bg-yellow-100 text-yellow-800", icon: Clock };
+      case "approved":
+        return { label: "승인", color: "bg-green-100 text-green-800", icon: CheckCircle };
+      case "revision_required":
+        return { label: "수정 요청", color: "bg-red-100 text-red-800", icon: XCircle };
       default:
-        return { label: '알 수 없음', color: 'bg-gray-100 text-gray-800', icon: AlertCircle };
+        return { label: "알 수 없음", color: "bg-gray-100 text-gray-800", icon: AlertCircle };
     }
   };
 
   // 문서 상태 업데이트
-  const handleStatusUpdate = async (documentId, newStatus, notes = '') => {
+  const handleStatusUpdate = async (documentId, newStatus, notes = "") => {
     try {
       await updateDocumentStatus({
         variables: {
           id: documentId,
           status: newStatus.toUpperCase(),
-          notes: notes || undefined
-        }
+          notes: notes || undefined,
+        },
       });
     } catch (error) {
-      console.error('상태 업데이트 실패:', error);
+      console.error("상태 업데이트 실패:", error);
     }
   };
 
@@ -196,34 +186,30 @@ export default function DocumentsManagement() {
         variables: {
           ids: selectedDocuments,
           status: newStatus.toUpperCase(),
-          notes: reviewNotes || undefined
-        }
+          notes: reviewNotes || undefined,
+        },
       });
     } catch (error) {
-      console.error('일괄 상태 업데이트 실패:', error);
+      console.error("일괄 상태 업데이트 실패:", error);
     }
   };
 
   // 문서 삭제
   const handleDeleteDocument = async (documentId) => {
-    if (window.confirm('정말로 이 문서를 삭제하시겠습니까?')) {
+    if (window.confirm("정말로 이 문서를 삭제하시겠습니까?")) {
       try {
         await deleteDocument({
-          variables: { id: documentId }
+          variables: { id: documentId },
         });
       } catch (error) {
-        console.error('문서 삭제 실패:', error);
+        console.error("문서 삭제 실패:", error);
       }
     }
   };
 
   // 문서 선택 토글
   const toggleDocumentSelection = (documentId) => {
-    setSelectedDocuments(prev => 
-      prev.includes(documentId)
-        ? prev.filter(id => id !== documentId)
-        : [...prev, documentId]
-    );
+    setSelectedDocuments((prev) => (prev.includes(documentId) ? prev.filter((id) => id !== documentId) : [...prev, documentId]));
   };
 
   // 전체 선택/해제
@@ -231,14 +217,14 @@ export default function DocumentsManagement() {
     if (selectedDocuments.length === filteredDocuments.length) {
       setSelectedDocuments([]);
     } else {
-      setSelectedDocuments(filteredDocuments.map(doc => doc.id));
+      setSelectedDocuments(filteredDocuments.map((doc) => doc.id));
     }
   };
 
   // 파일 다운로드
   const handleDownload = (document) => {
     if (document.downloadUrl) {
-      window.open(document.downloadUrl, '_blank');
+      window.open(document.downloadUrl, "_blank");
     }
   };
 
@@ -246,12 +232,12 @@ export default function DocumentsManagement() {
   const handleUploadSuccess = (uploadedDocuments) => {
     refetchDocuments();
     setShowUploadModal(false);
-    setUploadApplicationId('');
+    setUploadApplicationId("");
   };
 
   // 업로드 에러 핸들러
   const handleUploadError = (error) => {
-    console.error('업로드 오류:', error);
+    console.error("업로드 오류:", error);
     alert(`업로드 오류: ${error}`);
   };
 
@@ -260,9 +246,7 @@ export default function DocumentsManagement() {
       <div className="p-6">
         <Alert>
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            문서 목록을 불러오는 중 오류가 발생했습니다: {documentsError.message}
-          </AlertDescription>
+          <AlertDescription>문서 목록을 불러오는 중 오류가 발생했습니다: {documentsError.message}</AlertDescription>
         </Alert>
       </div>
     );
@@ -277,12 +261,8 @@ export default function DocumentsManagement() {
           <p className="text-gray-600 mt-1">업로드된 문서를 검토하고 관리합니다</p>
         </div>
         <div className="flex gap-2">
-          <Button 
-            variant="outline" 
-            onClick={() => refetchDocuments()}
-            disabled={documentsLoading}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${documentsLoading ? 'animate-spin' : ''}`} />
+          <Button variant="outline" onClick={() => refetchDocuments()} disabled={documentsLoading}>
+            <RefreshCw className={`h-4 w-4 mr-2 ${documentsLoading ? "animate-spin" : ""}`} />
             새로고침
           </Button>
           <Button onClick={() => setShowUploadModal(true)}>
@@ -300,9 +280,7 @@ export default function DocumentsManagement() {
               <FileText className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">전체 문서</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {statisticsLoading ? '-' : statistics.total}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{statisticsLoading ? "-" : statistics.total}</p>
               </div>
             </div>
           </CardContent>
@@ -314,9 +292,7 @@ export default function DocumentsManagement() {
               <Clock className="h-8 w-8 text-yellow-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">검토 대기</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {statisticsLoading ? '-' : statistics.pending}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{statisticsLoading ? "-" : statistics.pending}</p>
               </div>
             </div>
           </CardContent>
@@ -328,9 +304,7 @@ export default function DocumentsManagement() {
               <CheckCircle className="h-8 w-8 text-green-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">승인</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {statisticsLoading ? '-' : statistics.approved}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{statisticsLoading ? "-" : statistics.approved}</p>
               </div>
             </div>
           </CardContent>
@@ -342,9 +316,7 @@ export default function DocumentsManagement() {
               <XCircle className="h-8 w-8 text-red-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">수정 요청</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {statisticsLoading ? '-' : statistics.rejected}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{statisticsLoading ? "-" : statistics.rejected}</p>
               </div>
             </div>
           </CardContent>
@@ -356,9 +328,7 @@ export default function DocumentsManagement() {
               <FileCheck className="h-8 w-8 text-purple-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">검토율</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {statisticsLoading ? '-' : `${statistics.review_rate}%`}
-                </p>
+                <p className="text-2xl font-bold text-gray-900">{statisticsLoading ? "-" : `${statistics.review_rate}%`}</p>
               </div>
             </div>
           </CardContent>
@@ -372,12 +342,7 @@ export default function DocumentsManagement() {
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="신청번호, 고객명, 파일명으로 검색..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
+                <Input placeholder="신청번호, 고객명, 파일명으로 검색..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
               </div>
             </div>
             <div className="flex gap-3">
@@ -387,7 +352,7 @@ export default function DocumentsManagement() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">모든 타입</SelectItem>
-                  {documentTypes.map(type => (
+                  {documentTypes.map((type) => (
                     <SelectItem key={type.value} value={type.value}>
                       {type.label}
                     </SelectItem>
@@ -414,30 +379,16 @@ export default function DocumentsManagement() {
             <div className="mt-4 pt-4 border-t">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <span className="text-sm text-gray-600">
-                    {selectedDocuments.length}개 문서 선택됨
-                  </span>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSelectedDocuments([])}
-                  >
+                  <span className="text-sm text-gray-600">{selectedDocuments.length}개 문서 선택됨</span>
+                  <Button variant="outline" size="sm" onClick={() => setSelectedDocuments([])}>
                     선택 해제
                   </Button>
                 </div>
                 <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    onClick={() => handleBulkStatusUpdate('approved')}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
+                  <Button size="sm" onClick={() => handleBulkStatusUpdate("approved")} className="bg-green-600 hover:bg-green-700">
                     일괄 승인
                   </Button>
-                  <Button 
-                    size="sm" 
-                    variant="destructive"
-                    onClick={() => handleBulkStatusUpdate('revision_required')}
-                  >
+                  <Button size="sm" variant="destructive" onClick={() => handleBulkStatusUpdate("revision_required")}>
                     일괄 수정요청
                   </Button>
                 </div>
@@ -466,10 +417,7 @@ export default function DocumentsManagement() {
         <div className="space-y-4">
           {/* 전체 선택 체크박스 */}
           <div className="flex items-center gap-2 px-4">
-            <Checkbox
-              checked={selectedDocuments.length === filteredDocuments.length}
-              onCheckedChange={toggleSelectAll}
-            />
+            <Checkbox checked={selectedDocuments.length === filteredDocuments.length} onCheckedChange={toggleSelectAll} />
             <span className="text-sm text-gray-600">전체 선택</span>
           </div>
 
@@ -478,37 +426,30 @@ export default function DocumentsManagement() {
             const statusInfo = getStatusInfo(document.status);
             const TypeIcon = typeInfo.icon;
             const StatusIcon = statusInfo.icon;
-            
+
             return (
               <Card key={document.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
                   <div className="flex items-center gap-4">
                     {/* 선택 체크박스 */}
-                    <Checkbox
-                      checked={selectedDocuments.includes(document.id)}
-                      onCheckedChange={() => toggleDocumentSelection(document.id)}
-                    />
+                    <Checkbox checked={selectedDocuments.includes(document.id)} onCheckedChange={() => toggleDocumentSelection(document.id)} />
 
                     {/* 문서 아이콘 */}
                     <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                       <TypeIcon className="h-6 w-6 text-white" />
                     </div>
-                    
+
                     {/* 문서 정보 */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-4 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">
-                          {document.document_name}
-                        </h3>
-                        <Badge variant="outline">
-                          {document.application?.application_number || `#${document.application_id}`}
-                        </Badge>
+                        <h3 className="text-lg font-semibold text-gray-900 truncate">{document.document_name}</h3>
+                        <Badge variant="outline">{document.application?.application_number || `#${document.application_id}`}</Badge>
                       </div>
-                      
+
                       <div className="flex items-center gap-6 text-sm text-gray-600 mb-2">
                         <div className="flex items-center gap-1">
                           <User className="h-4 w-4" />
-                          <span>{document.application?.full_name || '고객명 없음'}</span>
+                          <span>{document.application?.full_name || "고객명 없음"}</span>
                         </div>
                         <div className="flex items-center gap-1">
                           <span className={typeInfo.color}>{typeInfo.label}</span>
@@ -518,28 +459,18 @@ export default function DocumentsManagement() {
                         </div>
                         <div className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
-                          <span>{new Date(document.uploaded_at).toLocaleDateString('ko-KR')}</span>
+                          <span>{new Date(document.uploaded_at).toLocaleDateString("ko-KR")}</span>
                         </div>
                       </div>
-                      
+
                       {document.reviewer && (
                         <div className="flex items-center gap-4 text-sm mb-2">
-                          <span className="text-blue-600">
-                            검토자: {document.reviewer.name || document.reviewer}
-                          </span>
-                          {document.reviewed_at && (
-                            <span className="text-gray-500">
-                              {new Date(document.reviewed_at).toLocaleDateString('ko-KR')}
-                            </span>
-                          )}
+                          <span className="text-blue-600">검토자: {document.reviewer.name || document.reviewer}</span>
+                          {document.reviewed_at && <span className="text-gray-500">{new Date(document.reviewed_at).toLocaleDateString("ko-KR")}</span>}
                         </div>
                       )}
 
-                      {document.notes && (
-                        <div className="bg-gray-50 p-2 rounded text-sm text-gray-700 mt-2">
-                          {document.notes}
-                        </div>
-                      )}
+                      {document.notes && <div className="bg-gray-50 p-2 rounded text-sm text-gray-700 mt-2">{document.notes}</div>}
                     </div>
 
                     {/* 상태 및 액션 */}
@@ -558,10 +489,12 @@ export default function DocumentsManagement() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => {
-                            setSelectedDocument(document);
-                            setShowDetailModal(true);
-                          }}>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              setSelectedDocument(document);
+                              setShowDetailModal(true);
+                            }}
+                          >
                             <Eye className="h-4 w-4 mr-2" />
                             상세보기
                           </DropdownMenuItem>
@@ -569,28 +502,19 @@ export default function DocumentsManagement() {
                             <Download className="h-4 w-4 mr-2" />
                             다운로드
                           </DropdownMenuItem>
-                          {document.status === 'pending' && (
+                          {document.status === "pending" && (
                             <>
-                              <DropdownMenuItem 
-                                onClick={() => handleStatusUpdate(document.id, 'approved')}
-                                className="text-green-600"
-                              >
+                              <DropdownMenuItem onClick={() => handleStatusUpdate(document.id, "approved")} className="text-green-600">
                                 <CheckCircle className="h-4 w-4 mr-2" />
                                 승인
                               </DropdownMenuItem>
-                              <DropdownMenuItem 
-                                onClick={() => handleStatusUpdate(document.id, 'revision_required')}
-                                className="text-red-600"
-                              >
+                              <DropdownMenuItem onClick={() => handleStatusUpdate(document.id, "revision_required")} className="text-red-600">
                                 <XCircle className="h-4 w-4 mr-2" />
                                 수정요청
                               </DropdownMenuItem>
                             </>
                           )}
-                          <DropdownMenuItem 
-                            onClick={() => handleDeleteDocument(document.id)}
-                            className="text-red-600"
-                          >
+                          <DropdownMenuItem onClick={() => handleDeleteDocument(document.id)} className="text-red-600">
                             <Trash2 className="h-4 w-4 mr-2" />
                             삭제
                           </DropdownMenuItem>
@@ -610,11 +534,9 @@ export default function DocumentsManagement() {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>문서 상세 정보</DialogTitle>
-            <DialogDescription>
-              업로드된 문서의 상세 정보를 확인하고 검토할 수 있습니다.
-            </DialogDescription>
+            <DialogDescription>업로드된 문서의 상세 정보를 확인하고 검토할 수 있습니다.</DialogDescription>
           </DialogHeader>
-          
+
           {selectedDocument && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -634,11 +556,11 @@ export default function DocumentsManagement() {
                   </div>
                   <div>
                     <label className="text-sm text-gray-600">업로드 일시</label>
-                    <p className="font-medium">{new Date(selectedDocument.uploaded_at).toLocaleString('ko-KR')}</p>
+                    <p className="font-medium">{new Date(selectedDocument.uploaded_at).toLocaleString("ko-KR")}</p>
                   </div>
                 </div>
               </div>
-              
+
               <div>
                 <h3 className="text-lg font-semibold mb-4">검토 정보</h3>
                 <div className="space-y-3">
@@ -648,26 +570,21 @@ export default function DocumentsManagement() {
                   </div>
                   <div>
                     <label className="text-sm text-gray-600">고객명</label>
-                    <p className="font-medium">{selectedDocument.application?.full_name || '고객명 없음'}</p>
+                    <p className="font-medium">{selectedDocument.application?.full_name || "고객명 없음"}</p>
                   </div>
                   <div>
                     <label className="text-sm text-gray-600">검토자</label>
-                    <p className="font-medium">{selectedDocument.reviewer?.name || '미지정'}</p>
+                    <p className="font-medium">{selectedDocument.reviewer?.name || "미지정"}</p>
                   </div>
                   <div>
                     <label className="text-sm text-gray-600">검토 일시</label>
-                    <p className="font-medium">
-                      {selectedDocument.reviewed_at 
-                        ? new Date(selectedDocument.reviewed_at).toLocaleString('ko-KR')
-                        : '미검토'
-                      }
-                    </p>
+                    <p className="font-medium">{selectedDocument.reviewed_at ? new Date(selectedDocument.reviewed_at).toLocaleString("ko-KR") : "미검토"}</p>
                   </div>
                 </div>
               </div>
             </div>
           )}
-          
+
           {selectedDocument?.notes && (
             <div className="mt-6">
               <h3 className="text-lg font-semibold mb-4">검토 메모</h3>
@@ -680,14 +597,9 @@ export default function DocumentsManagement() {
           {/* 검토 메모 입력 */}
           <div className="mt-6">
             <h3 className="text-lg font-semibold mb-4">검토 메모</h3>
-            <Textarea
-              placeholder="검토 메모를 입력하세요..."
-              value={reviewNotes}
-              onChange={(e) => setReviewNotes(e.target.value)}
-              className="min-h-[100px]"
-            />
+            <Textarea placeholder="검토 메모를 입력하세요..." value={reviewNotes} onChange={(e) => setReviewNotes(e.target.value)} className="min-h-[100px]" />
           </div>
-          
+
           <DialogFooter>
             <div className="flex gap-3">
               {selectedDocument?.downloadUrl && (
@@ -696,26 +608,20 @@ export default function DocumentsManagement() {
                   다운로드
                 </Button>
               )}
-              
-              {selectedDocument?.status === 'pending' && (
+
+              {selectedDocument?.status === "pending" && (
                 <>
-                  <Button 
-                    onClick={() => handleStatusUpdate(selectedDocument.id, 'approved', reviewNotes)}
-                    className="bg-green-600 hover:bg-green-700"
-                  >
+                  <Button onClick={() => handleStatusUpdate(selectedDocument.id, "approved", reviewNotes)} className="bg-green-600 hover:bg-green-700">
                     <CheckCircle className="h-4 w-4 mr-2" />
                     승인
                   </Button>
-                  <Button 
-                    variant="destructive"
-                    onClick={() => handleStatusUpdate(selectedDocument.id, 'revision_required', reviewNotes)}
-                  >
+                  <Button variant="destructive" onClick={() => handleStatusUpdate(selectedDocument.id, "revision_required", reviewNotes)}>
                     <XCircle className="h-4 w-4 mr-2" />
                     수정 요청
                   </Button>
                 </>
               )}
-              
+
               <Button variant="outline" onClick={() => setShowDetailModal(false)}>
                 닫기
               </Button>
@@ -729,23 +635,15 @@ export default function DocumentsManagement() {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>문서 업로드</DialogTitle>
-            <DialogDescription>
-              비자 신청과 관련된 문서를 업로드합니다.
-            </DialogDescription>
+            <DialogDescription>비자 신청과 관련된 문서를 업로드합니다.</DialogDescription>
           </DialogHeader>
-          
+
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                신청 ID
-              </label>
-              <Input
-                placeholder="신청 ID를 입력하세요 (예: VN-2024-001)"
-                value={uploadApplicationId}
-                onChange={(e) => setUploadApplicationId(e.target.value)}
-              />
+              <label className="text-sm font-medium text-gray-700 mb-2 block">신청 ID</label>
+              <Input placeholder="신청 ID를 입력하세요 (예: VN-2024-001)" value={uploadApplicationId} onChange={(e) => setUploadApplicationId(e.target.value)} />
             </div>
-            
+
             {uploadApplicationId && (
               <FileUpload
                 applicationId={uploadApplicationId}
@@ -757,7 +655,7 @@ export default function DocumentsManagement() {
               />
             )}
           </div>
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowUploadModal(false)}>
               취소

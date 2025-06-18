@@ -28,7 +28,11 @@ async function loadTemplate(templateName) {
   }
 
   try {
-    const templatePath = path.join(__dirname, "../templates/email", `${templateName}.hbs`);
+    const templatePath = path.join(
+      __dirname,
+      "../templates/email",
+      `${templateName}.hbs`,
+    );
     const templateContent = await fs.readFile(templatePath, "utf8");
     const compiledTemplate = handlebars.compile(templateContent);
 
@@ -70,7 +74,9 @@ async function sendEmail(emailData) {
     };
 
     const result = await transporter.sendMail(mailOptions);
-    console.log(`✅ Email sent successfully to ${emailData.to}: ${result.messageId}`);
+    console.log(
+      `✅ Email sent successfully to ${emailData.to}: ${result.messageId}`,
+    );
     return result;
   } catch (error) {
     console.error("❌ Error sending email:", error);
@@ -93,7 +99,11 @@ async function sendBulkEmails(emailList) {
       // 스팸 방지를 위한 지연
       await new Promise((resolve) => setTimeout(resolve, 100));
     } catch (error) {
-      results.push({ success: false, email: emailData.to, error: error.message });
+      results.push({
+        success: false,
+        email: emailData.to,
+        error: error.message,
+      });
     }
   }
 
@@ -122,14 +132,16 @@ const emailTemplates = {
   async sendApplicationConfirmation(application) {
     return sendEmail({
       to: application.email,
-      subject: `[베트남비자24] 비자 신청 확인 - ${application.application_number}`,
+      subject: `[베트남비자24] 비자 신청 확인 - ${application.applicationNumber}`,
       template: "application_confirmation",
       data: {
-        customerName: application.full_name,
-        applicationNumber: application.application_number,
-        visaType: application.visa_type,
-        submittedAt: application.created_at,
-        estimatedProcessingTime: getEstimatedProcessingTime(application.visa_type),
+        customerName: application.fullName,
+        applicationNumber: application.applicationNumber,
+        visaType: application.visaType,
+        submittedAt: application.createdAt,
+        estimatedProcessingTime: getEstimatedProcessingTime(
+          application.visa_type,
+        ),
       },
     });
   },
@@ -138,12 +150,12 @@ const emailTemplates = {
   async sendDocumentRequest(application, requiredDocuments) {
     return sendEmail({
       to: application.email,
-      subject: `[베트남비자24] 서류 보완 요청 - ${application.application_number}`,
+      subject: `[베트남비자24] 서류 보완 요청 - ${application.applicationNumber}`,
       template: "document_request",
       data: {
-        fullName: application.full_name,
-        applicationNumber: application.application_number,
-        visaType: application.visa_type,
+        fullName: application.fullName,
+        applicationNumber: application.applicationNumber,
+        visaType: application.visaType,
         requiredDocuments: requiredDocuments,
         requestDate: new Date().toLocaleDateString("ko-KR"),
         isUrgent: application.priority === "urgent",
@@ -351,13 +363,16 @@ handlebars.registerHelper("formatDate", function (date) {
   return new Date(date).toLocaleDateString("ko-KR");
 });
 
-handlebars.registerHelper("formatCurrency", function (amount, currency = "KRW") {
-  if (!amount) return "0";
-  return new Intl.NumberFormat("ko-KR", {
-    style: "currency",
-    currency: currency,
-  }).format(amount);
-});
+handlebars.registerHelper(
+  "formatCurrency",
+  function (amount, currency = "KRW") {
+    if (!amount) return "0";
+    return new Intl.NumberFormat("ko-KR", {
+      style: "currency",
+      currency: currency,
+    }).format(amount);
+  },
+);
 
 handlebars.registerHelper("eq", function (a, b) {
   return a === b;

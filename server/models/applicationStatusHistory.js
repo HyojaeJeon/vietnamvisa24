@@ -1,53 +1,64 @@
 module.exports = (sequelize, DataTypes) => {
-  const ApplicationStatusHistory = sequelize.define('ApplicationStatusHistory', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
+  const ApplicationStatusHistory = sequelize.define(
+    "ApplicationStatusHistory",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      applicationId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "visa_applications",
+          key: "id",
+        },
+      },
+      previousStatus: {
+        type: DataTypes.STRING(50),
+        allowNull: true,
+      },
+      newStatus: {
+        type: DataTypes.STRING(50),
+        allowNull: false,
+      },
+      changedBy: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "users",
+          key: "id",
+        },
+      },
+      notes: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
     },
-    application_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'visa_applications',
-        key: 'id'
-      }
+    {
+      tableName: "application_status_history",
+      timestamps: false,
+      underscored: false,
     },
-    previous_status: {
-      type: DataTypes.STRING(50),
-      allowNull: true
-    },
-    new_status: {
-      type: DataTypes.STRING(50),
-      allowNull: false
-    },
-    changed_by: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'admins',
-        key: 'id'
-      }
-    },
-    notes: {
-      type: DataTypes.TEXT,
-      allowNull: true
-    }
-  }, {
-    tableName: 'application_status_history',
-    timestamps: true,
-    underscored: true
-  });
+  );
 
-  ApplicationStatusHistory.associate = function(models) {
+  ApplicationStatusHistory.associate = function (models) {
     ApplicationStatusHistory.belongsTo(models.VisaApplication, {
-      foreignKey: 'application_id',
-      as: 'application'
+      foreignKey: "applicationId",
+      as: "application",
     });
-
-    ApplicationStatusHistory.belongsTo(models.Admin, {
-      foreignKey: 'changed_by',
-      as: 'changedBy'
+    ApplicationStatusHistory.belongsTo(models.User, {
+      foreignKey: "changedBy",
+      as: "changedByUser",
     });
   };
 

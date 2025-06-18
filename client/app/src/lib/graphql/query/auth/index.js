@@ -1,6 +1,20 @@
 import { gql } from "@apollo/client";
 
-// User queries
+export const USER_LOGIN_QUERY = gql`
+  query UserLogin($input: LoginInput!) {
+    userLogin(input: $input) {
+      accessToken
+      refreshToken
+      user {
+        id
+        email
+        name
+        phone
+      }
+    }
+  }
+`;
+
 export const GET_ME_QUERY = gql`
   query GetMe {
     getMe {
@@ -8,32 +22,7 @@ export const GET_ME_QUERY = gql`
       email
       name
       phone
-      created_at
-    }
-  }
-`;
-
-export const GET_USER_ME_QUERY = gql`
-  query GetUserMe {
-    getMe {
-      id
-      email
-      name
-      phone
-      created_at
-    }
-  }
-`;
-
-export const GET_DASHBOARD_STATS = gql`
-  query GetDashboardStats {
-    getDashboardStats {
-      totalApplications
-      pendingApplications
-      approvedApplications
-      rejectedApplications
-      totalRevenue
-      monthlyRevenue
+      role
     }
   }
 `;

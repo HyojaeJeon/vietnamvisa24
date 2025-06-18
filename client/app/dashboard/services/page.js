@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@apollo/client";
-import { GET_ADMIN_ME_QUERY } from "@/lib/graphql";
+import { GET_ADMIN_ME_QUERY } from "../../src/lib/graphql";
 import ServicesManagement from "./ServicesManagement";
 
 export default function ServicesPage() {
@@ -14,10 +14,9 @@ export default function ServicesPage() {
     errorPolicy: "all",
     skip: !authChecked, // 인증 토큰 확인 전에는 쿼리 skip
   });
-
   useEffect(() => {
     // 클라이언트에서만 localStorage 접근
-    const token = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
     if (!token) {
       router.replace("/dashboard/login");
       setAuthChecked(true);
@@ -29,7 +28,7 @@ export default function ServicesPage() {
   useEffect(() => {
     if (authChecked && error?.message?.includes("Authentication")) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("adminToken");
+        localStorage.removeItem("accessToken");
       }
       router.replace("/dashboard/login");
     }

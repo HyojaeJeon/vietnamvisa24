@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      application_id: {
+      applicationId: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
@@ -15,7 +15,7 @@ module.exports = (sequelize, DataTypes) => {
           key: "id",
         },
       },
-      customer_name: {
+      customerName: {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(255),
         allowNull: false,
       },
-      service_type: {
+      serviceType: {
         type: DataTypes.STRING(100),
         allowNull: false,
       },
@@ -36,14 +36,19 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
       },
       status: {
-        type: DataTypes.ENUM("pending", "in_progress", "completed", "cancelled"),
+        type: DataTypes.ENUM(
+          "pending",
+          "in_progress",
+          "completed",
+          "cancelled",
+        ),
         defaultValue: "pending",
       },
-      assigned_to: {
+      assignedTo: {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-          model: "admins",
+          model: "users",
           key: "id",
         },
       },
@@ -51,21 +56,25 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
     },
-    {
-      tableName: "consultations",
-      timestamps: true,
-      underscored: true,
-    }
+    { tableName: "consultations", timestamps: false, underscored: false },
   );
   Consultation.associate = function (models) {
-    Consultation.belongsTo(models.Admin, {
-      foreignKey: "assigned_to",
-      as: "assignedAdmin",
+    // 담당자: User(role로 구분)
+    Consultation.belongsTo(models.User, {
+      foreignKey: "assignedTo",
+      as: "assignedUser",
     });
-
     Consultation.belongsTo(models.VisaApplication, {
-      foreignKey: "application_id",
+      foreignKey: "applicationId",
       as: "application",
     });
   };

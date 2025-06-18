@@ -1,17 +1,15 @@
 const bcrypt = require("bcryptjs");
 const { models } = require("../../../models");
-const { getAdminFromToken } = require("../../../utils/auth");
+const { requireAuth } = require("../../../utils/requireAuth");
 
 const resolvers = {
   Query: {
-    getAdminMe: async (_, __, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error("Authentication required");
-      return admin;
+    getMe: async (_, __, context) => {
+      const user = await requireAuth(context);
+      return user;
     },
-    getAllApplications: async (_, __, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error("Authentication required");
+    getAllApplications: async (_, __, context) => {
+      await requireAuth(context, ["SUPER_ADMIN", "ADMIN", "MANAGER"]);
 
       return await models.VisaApplication.findAll({
         include: [
@@ -22,9 +20,8 @@ const resolvers = {
         order: [["created_at", "DESC"]],
       });
     },
-    getApplicationById: async (_, { id }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error("Authentication required");
+    getApplicationById: async (_, { id }, context) => {
+      await requireAuth(context, ["SUPER_ADMIN", "ADMIN", "MANAGER", "STAFF"]);
 
       return await models.VisaApplication.findByPk(id, {
         include: [
@@ -35,10 +32,8 @@ const resolvers = {
         ],
       });
     },
-
-    getDashboardStats: async (_, __, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error("Authentication required");
+    getDashboardStats: async (_, __, context) => {
+      await requireAuth(context, ["SUPER_ADMIN", "ADMIN", "MANAGER"]);
 
       try {
         const totalApplications = await models.VisaApplication.count();
@@ -84,49 +79,27 @@ const resolvers = {
           pendingReview: 0,
         };
       }
-    },
-
-    // 추가된 쿼리들
-    getAllAdmins: async (_, __, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin || admin.role !== "SUPER_ADMIN") {
-        throw new Error("Permission denied");
-      }
-      return await models.Admin.findAll({
-        order: [["created_at", "DESC"]],
-      });
-    },
-
-    getAdminById: async (_, { id }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error("Authentication required");
-      return await models.Admin.findByPk(id);
-    },
-
-    getAllUsers: async (_, __, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error("Authentication required");
+    }, // 추가된 쿼리들
+    getAllUsers: async (_, __, context) => {
+      await requireAuth(context, ["SUPER_ADMIN", "ADMIN", "MANAGER"]);
       return await models.User.findAll({
         order: [["created_at", "DESC"]],
       });
     },
 
-    getUserById: async (_, { id }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error("Authentication required");
+    getUserById: async (_, { id }, context) => {
+      await requireAuth(context, ["SUPER_ADMIN", "ADMIN", "MANAGER", "STAFF"]);
       return await models.User.findByPk(id);
     },
-    getVisaApplications: async (_, __, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error("Authentication required");
+    getVisaApplications: async (_, __, context) => {
+      await requireAuth(context, ["SUPER_ADMIN", "ADMIN", "MANAGER", "STAFF"]);
       return await models.VisaApplication.findAll({
         include: [{ model: models.User, as: "applicant" }],
         order: [["created_at", "DESC"]],
       });
     },
-    getVisaApplicationById: async (_, { id }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin) throw new Error("Authentication required");
+    getVisaApplicationById: async (_, { id }, context) => {
+      await requireAuth(context, ["SUPER_ADMIN", "ADMIN", "MANAGER", "STAFF"]);
       return await models.VisaApplication.findByPk(id, {
         include: [
           { model: models.User, as: "applicant" },
@@ -137,55 +110,7 @@ const resolvers = {
   },
 
   Mutation: {
-    createAdmin: async (_, { input }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin || admin.role !== "SUPER_ADMIN") {
-        throw new Error("Permission denied");
-      }
-
-      const existingAdmin = await models.Admin.findOne({ where: { email: input.email } });
-      if (existingAdmin) {
-        throw new Error("Admin already exists");
-      }
-
-      const hashedPassword = await bcrypt.hash(input.password, 10);
-
-      return await models.Admin.create({
-        ...input,
-        password: hashedPassword,
-        is_active: true,
-      });
-    },
-
-    updateAdminRole: async (_, { id, role }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin || admin.role !== "SUPER_ADMIN") {
-        throw new Error("Permission denied");
-      }
-
-      const targetAdmin = await models.Admin.findByPk(id);
-      if (!targetAdmin) {
-        throw new Error("Admin not found");
-      }
-
-      await targetAdmin.update({ role });
-      return targetAdmin;
-    },
-
-    deactivateAdmin: async (_, { id }, { adminToken }) => {
-      const admin = await getAdminFromToken(adminToken);
-      if (!admin || admin.role !== "SUPER_ADMIN") {
-        throw new Error("Permission denied");
-      }
-
-      const targetAdmin = await models.Admin.findByPk(id);
-      if (!targetAdmin) {
-        throw new Error("Admin not found");
-      }
-
-      await targetAdmin.update({ is_active: false });
-      return targetAdmin;
-    },
+    // admin 관련 뮤테이션 제거
   },
 };
 

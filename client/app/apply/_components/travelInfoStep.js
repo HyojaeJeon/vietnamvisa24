@@ -13,7 +13,12 @@ import { validateStep } from "./utils";
 
 const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
   const handleInputChange = (field, value) => {
-    onUpdate({ [field]: value });
+    if (field === "travelInfo") {
+      // If updating travelInfo, merge with existing travelInfo
+      onUpdate({ travelInfo: { ...formData.travelInfo, ...value } });
+    } else {
+      onUpdate({ [field]: value });
+    }
   };
 
   const isValid = validateStep(3, formData);
@@ -77,15 +82,15 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {" "}
             {/* 입국 예정일 */}
             <div className="space-y-3">
-              <label className="block text-sm font-bold tracking-wide text-gray-800 uppercase">베트남 입국 예정일 *</label>
+              <label className="block text-sm font-bold tracking-wide text-gray-800 uppercase">베트남 입국 예정일 *</label>{" "}
               <Input
                 type="date"
                 value={formData.travelInfo?.entryDate || ""}
                 onChange={(e) =>
                   handleInputChange("travelInfo", {
-                    ...formData.travelInfo,
                     entryDate: e.target.value,
                   })
                 }
@@ -93,7 +98,7 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                 className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-200"
               />
               <p className="text-xs text-gray-500">오늘 이후 날짜를 선택하세요</p>
-            </div>
+            </div>{" "}
           </div>
         </div>
 
@@ -109,23 +114,46 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {/* 입국 공항/항구 */}
             <div className="space-y-3">
-              <label className="block text-sm font-bold tracking-wide text-gray-800 uppercase">입국 공항/항구 *</label>
+              <label className="block text-sm font-bold tracking-wide text-gray-800 uppercase">입국 공항/항구 *</label>{" "}
               <Select
                 value={formData.travelInfo?.entryPort || ""}
                 onValueChange={(value) =>
                   handleInputChange("travelInfo", {
-                    ...formData.travelInfo,
                     entryPort: value,
                   })
                 }
               >
                 <SelectTrigger className="h-12 text-lg border-2 border-gray-200 focus:border-purple-500">
                   <SelectValue placeholder="입국 공항/항구를 선택하세요" />
-                </SelectTrigger>
+                </SelectTrigger>{" "}
                 <SelectContent>
                   {entryPorts.map((port) => (
                     <SelectItem key={port.value} value={port.value}>
                       {port.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* 방문 목적 */}
+            <div className="space-y-3">
+              <label className="block text-sm font-bold tracking-wide text-gray-800 uppercase">방문 목적 *</label>{" "}
+              <Select
+                value={formData.travelInfo?.purpose || ""}
+                onValueChange={(value) =>
+                  handleInputChange("travelInfo", {
+                    purpose: value,
+                  })
+                }
+              >
+                <SelectTrigger className="h-12 text-lg border-2 border-gray-200 focus:border-purple-500">
+                  <SelectValue placeholder="방문 목적을 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  {purposeOfVisit.map((purpose) => (
+                    <SelectItem key={purpose.value} value={purpose.value}>
+                      {purpose.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

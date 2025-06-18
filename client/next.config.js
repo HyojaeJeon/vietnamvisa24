@@ -107,18 +107,23 @@ const nextConfig = {
   },
 
   async rewrites() {
-    const isReplit = Boolean(process.env.REPLIT || process.env.REPLIT_ID);
+    const { REPL_OWNER, REPL_SLUG, REPLIT_DEPLOYMENT, NODE_ENV } = process.env;
 
-    if (isReplit) {
-      // Replit 환경: 같은 호스트의 5002 포트로 프록시
+    console.log("Environment Variables:", NODE_ENV);
+    // 오직 실제 배포된(Replit Deploy) 환경에서만 true
+    const isReplit = REPLIT_DEPLOYMENT === "1";
+    const replitHost = isReplit && REPL_OWNER && REPL_SLUG ? `${REPL_SLUG}-${REPL_OWNER}.repl.co` : null;
+    if (isReplit && replitHost) {
+      console.log("Replit Deploy detected, using dynamic rewrites.");
+      console.log("Replit host:", replitHost);
       return [
         {
           source: "/graphql",
-          destination: "https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:5002/graphql",
+          destination: `https://${replitHost}:5002/graphql`,
         },
         {
           source: "/api/documents/:path*",
-          destination: "https://7b04571c-0d62-4a51-9cd2-f2eca1d84482-00-1bagmmob6jow8.picard.replit.dev:5002/api/documents/:path*",
+          destination: `https://${replitHost}:5002/api/documents/:path*`,
         },
       ];
     }
@@ -128,6 +133,14 @@ const nextConfig = {
         {
           source: "/graphql",
           destination: "http://localhost:5002/graphql",
+        },
+        {
+          source: "/api/documents/:path*",
+          destination: `http://localhost:5002/api/documents/:path*`,
+        },
+        {
+          source: "/api/:path*",
+          destination: `http://localhost:5002/api/:path*`,
         },
       ];
     }

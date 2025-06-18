@@ -20,12 +20,6 @@ module.exports = {
         references: { model: "users", key: "id" },
         onDelete: "CASCADE",
       },
-      admin_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-        references: { model: "admins", key: "id" },
-        onDelete: "CASCADE",
-      },
       revoked: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
@@ -37,12 +31,12 @@ module.exports = {
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
       updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
-        defaultValue: Sequelize.fn('NOW')
+        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
       },
     });
   },

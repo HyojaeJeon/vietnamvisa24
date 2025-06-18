@@ -1,7 +1,7 @@
 const { mergeResolvers } = require("@graphql-tools/merge");
 
+const scalars = require("../schema/scalars");
 const authResolvers = require("./auth");
-const adminResolvers = require("./admin");
 const applicationsResolvers = require("./applications");
 const documentsResolvers = require("./documents");
 const consultationsResolvers = require("./consultations");
@@ -11,8 +11,8 @@ const reportsResolvers = require("./reports");
 const pricingResolvers = require("./pricing");
 
 const resolvers = mergeResolvers([
+  scalars,
   authResolvers,
-  adminResolvers,
   applicationsResolvers,
   documentsResolvers,
   consultationsResolvers,
@@ -23,4 +23,3 @@ const resolvers = mergeResolvers([
 ]);
 
 module.exports = resolvers;
- 

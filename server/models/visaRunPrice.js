@@ -55,7 +55,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "Admins",
+          model: "users",
           key: "id",
         },
       },
@@ -64,14 +64,22 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-          model: "Admins",
+          model: "users",
           key: "id",
         },
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
     },
     {
       tableName: "visa_run_prices",
-      timestamps: true,
+      timestamps: false,
       paranoid: true,
       underscored: false, // camelCase 필드명 사용
       indexes: [
@@ -80,15 +88,15 @@ module.exports = (sequelize, DataTypes) => {
           fields: ["visaType", "peopleCount"], // 같은 비자타입과 인원수 조합은 유일해야 함
         },
       ],
-    }
+    },
   );
-  // 관계 정의: VisaRunPrice -> Admin
+  // 관계 정의: VisaRunPrice -> User
   VisaRunPrice.associate = (models) => {
-    VisaRunPrice.belongsTo(models.Admin, {
+    VisaRunPrice.belongsTo(models.User, {
       foreignKey: "createdBy",
       as: "creator",
     });
-    VisaRunPrice.belongsTo(models.Admin, {
+    VisaRunPrice.belongsTo(models.User, {
       foreignKey: "updatedBy",
       as: "updater",
     });

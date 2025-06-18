@@ -1,25 +1,72 @@
 import { gql } from "@apollo/client";
 
-export const CREATE_VISA_APPLICATION_MUTATION = gql`
-  mutation CreateVisaApplication($input: VisaApplicationInput!) {
-    createVisaApplication(input: $input) {
+// New simplified mutation for creating applications
+export const CREATE_APPLICATION_MUTATION = gql`
+  mutation CreateApplication($input: CreateApplicationInput!) {
+    createApplication(input: $input) {
       id
-      visa_type
-      full_name
-      status
-      created_at
+      applicationId
+      processingType
+      totalPrice
+      createdAt
+      personalInfo {
+        id
+        firstName
+        lastName
+        email
+        phone
+        address
+        phoneOfFriend
+      }
+      travelInfo {
+        id
+        entryDate
+        entryPort
+        visaType
+      }
+      additionalServices {
+        id
+        name
+      }
+      documents {
+        id
+        type
+        fileName
+        fileSize
+        fileType
+        uploadedAt
+        extractedInfo {
+          type
+          issuingCountry
+          passportNo
+          surname
+          givenNames
+          dateOfBirth
+          dateOfIssue
+          dateOfExpiry
+          sex
+          nationality
+          personalNo
+          authority
+          koreanName
+          # Legacy camelCase fields
+          passportNo
+          givenNames
+        }
+      }
     }
   }
 `;
 
-export const UPDATE_APPLICATION_STATUS_MUTATION = gql`
-  mutation UpdateApplicationStatus($id: ID!, $status: ApplicationStatus!) {
-    updateApplicationStatus(id: $id, status: $status) {
+// Legacy mutation for backward compatibility
+export const CREATE_VISA_APPLICATION_MUTATION = gql`
+  mutation CreateVisaApplication($input: VisaApplicationInput!) {
+    createVisaApplication(input: $input) {
       id
+      visaType
+      fullName
       status
-      updated_at
-      application_number
-      full_name
+      createdAt
     }
   }
 `;
@@ -38,8 +85,8 @@ export const ADD_MEMO_MUTATION = gql`
     addApplicationMemo(applicationId: $applicationId, content: $content) {
       id
       content
-      created_at
-      created_by
+      createdAt
+      createdBy
     }
   }
 `;
@@ -48,12 +95,12 @@ export const UPDATE_APPLICATION_INFO_MUTATION = gql`
   mutation UpdateApplicationInfo($id: ID!, $input: UpdateApplicationInput!) {
     updateApplicationInfo(id: $id, input: $input) {
       id
-      full_name
+      fullName
       email
       phone
-      arrival_date
-      departure_date
-      updated_at
+      arrivalDate
+      departureDate
+      updatedAt
     }
   }
 `;
@@ -72,8 +119,8 @@ export const UPDATE_MEMO_MUTATION = gql`
     updateApplicationMemo(id: $id, content: $content) {
       id
       content
-      updated_at
-      created_by
+      updatedAt
+      createdBy
     }
   }
 `;
@@ -83,6 +130,42 @@ export const DELETE_MEMO_MUTATION = gql`
     deleteApplicationMemo(id: $id) {
       success
       message
+    }
+  }
+`;
+
+// 상태 업데이트 뮤테이션
+export const UPDATE_STATUS_MUTATION = gql`
+  mutation UpdateApplicationStatus($id: ID!, $status: ApplicationStatus!) {
+    updateApplicationStatus(id: $id, status: $status) {
+      id
+      status
+      message
+    }
+  }
+`;
+
+// 새로운 이메일 발송 뮤테이션
+export const SEND_NOTIFICATION_EMAIL_MUTATION = gql`
+  mutation SendNotificationEmail($applicationId: ID!, $emailType: EmailType!, $customMessage: String) {
+    sendNotificationEmail(applicationId: $applicationId, emailType: $emailType, customMessage: $customMessage) {
+      success
+      message
+      emailType
+      recipientEmail
+    }
+  }
+`;
+
+// PDF 생성 뮤테이션
+export const GENERATE_APPLICATION_PDF_MUTATION = gql`
+  mutation GenerateApplicationPDF($applicationId: ID!) {
+    generateApplicationPDF(applicationId: $applicationId) {
+      success
+      message
+      downloadUrl
+      fileName
+      generatedAt
     }
   }
 `;

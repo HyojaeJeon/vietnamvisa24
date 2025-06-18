@@ -34,24 +34,33 @@ module.exports = (sequelize) => {
         defaultValue: 0,
         allowNull: false,
       },
-      created_at: {
+      createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
       },
-      updated_at: {
+      updatedAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
+      },
+      role: {
+        type: DataTypes.ENUM("SUPER_ADMIN", "MANAGER", "STAFF", "USER"),
+        defaultValue: "USER",
+        allowNull: false,
+      },
+      refreshToken: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      refreshTokenExpires: {
+        type: DataTypes.DATE,
+        allowNull: true,
       },
     },
-    {
-      tableName: "users",
-      timestamps: true,
-      underscored: true,
-    }
+    { tableName: "users", timestamps: false, underscored: false },
   );
   User.associate = (models) => {
     User.hasMany(models.VisaApplication, {
-      foreignKey: "user_id",
+      foreignKey: "userId",
       as: "visaApplications",
     });
 

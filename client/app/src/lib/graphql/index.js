@@ -1,24 +1,14 @@
 // ====================
-// AUTH MUTATIONS
-// ====================
-export * from "./mutation/auth";
-
-// ====================
-// AUTH QUERIES
+// AUTH QUERIES &  AUTH MUTATIONS
 // ====================
 export * from "./query/auth";
+export * from "./mutation/auth";
 
 // ====================
 // APPLICATION QUERIES & MUTATIONS
 // ====================
 export * from "./query/applications";
 export * from "./mutation/applications";
-
-// ====================
-// ADMIN QUERIES & MUTATIONS
-// ====================
-export * from "./query/admin";
-export * from "./mutation/admin";
 
 // ====================
 // DOCUMENT QUERIES & MUTATIONS

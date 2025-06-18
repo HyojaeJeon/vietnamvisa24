@@ -54,11 +54,11 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: true,
       },
       createdBy: {
-        // 생성자 사용자 ID (외래키, Admin 테이블 참조)
+        // 생성자 사용자 ID (외래키, User 테이블 참조)
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "Admins",
+          model: "users",
           key: "id",
         },
       },
@@ -67,14 +67,22 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-          model: "Admins",
+          model: "users",
           key: "id",
         },
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
     },
     {
       tableName: "evisa_prices",
-      timestamps: true, // createdAt, updatedAt 자동 생성
+      timestamps: false, // 명시적으로 정의한 타임스탬프 사용
       paranoid: true, // deletedAt 소프트 삭제 지원
       underscored: false, // camelCase 필드명 사용
       indexes: [
@@ -83,15 +91,15 @@ module.exports = (sequelize, DataTypes) => {
           fields: ["type", "processingTime"], // 같은 타입과 처리시간 조합은 유일해야 함
         },
       ],
-    }
+    },
   );
-  // 관계 정의: EVisaPrice -> Admin (여러 EVisaPrice 레코드가 하나의 Admin에 속함)
+  // 관계 정의: EVisaPrice -> User (여러 EVisaPrice 레코드가 하나의 User에 속함)
   EVisaPrice.associate = (models) => {
-    EVisaPrice.belongsTo(models.Admin, {
+    EVisaPrice.belongsTo(models.User, {
       foreignKey: "createdBy",
       as: "creator",
     });
-    EVisaPrice.belongsTo(models.Admin, {
+    EVisaPrice.belongsTo(models.User, {
       foreignKey: "updatedBy",
       as: "updater",
     });

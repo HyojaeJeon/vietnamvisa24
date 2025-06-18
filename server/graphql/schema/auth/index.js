@@ -8,15 +8,8 @@ const authTypeDefs = gql`
     phone: String
     created_at: String
     tokenVersion: Int
-  }
-
-  type Admin {
-    id: ID!
-    email: String!
-    name: String!
-    role: AdminRole!
-    created_at: String
-    is_active: Boolean!
+    role: UserRole!
+    is_active: Boolean
   }
 
   type VisaApplication {
@@ -38,27 +31,7 @@ const authTypeDefs = gql`
     created_at: String!
     updated_at: String!
     applicant: User
-    assignedAdmin: Admin
-  }
-
-  type Document {
-    id: ID!
-    application_id: String!
-    customer_name: String!
-    document_type: String!
-    document_name: String!
-    file_size: String!
-    status: DocumentStatus!
-    uploaded_at: String!
-    reviewed_at: String
-    reviewer: String
-    notes: String
-  }
-
-  enum AdminRole {
-    SUPER_ADMIN
-    MANAGER
-    STAFF
+    assignedUser: User
   }
 
   enum ApplicationStatus {
@@ -112,13 +85,6 @@ const authTypeDefs = gql`
     pendingReview: Int!
   }
 
-  input AdminInput {
-    email: String!
-    password: String!
-    name: String!
-    role: AdminRole!
-  }
-
   input RegisterInput {
     email: String!
     password: String!
@@ -132,73 +98,68 @@ const authTypeDefs = gql`
     rememberMe: Boolean
     autoLogin: Boolean
   }
-
-  input AdminLoginInput {
-    email: String!
-    password: String!
-  }
-
   input VisaApplicationInput {
-    visa_type: String!
-    full_name: String!
-    passport_number: String!
+    visaType: String!
+    fullName: String!
+    passportNumber: String!
     nationality: String!
-    birth_date: String
+    birthDate: String
     phone: String!
     email: String!
-    arrival_date: String!
-    departure_date: String!
+    arrivalDate: String!
+    departureDate: String!
     purpose: String
   }
-
   input NotificationInput {
     type: NotificationType!
     title: String!
     message: String!
     recipient: String!
     priority: NotificationPriority
-    related_id: String
+    relatedId: String
   }
-
   input DocumentInput {
-    application_id: String!
-    customer_name: String!
-    document_type: String!
-    document_name: String!
-    file_size: String!
+    applicationId: String!
+    customerName: String!
+    documentType: String!
+    documentName: String!
+    fileSize: String!
   }
-
   type AuthResponse {
-    token: String!
+    accessToken: String!
     refreshToken: String
     user: User!
   }
-  type AdminAuthResponse {
-    token: String!
-    refreshToken: String
-    admin: Admin!
-  }
 
   type RefreshTokenResponse {
-    token: String!
+    accessToken: String!
     refreshToken: String!
+  }
+
+  enum UserRole {
+    ADMIN
+    USER
+    STAFF
+    MANAGER
+    SUPER_ADMIN
   }
   extend type Query {
     getMe: User
-    getVisaTypes: [String!]!
     getDocuments: [Document!]!
     getDocumentsByApplication(applicationId: String!): [Document!]!
     getNotifications: [Notification!]!
     getUnreadNotifications: [Notification!]!
+    userLogin(input: LoginInput!): AuthResponse!
   }
   extend type Mutation {
     userRegister(input: RegisterInput!): AuthResponse!
-    userLogin(input: LoginInput!): AuthResponse!
-    adminLogin(input: AdminLoginInput!): AdminAuthResponse!
     refreshToken(refreshToken: String): RefreshTokenResponse!
-    refreshAdminToken(refreshToken: String): RefreshTokenResponse!
     createDocument(input: DocumentInput!): Document!
-    updateDocumentStatus(id: ID!, status: DocumentStatus!, notes: String): Document!
+    updateDocumentStatus(
+      id: ID!
+      status: DocumentStatus!
+      notes: String
+    ): Document!
     createNotification(input: NotificationInput!): Notification!
     markNotificationAsRead(id: ID!): Notification!
     markAllNotificationsAsRead(userId: String!): SuccessResponse!

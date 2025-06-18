@@ -85,11 +85,6 @@ const ContactForm = dynamic(() => import("./contactForm"), {
   ),
 });
 
-const GraphQLTest = dynamic(() => import("./test/GraphQLTest.jsx"), {
-  ssr: false,
-  loading: () => null,
-});
-
 export default function InteractiveSections() {
   const [mounted, setMounted] = useState(false);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
@@ -149,15 +144,6 @@ export default function InteractiveSections() {
 
       {/* Interactive Additional Services */}
       <AdditionalServices onApplyClick={handleVisaApply} />
-
-      {/* GraphQL Test - 개발 모드에서만 표시 */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="py-12 bg-gray-50">
-          <div className="max-w-4xl px-4 mx-auto">
-            <GraphQLTest />
-          </div>
-        </div>
-      )}
 
       {/* Interactive Contact Form */}
       <ContactForm />

@@ -1,74 +1,153 @@
 const { gql } = require("graphql-tag");
 
 const typeDefs = gql`
-  type EmailResponse {
-    success: Boolean!
-    message: String!
-  }
-  type MemoResponse {
-    id: ID!
-    content: String!
-    created_at: String!
-    updated_at: String
-    created_by: String!
+  scalar Date
+  scalar DateTime
+
+  type Application {
+    id: ID
+    applicationId: String
+    processingType: String
+    totalPrice: Float
+    createdAt: DateTime
+    documents: [Document]
+    personalInfo: PersonalInfo
+    travelInfo: TravelInfo
+    additionalServices: [AdditionalService]
   }
 
-  type DeleteResponse {
-    success: Boolean!
-    message: String!
+  extend type Document {
+    extractedInfo: ExtractedInfo
   }
 
-  type DownloadResponse {
-    downloadUrl: String!
-    fileName: String!
+  type ExtractedInfo {
+    type: String
+    issuingCountry: String
+    passportNo: String
+    surname: String
+    givenNames: String
+    dateOfBirth: String
+    dateOfIssue: String
+    dateOfExpiry: String
+    sex: String
+    nationality: String
+    personalNo: String
+    authority: String
+    koreanName: String
+    # Legacy snake_case fields for backward compatibility
+    issuing_country: String
+    passport_no: String
+    given_names: String
+    date_of_birth: String
+    date_of_issue: String
+    date_of_expiry: String
+    personal_no: String
+    korean_name: String
+  }
+  type PersonalInfo {
+    id: ID
+    firstName: String
+    lastName: String
+    email: String
+    phone: String
+    address: String
+    phoneOfFriend: String
+  }
+
+  type TravelInfo {
+    id: ID
+    entryDate: Date
+    entryPort: String
+    visaType: String
+  }
+
+  type AdditionalService {
+    id: ID
+    name: String
+  }
+
+  type Query {
+    application(id: ID): Application
+    applications: [Application]
+    documents(applicationId: ID): [Document]
+    services: [AdditionalService]
+  }
+
+  type Mutation {
+    createApplication(input: CreateApplicationInput): Application
+    updateApplication(id: ID, input: UpdateApplicationInput): Application
+  }
+  input CreateApplicationInput {
+    applicationId: String
+    processingType: String
+    totalPrice: Float
+    personalInfo: PersonalInfoInput
+    travelInfo: TravelInfoInput
+    additionalServiceIds: [ID]
+    documents: DocumentsInput
   }
 
   input UpdateApplicationInput {
-    full_name: String
-    email: String
-    phone: String
-    arrival_date: String
-    departure_date: String
-    visa_type: String
-    nationality: String
-    passport_number: String
-    purpose: String
-  }
-  input VisaApplicationInput {
-    visa_type: String!
-    full_name: String!
-    passport_number: String
-    nationality: String!
-    birth_date: String!
-    phone: String!
-    email: String!
-    gender: String
-    processing_speed: String
-    visa_subtype: String
-    documents: String
-    additional_services: String
-    payment_method: String
-    payment_skipped: Boolean
-    base_price: Float
-    total_price: Float
+    processingType: String
+    totalPrice: Float
+    personalInfo: PersonalInfoInput
+    travelInfo: TravelInfoInput
+    additionalServiceIds: [ID]
+    documents: DocumentsInput
   }
 
-  extend type Query {
-    getVisaApplications: [VisaApplication!]!
-    getVisaApplication(id: ID!): VisaApplication
-    getApplicationHistory(id: ID!): [ApplicationStatusHistory!]!
-    getApplicationMemos(applicationId: ID!): [MemoResponse!]!
+  input DocumentsInput {
+    passport: DocumentFileInput
+    photo: DocumentFileInput
+    flightTicket: DocumentFileInput
+    bankStatement: DocumentFileInput
+    invitationLetter: DocumentFileInput
+    businessRegistration: DocumentFileInput
   }
-  extend type Mutation {
-    createVisaApplication(input: VisaApplicationInput!): VisaApplication!
-    updateApplicationStatus(id: ID!, status: ApplicationStatus!): VisaApplication!
-    updateApplicationInfo(id: ID!, input: UpdateApplicationInput!): VisaApplication!
-    sendEmailToCustomer(applicationId: ID!, emailType: String!, content: String): EmailResponse!
-    addApplicationMemo(applicationId: ID!, content: String!): MemoResponse!
-    updateApplicationMemo(id: ID!, content: String!): MemoResponse!
-    deleteApplicationMemo(id: ID!): DeleteResponse!
-    downloadApplicationDocuments(applicationId: ID!): DownloadResponse!
-    deleteApplication(id: ID!): Boolean!
+
+  input DocumentFileInput {
+    fileName: String
+    fileSize: Int
+    fileType: String
+    fileData: String # Base64 encoded file data
+    extractedInfo: PassportInfoInput # For passport OCR data
+  }
+  input PassportInfoInput {
+    type: String
+    issuing_country: String
+    issuingCountry: String # camelCase alias for backward compatibility
+    passport_no: String
+    passportNo: String # camelCase alias for backward compatibility
+    surname: String
+    given_names: String
+    givenNames: String # camelCase alias for backward compatibility
+    date_of_birth: String
+    dateOfBirth: String # camelCase alias for backward compatibility
+    date_of_issue: String
+    dateOfIssue: String # camelCase alias for backward compatibility
+    date_of_expiry: String
+    dateOfExpiry: String # camelCase alias for backward compatibility
+    sex: String
+    nationality: String
+    personal_no: String
+    personalNo: String # camelCase alias for backward compatibility
+    authority: String
+    korean_name: String
+    koreanName: String # camelCase alias for backward compatibility
+  }
+  input PersonalInfoInput {
+    firstName: String
+    lastName: String
+    email: String
+    phone: String
+    address: String
+    phoneOfFriend: String
+  }
+
+  input TravelInfoInput {
+    entryDate: Date
+    entryPort: String
+    visaType: String
   }
 `;
 

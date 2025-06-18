@@ -1,38 +1,37 @@
-import { configureStore } from "@reduxjs/toolkit";
+// src/store/index.js
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from "redux-persist";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
-import { combineReducers } from "@reduxjs/toolkit";
 import authReducer from "./authSlice";
 import languageReducer from "./languageSlice";
 import applyFormReducer from "./applyFormSlice";
 
 // SSR 환경에서도 동작하는 NoopStorage 생성
-const createNoopStorage = () => {
-  return {
-    getItem(_key) {
-      return Promise.resolve(null);
-    },
-    setItem(_key, value) {
-      return Promise.resolve(value);
-    },
-    removeItem(_key) {
-      return Promise.resolve();
-    },
-  };
-};
+const createNoopStorage = () => ({
+  getItem(_key) {
+    return Promise.resolve(null);
+  },
+  setItem(_key, value) {
+    return Promise.resolve(value);
+  },
+  removeItem(_key) {
+    return Promise.resolve();
+  },
+});
 
 // 클라이언트 사이드에서만 localStorage 사용
 const storage = typeof window !== "undefined" ? createWebStorage("local") : createNoopStorage();
 
+// Persist 설정: auth 슬라이스는 제외하고 language/applyForm 만 저장
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth", "language", "applyForm"], // auth, language, applyForm 상태만 persist
+  whitelist: ["language", "applyForm"],
 };
 
 const rootReducer = combineReducers({
-  auth: authReducer,
-  language: languageReducer,
+  auth: authReducer, // accessToken 만 메모리에 보관 (persist 제외)
+  language: languageReducer, // 언어 설정만 persist
   applyForm: applyFormReducer,
 });
 
@@ -43,6 +42,7 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
+        // redux-persist action 무시
         ignoredActions: ["persist/PERSIST", "persist/REHYDRATE"],
       },
     }),
@@ -50,7 +50,7 @@ export const store = configureStore({
 
 export const persistor = persistStore(store);
 
-// Redux store를 전역에서 접근할 수 있도록 설정
+// 디버깅/테스트 목적: 전역에서 Redux store 접근 가능
 if (typeof window !== "undefined") {
   window.__REDUX_STORE__ = store;
 }

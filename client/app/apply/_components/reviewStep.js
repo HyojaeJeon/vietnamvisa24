@@ -4,11 +4,11 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
 import { Button } from "../../src/components/ui/button";
 import { Badge } from "../../src/components/ui/badge";
-import { CheckCircle, FileText, User, Mail, Globe, Calendar, ArrowRight, ArrowLeft, Phone, MapPin, Plane, Hotel, CreditCard, Edit } from "lucide-react";
+import { CheckCircle, FileText, User, Mail, Globe, Calendar, ArrowRight, ArrowLeft, Phone, MapPin, Plane, Hotel, Send, Edit, Loader2 } from "lucide-react";
 import { formatCurrency, calculateTotalPrice, formatDate } from "./utils";
 import { VISA_TYPES, PROCESSING_TYPES, ADDITIONAL_SERVICES } from "./types";
 
-const ReviewStep = ({ formData, onNext, onPrevious, onEdit }) => {
+const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting }) => {
   const currentPrice = calculateTotalPrice(formData);
 
   const getVisaTypeLabel = (type) => {
@@ -343,14 +343,23 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit }) => {
           <Button onClick={onPrevious} variant="outline" className="px-8 py-4 text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-2xl">
             <ArrowLeft className="w-6 h-6 mr-3" />
             <span>이전</span>
-          </Button>
-
+          </Button>{" "}
           <Button
             onClick={onNext}
-            className="px-12 py-4 text-lg font-bold text-white transition-all duration-300 transform shadow-2xl bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 rounded-2xl hover:shadow-3xl hover:scale-105"
+            disabled={isSubmitting}
+            className="px-12 py-4 text-lg font-bold text-white transition-all duration-300 transform shadow-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 rounded-2xl hover:shadow-3xl hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
           >
-            <span className="mr-3">결제하기</span>
-            <CreditCard className="w-6 h-6" />
+            {isSubmitting ? (
+              <>
+                <Loader2 className="w-6 h-6 mr-3 animate-spin" />
+                <span>신청서 제출 중...</span>
+              </>
+            ) : (
+              <>
+                <span className="mr-3">신청서 제출</span>
+                <Send className="w-6 h-6" />
+              </>
+            )}
           </Button>
         </div>
       </CardContent>

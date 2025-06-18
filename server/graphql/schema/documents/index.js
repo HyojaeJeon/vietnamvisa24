@@ -39,18 +39,73 @@ const documentsTypeDefs = gql`
     formattedFileSize: String
   }
 
+  scalar Upload
+
+  type PassportInfo {
+    Type: String
+    Issuing_country: String
+    Passport_No: String
+    Surname: String
+    Given_names: String
+    Date_of_birth: String
+    Sex: String
+    Nationality: String
+    Personal_No: String
+    Date_of_issue: String
+    Date_of_expiry: String
+    Authority: String
+    korean_name: String
+  }
+
+  type Query {
+    _empty: String
+  }
+
   extend type Query {
+    getDocument(id: ID!): Document
     getDocuments: [Document!]!
     getDocumentsByApplication(applicationId: String!): [Document!]!
-    getDocument(id: ID!): Document
     getDocumentTypes: [DocumentType!]!
     getDocumentStatistics(applicationId: String): DocumentStatistics!
   }
+  input CreateDocumentInput {
+    applicationId: ID!
+    customerName: String!
+    documentType: String!
+    documentName: String
+    filePath: String!
+    fileSize: Int
+    fileType: String
+  }
 
+  input UpdateDocumentInput {
+    customerName: String
+    documentType: String
+    documentName: String
+    status: DocumentStatus
+    notes: String
+  }
+
+  extend type Query {
+    getDocuments: [Document]
+    getDocumentsByStatus(status: DocumentStatus!): [Document]
+    getDocumentsByApplication(applicationId: ID!): [Document]
+    getDocumentStatistics: DocumentStatistics
+  }
   extend type Mutation {
-    createDocument(input: DocumentInput!): Document!
-    updateDocumentStatus(id: ID!, status: DocumentStatus!, notes: String): Document!
-    bulkUpdateDocumentStatus(ids: [ID!]!, status: DocumentStatus!, notes: String): BulkUpdateResponse!
+    createDocument(input: CreateDocumentInput!): Document!
+    updateDocument(id: ID!, input: UpdateDocumentInput!): Document!
+    updateDocumentOcrData(id: ID!, ocrData: JSON!): Document!
+    updateDocumentStatus(
+      id: ID!
+      status: DocumentStatus!
+      notes: String
+    ): Document!
+    bulkUpdateDocumentStatus(
+      ids: [ID!]!
+      status: DocumentStatus!
+      notes: String
+    ): BulkUpdateResponse!
     deleteDocument(id: ID!): SuccessResponse!
     deleteDocumentsByApplication(applicationId: String!): DeleteResponse!
   }

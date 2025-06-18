@@ -1,49 +1,59 @@
-
 module.exports = (sequelize, DataTypes) => {
-  const ApplicationWorkflow = sequelize.define('ApplicationWorkflow', {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true
+  const ApplicationWorkflow = sequelize.define(
+    "ApplicationWorkflow",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      applicationId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "visa_applications",
+          key: "id",
+        },
+      },
+      templateId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "workflow_templates",
+          key: "id",
+        },
+      },
+      checklistStatus: {
+        type: DataTypes.JSON,
+        allowNull: false,
+      },
+      completedAt: {
+        type: DataTypes.DATE,
+        allowNull: true,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
     },
-    application_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'visa_applications',
-        key: 'id'
-      }
+    {
+      tableName: "application_workflows",
+      timestamps: false,
+      underscored: false,
     },
-    template_id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: 'workflow_templates',
-        key: 'id'
-      }
-    },
-    checklist_status: {
-      type: DataTypes.JSON,
-      allowNull: false
-    },
-    completed_at: {
-      type: DataTypes.DATE,
-      allowNull: true
-    }
-  }, {
-    tableName: 'application_workflows',
-    timestamps: true,
-    underscored: true
-  });
-
-  ApplicationWorkflow.associate = function(models) {
+  );
+  ApplicationWorkflow.associate = function (models) {
     ApplicationWorkflow.belongsTo(models.VisaApplication, {
-      foreignKey: 'application_id',
-      as: 'application'
+      foreignKey: "applicationId",
+      as: "application",
     });
     ApplicationWorkflow.belongsTo(models.WorkflowTemplate, {
-      foreignKey: 'template_id',
-      as: 'template'
+      foreignKey: "templateId",
+      as: "template",
     });
   };
 

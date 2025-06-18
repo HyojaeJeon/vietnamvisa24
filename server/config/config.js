@@ -1,19 +1,28 @@
 const dotenv = require("dotenv");
 dotenv.config();
 
-// Replit 환경 감지 - 더 확실한 감지
+// 환경 감지 로직 개선
 const isReplit = !!(
   process.env.REPLIT ||
   process.env.REPLIT_DB_URL ||
   process.env.REPL_ID ||
   process.env.REPL_SLUG ||
-  process.cwd().includes("/home/runner") ||
-  process.env.DB_DIALECT === "mysql" ||
-  "sqlite"
+  process.cwd().includes("/home/runner")
 );
 
+// 로컬 환경에서 강제로 SQLite 사용하고 싶다면 DB_FORCE_SQLITE=true 설정
+const useSQLite = isReplit || process.env.DB_FORCE_SQLITE === "true";
+// 명시적으로 MySQL 사용하고 싶다면 DB_FORCE_MYSQL=true 설정
+const useMySQL =
+  process.env.DB_FORCE_MYSQL === "true" || (!useSQLite && !isReplit);
+
 console.log("🔧 Config - Environment:", isReplit ? "Replit" : "Local");
-console.log("🔧 Config - Database:", isReplit ? "SQLite" : "MySQL");
+console.log("🔧 Config - Database:", useSQLite ? "SQLite" : "MySQL");
+console.log(
+  "🔧 Config - Force SQLite:",
+  process.env.DB_FORCE_SQLITE === "true",
+);
+console.log("🔧 Config - Force MySQL:", process.env.DB_FORCE_MYSQL === "true");
 
 const commonConfig = {
   logging: process.env.NODE_ENV === "development" ? console.log : false,
@@ -44,8 +53,8 @@ const sqliteConfig = {
   define: {
     timestamps: true,
     underscored: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    createdAt: "created_at",
+    updatedAt: "updated_at",
   },
   ...commonConfig,
 };
@@ -57,41 +66,41 @@ const mysqlConfig = {
   define: {
     timestamps: true,
     underscored: true,
-    createdAt: 'created_at',
-    updatedAt: 'updated_at'
+    createdAt: "created_at",
+    updatedAt: "updated_at",
   },
   ...commonConfig,
 };
 
 // 개발 환경 설정
-const developmentConfig = isReplit
-  ? {
-      ...sqliteConfig,
-    }
-  : {
-      username: process.env.DB_USER || "appuser",
-      password: process.env.DB_PASSWORD || "gywo9988!@",
-      database: process.env.DB_NAME || "lngw2025_db",
-      host: process.env.DB_HOST || "127.0.0.1",
-      port: process.env.DB_PORT || 3306,
-      ...mysqlConfig,
-    };
-
-// 프로덕션 환경 설정
-const productionConfig = isReplit
+const developmentConfig = useSQLite
   ? {
       ...sqliteConfig,
     }
   : {
       username: process.env.DB_USER || "root",
       password: process.env.DB_PASSWORD || "",
-      database: process.env.DB_NAME || "lngw2025_db",
+      database: process.env.DB_NAME || "vietnamvisa24_db",
       host: process.env.DB_HOST || "127.0.0.1",
       port: process.env.DB_PORT || 3306,
       ...mysqlConfig,
     };
 
-console.log("🔧 Config - Selected config:", isReplit ? "SQLite" : "MySQL");
+// 프로덕션 환경 설정
+const productionConfig = useSQLite
+  ? {
+      ...sqliteConfig,
+    }
+  : {
+      username: process.env.DB_USER || "root",
+      password: process.env.DB_PASSWORD || "",
+      database: process.env.DB_NAME || "vietnamvisa24_db",
+      host: process.env.DB_HOST || "127.0.0.1",
+      port: process.env.DB_PORT || 3306,
+      ...mysqlConfig,
+    };
+
+console.log("🔧 Config - Selected config:", useSQLite ? "SQLite" : "MySQL");
 
 module.exports = {
   development: developmentConfig,

@@ -43,42 +43,42 @@ function StaticHeroSection() {
   const currentSlide = slides[0];
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative flex items-center justify-center min-h-screen overflow-hidden">
       {/* Animated Background */}
       <div className={`absolute inset-0 bg-gradient-to-br ${currentSlide.gradient}`}>
         <div className="absolute inset-0 bg-black/20"></div>
 
         {/* Floating Elements */}
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-3/4 right-1/4 w-48 h-48 bg-white/5 rounded-full blur-2xl animate-pulse delay-1000"></div>
-        <div className="absolute bottom-1/4 left-1/3 w-32 h-32 bg-white/15 rounded-full blur-xl animate-pulse delay-500"></div>
+        <div className="absolute w-64 h-64 rounded-full top-1/4 left-1/4 bg-white/10 blur-3xl animate-pulse"></div>
+        <div className="absolute w-48 h-48 delay-1000 rounded-full top-3/4 right-1/4 bg-white/5 blur-2xl animate-pulse"></div>
+        <div className="absolute w-32 h-32 delay-500 rounded-full bottom-1/4 left-1/3 bg-white/15 blur-xl animate-pulse"></div>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-4 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div className="container relative z-10 px-4 py-20 mx-auto">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
           {/* Left Content */}
-          <div className="text-white space-y-8">
+          <div className="space-y-8 text-white">
             {/* Badge */}
-            <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
-              <Star className="h-4 w-4 text-yellow-300" />
+            <div className="inline-flex items-center px-4 py-2 space-x-2 text-sm font-medium rounded-full bg-white/20 backdrop-blur-sm">
+              <Star className="w-4 h-4 text-yellow-300" />
               <span>베트남 비자 전문 대행 서비스</span>
             </div>
 
             {/* Main Title */}
             <div className="space-y-4">
-              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold leading-tight">{currentSlide.title}</h1>
-              <h2 className="text-2xl md:text-3xl font-medium text-white/90">{currentSlide.subtitle}</h2>
-              <p className="text-xl text-white/80 max-w-2xl leading-relaxed">{currentSlide.description}</p>
+              <h1 className="text-5xl font-bold leading-tight md:text-6xl lg:text-7xl">{currentSlide.title}</h1>
+              <h2 className="text-2xl font-medium md:text-3xl text-white/90">{currentSlide.subtitle}</h2>
+              <p className="max-w-2xl text-xl leading-relaxed text-white/80">{currentSlide.description}</p>
             </div>
 
             {/* Benefits */}
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
               {benefits.map((benefit, index) => {
                 const IconComponent = benefit.icon;
                 return (
-                  <div key={index} className="flex items-center space-x-3 bg-white/10 backdrop-blur-sm p-4 rounded-xl">
-                    <IconComponent className="h-5 w-5 text-green-300 flex-shrink-0" />
+                  <div key={index} className="flex items-center p-4 space-x-3 bg-white/10 backdrop-blur-sm rounded-xl">
+                    <IconComponent className="flex-shrink-0 w-5 h-5 text-green-300" />
                     <span className="text-sm font-medium">{benefit.text}</span>
                   </div>
                 );
@@ -86,26 +86,26 @@ function StaticHeroSection() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button className="bg-white text-gray-800 px-8 py-4 rounded-xl font-semibold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2">
-                <Zap className="h-5 w-5" />
+            <div className="flex flex-col gap-4 sm:flex-row">
+              <button className="flex items-center justify-center px-8 py-4 space-x-2 font-semibold text-gray-800 transition-all duration-300 transform bg-white shadow-xl rounded-xl hover:shadow-2xl hover:scale-105">
+                <Zap className="w-5 h-5" />
                 <span>지금 신청하기</span>
               </button>
 
-              <button className="border-2 border-white/30 text-white px-8 py-4 rounded-xl font-semibold backdrop-blur-sm hover:bg-white/10 transition-all duration-300 flex items-center justify-center space-x-2">
-                <Phone className="h-5 w-5" />
+              <button className="flex items-center justify-center px-8 py-4 space-x-2 font-semibold text-white transition-all duration-300 border-2 border-white/30 rounded-xl backdrop-blur-sm hover:bg-white/10">
+                <Phone className="w-5 h-5" />
                 <span>무료 상담</span>
               </button>
             </div>
 
             {/* Contact Info */}
-            <div className="flex flex-col sm:flex-row gap-4 text-sm text-white/80">
+            <div className="flex flex-col gap-4 text-sm sm:flex-row text-white/80">
               <div className="flex items-center space-x-2">
-                <MessageCircle className="h-4 w-4" />
+                <MessageCircle className="w-4 h-4" />
                 <span>카카오톡: @vietnamvisa24</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4" />
+                <Phone className="w-4 h-4" />
                 <span>24시간 상담: 1588-0000</span>
               </div>
             </div>
@@ -118,10 +118,10 @@ function StaticHeroSection() {
               {stats.map((stat, index) => {
                 const IconComponent = stat.icon;
                 return (
-                  <Card key={index} className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+                  <Card key={index} className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
                     <CardContent className="p-6 text-center">
-                      <IconComponent className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-                      <div className="text-2xl font-bold text-gray-800 mb-1">{stat.number}</div>
+                      <IconComponent className="w-8 h-8 mx-auto mb-3 text-blue-600" />
+                      <div className="mb-1 text-2xl font-bold text-gray-800">{stat.number}</div>
                       <div className="text-sm text-gray-600">{stat.label}</div>
                     </CardContent>
                   </Card>
@@ -130,11 +130,11 @@ function StaticHeroSection() {
             </div>
 
             {/* Process Preview */}
-            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
               <CardContent className="p-6">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
-                    <Play className="h-6 w-6 text-white" />
+                <div className="flex items-center mb-4 space-x-3">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl">
+                    <Play className="w-6 h-6 text-white" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-800">간단한 3단계 신청</h3>
@@ -145,8 +145,8 @@ function StaticHeroSection() {
                 <div className="space-y-3">
                   {["1. 온라인 정보 입력", "2. 전문가 서류 검토", "3. 이메일로 비자 수령"].map((step, index) => (
                     <div key={index} className="flex items-center space-x-3">
-                      <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
+                      <div className="flex items-center justify-center w-6 h-6 bg-green-100 rounded-full">
+                        <CheckCircle className="w-4 h-4 text-green-600" />
                       </div>
                       <span className="text-sm text-gray-700">{step}</span>
                     </div>
@@ -156,29 +156,29 @@ function StaticHeroSection() {
             </Card>
 
             {/* Trust Indicators */}
-            <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl">
+            <Card className="border-0 shadow-xl bg-white/95 backdrop-blur-sm">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-800">신뢰할 수 있는 서비스</h3>
-                  <Award className="h-6 w-6 text-yellow-500" />
+                  <Award className="w-6 h-6 text-yellow-500" />
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div>
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <Shield className="h-4 w-4 text-green-600" />
+                    <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2 bg-green-100 rounded-full">
+                      <Shield className="w-4 h-4 text-green-600" />
                     </div>
                     <div className="text-xs text-gray-600">정부 공인</div>
                   </div>
                   <div>
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <Globe className="h-4 w-4 text-blue-600" />
+                    <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2 bg-blue-100 rounded-full">
+                      <Globe className="w-4 h-4 text-blue-600" />
                     </div>
                     <div className="text-xs text-gray-600">국제 인증</div>
                   </div>
                   <div>
-                    <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                      <Star className="h-4 w-4 text-purple-600" />
+                    <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2 bg-purple-100 rounded-full">
+                      <Star className="w-4 h-4 text-purple-600" />
                     </div>
                     <div className="text-xs text-gray-600">5성급 서비스</div>
                   </div>
@@ -190,11 +190,11 @@ function StaticHeroSection() {
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/60">
+      <div className="absolute transform -translate-x-1/2 bottom-8 left-1/2 text-white/60">
         <div className="flex flex-col items-center space-y-2">
           <span className="text-sm">아래로 스크롤</span>
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-            <div className="w-1 h-3 bg-white/60 rounded-full mt-2 animate-bounce"></div>
+          <div className="flex justify-center w-6 h-10 border-2 rounded-full border-white/30">
+            <div className="w-1 h-3 mt-2 rounded-full bg-white/60 animate-bounce"></div>
           </div>
         </div>
       </div>

@@ -1,93 +1,43 @@
+import { createSlice } from "@reduxjs/toolkit";
 
-import { createSlice } from '@reduxjs/toolkit';
+// 초기 상태
+const initialState = {
+  isAuthenticated: false,
+  user: null,
+  accessToken: null,
+};
 
 const authSlice = createSlice({
-  name: 'auth',
-  initialState: {
-    isAuthenticated: false,
-    user: null,
-    token: null,
-    refreshToken: null,
-    rememberMe: false,
-    autoLogin: false,
-  },
+  name: "auth",
+  initialState,
   reducers: {
+    // 로그인 성공: user, accessToken만 상태에 저장
     loginSuccess: (state, action) => {
-      const { user, token, refreshToken, rememberMe, autoLogin } = action.payload;
-      
+      const { user, accessToken } = action.payload;
       state.isAuthenticated = true;
       state.user = user;
-      state.token = token;
-      state.refreshToken = refreshToken || null;
-      state.rememberMe = rememberMe || false;
-      state.autoLogin = autoLogin || false;
-      
-      // localStorage에도 저장 (Apollo Client에서 사용)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('token', token);
-        if (refreshToken) {
-          localStorage.setItem('refreshToken', refreshToken);
-        }
-        localStorage.setItem('user', JSON.stringify(user));
-      }
+      state.accessToken = accessToken;
     },
+    // 로그아웃: 초기 상태로 리셋
     logout: (state) => {
       state.isAuthenticated = false;
       state.user = null;
-      state.token = null;
-      state.refreshToken = null;
-      state.rememberMe = false;
-      state.autoLogin = false;
-      
-      // localStorage에서도 제거
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        localStorage.removeItem('autoLoginEmail');
-        localStorage.removeItem('autoLoginPassword');
-        localStorage.removeItem('autoLoginEnabled');
-      }
+      state.accessToken = null;
     },
+    // 사용자 정보 업데이트
     updateUser: (state, action) => {
       state.user = { ...state.user, ...action.payload };
-      
-      // localStorage 업데이트
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(state.user));
-      }
-    },
-    setRememberMe: (state, action) => {
-      state.rememberMe = action.payload;
-    },
-    setAutoLogin: (state, action) => {
-      state.autoLogin = action.payload;
-    },
+    }, // accessToken 갱신
     updateTokens: (state, action) => {
-      const { token, refreshToken } = action.payload;
-      state.token = token;
-      if (refreshToken) {
-        state.refreshToken = refreshToken;
-      }
-      
-      // localStorage 업데이트
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('token', token);
-        if (refreshToken) {
-          localStorage.setItem('refreshToken', refreshToken);
-        }
-      }
-    }
-  }
+      const { accessToken } = action.payload;
+      console.log("🔄 Redux: Updating access token", {
+        oldToken: state.accessToken ? state.accessToken.substring(0, 20) + "..." : "none",
+        newToken: accessToken ? accessToken.substring(0, 20) + "..." : "none",
+      });
+      state.accessToken = accessToken;
+    },
+  },
 });
 
-export const { 
-  loginSuccess, 
-  logout, 
-  updateUser, 
-  setRememberMe, 
-  setAutoLogin,
-  updateTokens 
-} = authSlice.actions;
-
+export const { loginSuccess, logout, updateUser, updateTokens } = authSlice.actions;
 export default authSlice.reducer;

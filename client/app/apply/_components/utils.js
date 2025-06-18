@@ -97,7 +97,12 @@ export const validateStep = (step, formData) => {
     case 4: {
       // 서류 업로드 단계: passport와 photo가 필수
       const documents = formData.documents || {};
-      return documents.passport && documents.photo;
+      const hasPassport = documents.passport;
+      const hasPhoto = documents.photo; // 증명사진이 있고 검증 결과가 있다면 적합한지 확인
+      const photoValidation = documents.photo?.validationResult;
+      const isPhotoSuitable = !photoValidation || (photoValidation?.result || photoValidation) === "SUITABLE";
+
+      return hasPassport && hasPhoto && isPhotoSuitable;
     }
     case 5:
       return true; // Review step

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ProtectedRoute({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -13,9 +13,9 @@ export default function ProtectedRoute({ children }) {
     // 개발 환경에서는 임시로 인증된 것으로 간주
     const checkAuth = () => {
       // 실제 환경에서는 토큰 검증 등의 로직이 필요
-      const token = localStorage.getItem('authToken');
-      
-      if (process.env.NODE_ENV === 'development') {
+      const token = localStorage.getItem("accessToken");
+
+      if (process.env.NODE_ENV === "development") {
         // 개발 환경에서는 항상 인증된 것으로 처리
         setIsAuthenticated(true);
       } else {
@@ -23,10 +23,10 @@ export default function ProtectedRoute({ children }) {
         if (token) {
           setIsAuthenticated(true);
         } else {
-          router.push('/auth/login');
+          router.push("/auth/login");
         }
       }
-      
+
       setIsLoading(false);
     };
 
@@ -50,10 +50,7 @@ export default function ProtectedRoute({ children }) {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">접근 권한이 필요합니다</h2>
           <p className="text-gray-600 mb-4">이 페이지에 접근하려면 로그인이 필요합니다.</p>
-          <button
-            onClick={() => router.push('/auth/login')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          >
+          <button onClick={() => router.push("/auth/login")} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
             로그인 페이지로 이동
           </button>
         </div>

@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { GET_HOME_CONTENT, UPDATE_HOME_CONTENT } from "@/lib/graphql";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { GET_HOME_CONTENT, UPDATE_HOME_CONTENT } from "../../src/lib/graphql";
+import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
+import { Button } from "../../src/components/ui/button";
+import { Input } from "../../src/components/ui/input";
+import { Textarea } from "../../src/components/ui/textarea";
 import { toast } from "react-hot-toast";
 
 export default function HomeContentManagement() {

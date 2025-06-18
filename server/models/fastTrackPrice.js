@@ -56,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-          model: "Admins",
+          model: "users",
           key: "id",
         },
       },
@@ -65,14 +65,22 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
         references: {
-          model: "Admins",
+          model: "users",
           key: "id",
         },
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
       },
     },
     {
       tableName: "fast_track_prices",
-      timestamps: true,
+      timestamps: false,
       paranoid: true,
       underscored: false, // camelCase 필드명 사용
       indexes: [
@@ -81,15 +89,15 @@ module.exports = (sequelize, DataTypes) => {
           fields: ["serviceType", "airport"], // 같은 서비스타입과 공항 조합은 유일해야 함
         },
       ],
-    }
+    },
   );
-  // 관계 정의: FastTrackPrice -> Admin
+  // 관계 정의: FastTrackPrice -> User
   FastTrackPrice.associate = (models) => {
-    FastTrackPrice.belongsTo(models.Admin, {
+    FastTrackPrice.belongsTo(models.User, {
       foreignKey: "createdBy",
       as: "creator",
     });
-    FastTrackPrice.belongsTo(models.Admin, {
+    FastTrackPrice.belongsTo(models.User, {
       foreignKey: "updatedBy",
       as: "updater",
     });
