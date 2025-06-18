@@ -1,170 +1,239 @@
+
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
+import PropTypes from "prop-types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
 import { Button } from "../../src/components/ui/button";
 import { Input } from "../../src/components/ui/input";
-import { Textarea } from "../../src/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../src/components/ui/select";
-import { RadioGroup, RadioGroupItem } from "../../src/components/ui/radio-group";
-import { Label } from "../../src/components/ui/label";
-import { Plane, Calendar, MapPin, Hotel, ArrowRight, ArrowLeft, Clock, Users, Building, Heart } from "lucide-react";
+import { Plane, Calendar, MapPin, ArrowRight, ArrowLeft, AlertCircle, CheckCircle } from "lucide-react";
 import { validateStep } from "./utils";
 
 const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [fieldTouched, setFieldTouched] = useState({});
+
   const handleInputChange = (field, value) => {
-    if (field === "travelInfo") {
-      // If updating travelInfo, merge with existing travelInfo
-      onUpdate({ travelInfo: { ...formData.travelInfo, ...value } });
-    } else {
-      onUpdate({ [field]: value });
+    onUpdate({
+      travelInfo: {
+        ...formData.travelInfo,
+        [field]: value,
+      },
+    });
+
+    // 실시간 유효성 검사
+    validateField(field, value);
+    setFieldTouched({ ...fieldTouched, [field]: true });
+  };
+
+  const validateField = (field, value) => {
+    const errors = { ...fieldErrors };
+
+    switch (field) {
+      case "entryDate":
+        if (!value) {
+          errors.entryDate = "입국 예정일을 선택해주세요.";
+        } else {
+          const entryDate = new Date(value);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          if (entryDate < today) {
+            errors.entryDate = "입국 예정일은 오늘 이후 날짜여야 합니다.";
+          } else {
+            delete errors.entryDate;
+          }
+        }
+        break;
+
+      case "entryPort":
+        if (!value) {
+          errors.entryPort = "입국 공항을 선택해주세요.";
+        } else {
+          delete errors.entryPort;
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    setFieldErrors(errors);
+  };
+
+  const isValid = validateStep(3, formData) && Object.keys(fieldErrors).length === 0;
+
+  const getFieldValidationState = (field) => {
+    const value = formData.travelInfo?.[field] || "";
+    const hasError = fieldErrors[field];
+    const isTouched = fieldTouched[field];
+    const hasValue = value.length > 0;
+
+    if (hasError && isTouched) return "error";
+    if (!hasError && hasValue && isTouched) return "success";
+    return "default";
+  };
+
+  const getInputClassName = (field) => {
+    const state = getFieldValidationState(field);
+    const baseClasses = "h-12 text-lg font-medium border-2 transition-all duration-200";
+    
+    switch (state) {
+      case "error":
+        return `${baseClasses} border-red-500 focus:border-red-500 focus:ring-red-200 bg-red-50`;
+      case "success":
+        return `${baseClasses} border-green-500 focus:border-green-500 focus:ring-green-200 bg-green-50`;
+      default:
+        return `${baseClasses} border-gray-200 focus:border-indigo-500 focus:ring-indigo-200`;
     }
   };
 
-  const isValid = validateStep(3, formData);
-
-  const purposeOfVisit = [
-    { value: "TOURISM", label: "관광", icon: "🏖️" },
-    { value: "BUSINESS", label: "비즈니스", icon: "💼" },
-    { value: "VISIT_RELATIVES", label: "친척 방문", icon: "👨‍👩‍👧‍👦" },
-    { value: "CONFERENCE", label: "회의/컨퍼런스", icon: "🏢" },
-    { value: "MEDICAL", label: "의료", icon: "🏥" },
-    { value: "EDUCATION", label: "교육", icon: "🎓" },
-    { value: "TRANSIT", label: "경유", icon: "✈️" },
-    { value: "OTHER", label: "기타", icon: "📋" },
-  ];
-
   const entryPorts = [
-    { value: "SGN", label: "호치민 (탄손녓 국제공항)" },
+    { value: "SGN", label: "호치민시 (탄손낫 국제공항)" },
     { value: "HAN", label: "하노이 (노이바이 국제공항)" },
     { value: "DAD", label: "다낭 (다낭 국제공항)" },
     { value: "CXR", label: "나트랑 (캄란 국제공항)" },
     { value: "PQC", label: "푸꾸옥 (푸꾸옥 국제공항)" },
     { value: "VDO", label: "반돈 (반돈 국제공항)" },
-    { value: "HPH", label: "하이퐁 (캣비 국제공항)" },
-    { value: "LAND_BORDER", label: "육로 국경" },
-    { value: "OTHER", label: "기타" },
+    { value: "HPH", label: "하이퐁 (캇비 국제공항)" },
+    { value: "UIH", label: "꾸이년 (꾸이년 공항)" },
+    { value: "CAH", label: "까마우 (까마우 공항)" },
   ];
 
-  const accommodationTypes = [
-    { value: "HOTEL", label: "호텔" },
-    { value: "RESORT", label: "리조트" },
-    { value: "HOMESTAY", label: "홈스테이" },
-    { value: "AIRBNB", label: "에어비앤비" },
-    { value: "RELATIVES_HOUSE", label: "친척/지인 집" },
-    { value: "COMPANY_ACCOMMODATION", label: "회사 숙소" },
-    { value: "OTHER", label: "기타" },
-  ];
+  // 오늘 날짜를 YYYY-MM-DD 형식으로 가져오기
+  const getTodayDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
 
   return (
     <Card className="overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30">
-      <CardHeader className="relative pb-8 text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600">
+      <CardHeader className="relative pb-8 text-white bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
         <div className="absolute inset-0 bg-black/10"></div>
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="flex items-center justify-center w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl">
-            <Plane className="w-8 h-8 text-white" />
+        <div className="relative z-10 text-center">
+          <div className="flex items-center justify-center w-20 h-20 mx-auto mb-4 bg-white/20 backdrop-blur-sm rounded-3xl">
+            <Plane className="w-10 h-10 text-white" />
           </div>
-          <div>
-            <CardTitle className="mb-2 text-3xl font-bold">베트남 방문 정보</CardTitle>
-            <p className="text-lg text-blue-100">베트남 여행 계획에 대한 정보를 입력해주세요</p>
-          </div>
+          <CardTitle className="mb-3 text-4xl font-bold">여행 정보</CardTitle>
+          <p className="text-xl text-indigo-100">베트남 방문 계획을 알려주세요</p>
         </div>
       </CardHeader>
 
       <CardContent className="p-8 space-y-8">
-        {/* 여행 일정 섹션 */}
-        <div className="space-y-6">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex items-center justify-center w-8 h-8 bg-blue-100 rounded-lg">
-              <Calendar className="w-5 h-5 text-blue-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-800">여행 일정</h3>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {" "}
-            {/* 입국 예정일 */}
-            <div className="space-y-3">
-              <label className="block text-sm font-bold tracking-wide text-gray-800 uppercase">베트남 입국 예정일 *</label>{" "}
-              <Input
-                type="date"
-                value={formData.travelInfo?.entryDate || ""}
-                onChange={(e) =>
-                  handleInputChange("travelInfo", {
-                    entryDate: e.target.value,
-                  })
-                }
-                min={new Date().toISOString().split("T")[0]}
-                className="h-12 text-lg font-medium border-2 border-gray-200 focus:border-blue-500 focus:ring-blue-200"
-              />
-              <p className="text-xs text-gray-500">오늘 이후 날짜를 선택하세요</p>
-            </div>{" "}
-          </div>
-        </div>
-
         {/* 입국 정보 섹션 */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-6">
-            <div className="flex items-center justify-center w-8 h-8 bg-purple-100 rounded-lg">
-              <MapPin className="w-5 h-5 text-purple-600" />
+            <div className="flex items-center justify-center w-12 h-12 bg-indigo-100 rounded-2xl">
+              <Calendar className="w-6 h-6 text-indigo-600" />
             </div>
-            <h3 className="text-xl font-bold text-gray-800">입국 정보</h3>
+            <h3 className="text-2xl font-bold text-gray-800">입국 정보</h3>
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* 입국 공항/항구 */}
+            {/* 입국 예정일 */}
             <div className="space-y-3">
-              <label className="block text-sm font-bold tracking-wide text-gray-800 uppercase">입국 공항/항구 *</label>{" "}
-              <Select
-                value={formData.travelInfo?.entryPort || ""}
-                onValueChange={(value) =>
-                  handleInputChange("travelInfo", {
-                    entryPort: value,
-                  })
-                }
-              >
-                <SelectTrigger className="h-12 text-lg border-2 border-gray-200 focus:border-purple-500">
-                  <SelectValue placeholder="입국 공항/항구를 선택하세요" />
-                </SelectTrigger>{" "}
-                <SelectContent>
-                  {entryPorts.map((port) => (
-                    <SelectItem key={port.value} value={port.value}>
-                      {port.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label htmlFor="entryDate" className="block text-sm font-bold tracking-wide text-gray-800 uppercase">
+                입국 예정일 *
+              </label>
+              <div className="relative">
+                <Calendar className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2" />
+                <Input
+                  id="entryDate"
+                  type="date"
+                  value={formData.travelInfo?.entryDate || ""}
+                  onChange={(e) => handleInputChange("entryDate", e.target.value)}
+                  onBlur={() => setFieldTouched({ ...fieldTouched, entryDate: true })}
+                  min={getTodayDate()}
+                  className={`${getInputClassName("entryDate")} pl-10`}
+                  aria-invalid={!!fieldErrors.entryDate}
+                  aria-describedby={fieldErrors.entryDate ? "entryDate-error" : undefined}
+                />
+                {getFieldValidationState("entryDate") === "success" && (
+                  <CheckCircle className="absolute w-5 h-5 text-green-500 transform -translate-y-1/2 right-3 top-1/2" />
+                )}
+                {getFieldValidationState("entryDate") === "error" && (
+                  <AlertCircle className="absolute w-5 h-5 text-red-500 transform -translate-y-1/2 right-3 top-1/2" />
+                )}
+              </div>
+              <p className="text-xs text-gray-500">베트남 입국 예정 날짜를 선택해주세요</p>
+              {fieldErrors.entryDate && fieldTouched.entryDate && (
+                <p id="entryDate-error" className="flex items-center gap-1 mt-1 text-sm text-red-500">
+                  <AlertCircle className="w-4 h-4" />
+                  {fieldErrors.entryDate}
+                </p>
+              )}
             </div>
 
-            {/* 방문 목적 */}
+            {/* 입국 공항 */}
             <div className="space-y-3">
-              <label className="block text-sm font-bold tracking-wide text-gray-800 uppercase">방문 목적 *</label>{" "}
-              <Select
-                value={formData.travelInfo?.purpose || ""}
-                onValueChange={(value) =>
-                  handleInputChange("travelInfo", {
-                    purpose: value,
-                  })
-                }
-              >
-                <SelectTrigger className="h-12 text-lg border-2 border-gray-200 focus:border-purple-500">
-                  <SelectValue placeholder="방문 목적을 선택하세요" />
-                </SelectTrigger>
-                <SelectContent>
-                  {purposeOfVisit.map((purpose) => (
-                    <SelectItem key={purpose.value} value={purpose.value}>
-                      {purpose.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label htmlFor="entryPort" className="block text-sm font-bold tracking-wide text-gray-800 uppercase">
+                입국 공항 *
+              </label>
+              <div className="relative">
+                <MapPin className="absolute w-5 h-5 text-gray-400 transform -translate-y-1/2 left-3 top-1/2 z-10" />
+                <Select
+                  value={formData.travelInfo?.entryPort || ""}
+                  onValueChange={(value) => handleInputChange("entryPort", value)}
+                >
+                  <SelectTrigger 
+                    className={`${getInputClassName("entryPort")} pl-10`}
+                    onBlur={() => setFieldTouched({ ...fieldTouched, entryPort: true })}
+                  >
+                    <SelectValue placeholder="입국할 공항을 선택해주세요" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {entryPorts.map((port) => (
+                      <SelectItem key={port.value} value={port.value}>
+                        {port.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {getFieldValidationState("entryPort") === "success" && (
+                  <CheckCircle className="absolute w-5 h-5 text-green-500 transform -translate-y-1/2 right-10 top-1/2 z-10" />
+                )}
+                {getFieldValidationState("entryPort") === "error" && (
+                  <AlertCircle className="absolute w-5 h-5 text-red-500 transform -translate-y-1/2 right-10 top-1/2 z-10" />
+                )}
+              </div>
+              <p className="text-xs text-gray-500">입국할 베트남 공항을 선택해주세요</p>
+              {fieldErrors.entryPort && fieldTouched.entryPort && (
+                <p id="entryPort-error" className="flex items-center gap-1 mt-1 text-sm text-red-500">
+                  <AlertCircle className="w-4 h-4" />
+                  {fieldErrors.entryPort}
+                </p>
+              )}
             </div>
           </div>
         </div>
 
+        {/* 참고 정보 */}
+        <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl">
+          <h4 className="mb-3 text-lg font-bold text-gray-800">📋 참고 사항</h4>
+          <ul className="space-y-2 text-sm text-gray-600">
+            <li className="flex items-start gap-2">
+              <span className="text-blue-500">•</span>
+              <span>E-비자는 모든 베트남 공항에서 사용 가능합니다</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-500">•</span>
+              <span>입국일 기준 최소 3일 전에 신청해주세요</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-blue-500">•</span>
+              <span>여권 유효기간이 6개월 이상 남아있어야 합니다</span>
+            </li>
+          </ul>
+        </div>
+
         {/* 네비게이션 버튼 */}
-        <div className="flex justify-between pt-8 border-t border-gray-200">
-          <Button onClick={onPrevious} variant="outline" className="px-8 py-4 text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-2xl">
+        <div className="flex flex-col gap-4 pt-8 border-t border-gray-200 sm:flex-row sm:justify-between">
+          <Button 
+            onClick={onPrevious} 
+            variant="outline" 
+            className="px-8 py-4 text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-2xl order-2 sm:order-1"
+          >
             <ArrowLeft className="w-6 h-6 mr-3" />
             <span>이전</span>
           </Button>
@@ -172,7 +241,7 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           <Button
             onClick={onNext}
             disabled={!isValid}
-            className="px-12 py-4 text-lg font-bold text-white transition-all duration-300 transform shadow-2xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 rounded-2xl hover:shadow-3xl disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+            className="px-12 py-4 text-lg font-bold text-white transition-all duration-300 transform shadow-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 rounded-2xl hover:shadow-3xl disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 order-1 sm:order-2"
           >
             <span className="mr-3">다음</span>
             <ArrowRight className="w-6 h-6" />
@@ -181,6 +250,18 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
       </CardContent>
     </Card>
   );
+};
+
+TravelInfoStep.propTypes = {
+  formData: PropTypes.shape({
+    travelInfo: PropTypes.shape({
+      entryDate: PropTypes.string,
+      entryPort: PropTypes.string,
+    }),
+  }).isRequired,
+  onUpdate: PropTypes.func.isRequired,
+  onNext: PropTypes.func.isRequired,
+  onPrevious: PropTypes.func.isRequired,
 };
 
 export default TravelInfoStep;

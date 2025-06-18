@@ -14,13 +14,18 @@ export const formatDate = (date) => {
 };
 
 export const validateEmail = (email) => {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
+  // 더 정확한 이메일 정규식
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+  return emailRegex.test(email) && email.length <= 254;
 };
 
 export const validatePhone = (phone) => {
-  const phoneRegex = /^[\d\-+()\s]+$/;
-  return phoneRegex.test(phone) && phone.length >= 10;
+  // 국제 전화번호 형식 검증 (한국: +82, 베트남: +84 등)
+  const phoneRegex = /^(\+\d{1,3}[-.\s]?)?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
+  const cleanPhone = phone.replace(/[\s\-()]/g, '');
+  
+  // 최소 8자리, 최대 15자리 (국제표준)
+  return phoneRegex.test(phone) && cleanPhone.length >= 8 && cleanPhone.length <= 15;
 };
 
 export const validatePassport = (passport) => {
