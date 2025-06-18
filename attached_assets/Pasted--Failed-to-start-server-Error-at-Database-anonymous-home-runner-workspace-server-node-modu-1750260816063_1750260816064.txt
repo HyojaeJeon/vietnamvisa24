@@ -1,0 +1,39 @@
+❌ Failed to start server: Error
+    at Database.<anonymous> (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:185:27)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:50
+    at new Promise (<anonymous>)
+    at Query.run (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:12)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at async SQLiteQueryInterface.changeColumn (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query-interface.js:43:7)
+    at async VisaApplication.sync (/home/runner/workspace/server/node_modules/sequelize/lib/model.js:984:11)
+    at async Sequelize.sync (/home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:377:9)
+    at async connectDB (/home/runner/workspace/server/database.js:56:5)
+    at async startServer (/home/runner/workspace/server/index.js:47:3) {
+  name: 'SequelizeUniqueConstraintError',
+  errors: [
+    ValidationErrorItem {
+      message: 'id must be unique',
+      type: 'unique violation',
+      path: 'id',
+      value: null,
+      origin: 'DB',
+      instance: null,
+      validatorKey: 'not_unique',
+      validatorName: null,
+      validatorArgs: []
+    }
+  ],
+  parent: [Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: visa_applications_backup.id] {
+    errno: 19,
+    code: 'SQLITE_CONSTRAINT',
+    sql: 'INSERT INTO `visa_applications_backup` SELECT `id`, `userId`, `applicationNumber`, `visaType`, `fullName`, `passportNumber`, `nationality`, `birthDate`, `phone`, `email`, `arrivalDate`, `departureDate`, `purpose`, `status`, `assignedTo`, `notes`, `processingType`, `totalPrice`, `applicationId`, `firstName`, `lastName`, `address`, `phoneOfFriend`, `entryPort`, `createdAt`, `updatedAt` FROM `visa_applications`;'
+  },
+  original: [Error: SQLITE_CONSTRAINT: UNIQUE constraint failed: visa_applications_backup.id] {
+    errno: 19,
+    code: 'SQLITE_CONSTRAINT',
+    sql: 'INSERT INTO `visa_applications_backup` SELECT `id`, `userId`, `applicationNumber`, `visaType`, `fullName`, `passportNumber`, `nationality`, `birthDate`, `phone`, `email`, `arrivalDate`, `departureDate`, `purpose`, `status`, `assignedTo`, `notes`, `processingType`, `totalPrice`, `applicationId`, `firstName`, `lastName`, `address`, `phoneOfFriend`, `entryPort`, `createdAt`, `updatedAt` FROM `visa_applications`;'
+  },
+  fields: [ 'id' ],
+  sql: 'INSERT INTO `visa_applications_backup` SELECT `id`, `userId`, `applicationNumber`, `visaType`, `fullName`, `passportNumber`, `nationality`, `birthDate`, `phone`, `email`, `arrivalDate`, `departureDate`, `purpose`, `status`, `assignedTo`, `notes`, `processingType`, `totalPrice`, `applicationId`, `firstName`, `lastName`, `address`, `phoneOfFriend`, `entryPort`, `createdAt`, `updatedAt` FROM `visa_applications`;'
+}
+[nodemon] app crashed - waiting for file changes before starting...

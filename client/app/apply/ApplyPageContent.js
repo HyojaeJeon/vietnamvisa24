@@ -488,4 +488,3 @@ export default function ApplyPageContent() {
     </div>
   );
 }
-```Fixed syntax error in ApplyPageContent.js by correcting console.log and ensuring proper formatting.

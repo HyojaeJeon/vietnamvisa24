@@ -201,6 +201,9 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
       info.genderCode = ocrResult.sex.toUpperCase(); // 원본 영어 코드도 저장
     }
 
+    if (ocrResult.type) info.passportType = ocrResult.type.trim();
+    if (ocrResult.authority) info.authority = ocrResult.authority.trim();
+
     if (ocrResult.nationality) {
       info.nationality = formatNationality(ocrResult.nationality);
       info.nationalityCode = ocrResult.nationality; // 원본 영어 코드도 저장
@@ -1666,9 +1669,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
               <h3 className="text-xl font-bold text-gray-800 mb-2">
                 처리 중입니다
               </h3>
-              <p className="text-gray-600 mb-6">
-                {loadingMessage}
-              </p>
+              <p className="text-gray-600 mb-6">{loadingMessage}</p>
 
               {/* 프로그레스 바 (여권의 경우) */}
               {ocrProcessing && (
@@ -1686,7 +1687,9 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                 <div className="flex items-center justify-center gap-2 text-sm text-blue-700">
                   <Info className="w-4 h-4" />
-                  <span>잠시만 기다려주세요. 처리가 완료되면 자동으로 닫힙니다.</span>
+                  <span>
+                    잠시만 기다려주세요. 처리가 완료되면 자동으로 닫힙니다.
+                  </span>
                 </div>
               </div>
             </div>

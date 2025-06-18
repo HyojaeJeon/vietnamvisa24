@@ -109,6 +109,7 @@ const resolvers = {
           "ADMIN",
           "MANAGER",
           "STAFF",
+          "USER",
         ]);
 
         if (!VisaApplication) {
