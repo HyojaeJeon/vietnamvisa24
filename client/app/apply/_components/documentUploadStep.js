@@ -1,11 +1,30 @@
 import React, { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import imageCompression from "browser-image-compression";
-import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../src/components/ui/card";
 import { Button } from "../../src/components/ui/button";
 import { Progress } from "../../src/components/ui/progress";
 import { Alert, AlertDescription } from "../../src/components/ui/alert";
-import { FileText, Upload, CheckCircle, AlertCircle, Camera, ArrowRight, ArrowLeft, X, Eye, Loader2, Sparkles, Info, RefreshCw } from "lucide-react";
+import {
+  FileText,
+  Upload,
+  CheckCircle,
+  AlertCircle,
+  Camera,
+  ArrowRight,
+  ArrowLeft,
+  X,
+  Eye,
+  Loader2,
+  Sparkles,
+  Info,
+  RefreshCw,
+} from "lucide-react";
 import { validateStep } from "./utils";
 
 const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
@@ -30,7 +49,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
   };
 
   const extractPassportInfoRest = async (formData) => {
-    const res = await fetch("http://localhost:5002/api/extract_passport", {
+    const res = await fetch("/api/extract_passport", {
       method: "POST",
       body: formData, // 브라우저가 multipart boundary를 자동 설정합니다.
     });
@@ -42,7 +61,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
 
   // 프로필 이미지 적합성 검사 API 함수
   const validateProfileImageRest = async (formData) => {
-    const res = await fetch("http://localhost:5002/api/upload_profile_image", {
+    const res = await fetch("/api/upload_profile_image", {
       method: "POST",
       body: formData,
     });
@@ -64,7 +83,8 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
     {
       type: "passport",
       title: "여권 사본",
-      description: "여권 정보면(사진이 있는 페이지) 전체가 선명하게 보여야 합니다",
+      description:
+        "여권 정보면(사진이 있는 페이지) 전체가 선명하게 보여야 합니다",
       required: true,
       icon: <FileText className="w-6 h-6" />,
       maxSize: "10MB",
@@ -80,12 +100,20 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
     {
       type: "photo",
       title: "증명사진",
-      description: "여권 규격의 증명사진 (4cm x 6cm, 최근 6개월 이내) / 또는 배경이 깔끔한 셀카도 가능합니다",
+      description:
+        "여권 규격의 증명사진 (4cm x 6cm, 최근 6개월 이내) / 또는 배경이 깔끔한 셀카도 가능합니다",
       required: true,
       icon: <Camera className="w-6 h-6" />,
       maxSize: "5MB",
       formats: ["JPG", "PNG"],
-      guidelines: ["흰색 배경 (다른 색상 불가)", "안경, 모자, 액세서리 착용 금지", "정면을 향한 자연스러운 표정", "크기: 4cm × 6cm", "최근 6개월 이내 촬영", "고해상도 (최소 300dpi)"],
+      guidelines: [
+        "흰색 배경 (다른 색상 불가)",
+        "안경, 모자, 액세서리 착용 금지",
+        "정면을 향한 자연스러운 표정",
+        "크기: 4cm × 6cm",
+        "최근 6개월 이내 촬영",
+        "고해상도 (최소 300dpi)",
+      ],
     },
   ];
   const mapPassportDataToPersonalInfo = (ocrResult) => {
@@ -158,9 +186,12 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
     if (ocrResult.given_names) info.firstName = ocrResult.given_names.trim();
 
     // 날짜 필드 처리
-    if (ocrResult.date_of_birth) info.birthDate = formatDate(ocrResult.date_of_birth);
-    if (ocrResult.date_of_issue) info.passportIssueDate = formatDate(ocrResult.date_of_issue);
-    if (ocrResult.date_of_expiry) info.passportExpiryDate = formatDate(ocrResult.date_of_expiry);
+    if (ocrResult.date_of_birth)
+      info.birthDate = formatDate(ocrResult.date_of_birth);
+    if (ocrResult.date_of_issue)
+      info.passportIssueDate = formatDate(ocrResult.date_of_issue);
+    if (ocrResult.date_of_expiry)
+      info.passportExpiryDate = formatDate(ocrResult.date_of_expiry);
 
     // 기타 필드 처리
     if (ocrResult.sex) {
@@ -173,7 +204,8 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
       info.nationalityCode = ocrResult.nationality; // 원본 영어 코드도 저장
     }
 
-    if (ocrResult.passport_no) info.passportNumber = ocrResult.passport_no.trim();
+    if (ocrResult.passport_no)
+      info.passportNumber = ocrResult.passport_no.trim();
     if (ocrResult.issuing_country) {
       info.issuingCountry = ocrResult.issuing_country; // 영어 원본 그대로 저장
       info.issuingCountryCode = ocrResult.issuing_country; // 원본 코드도 저장
@@ -203,9 +235,16 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
     });
     onUpdate({ personalInfo: current });
     const fields = Object.keys(finalInfo).length;
-    if (fields) showToast(`정보가 개인정보 입력 단계에 적용되었습니다`, "success");
+    if (fields)
+      showToast(`정보가 개인정보 입력 단계에 적용되었습니다`, "success");
     setEditingPassportInfo(null);
-  }, [editingPassportInfo, extractedPassportInfo, formData.personalInfo, onUpdate, showToast]);
+  }, [
+    editingPassportInfo,
+    extractedPassportInfo,
+    formData.personalInfo,
+    onUpdate,
+    showToast,
+  ]);
 
   // 이미지 압축 함수
   const compressImage = useCallback(
@@ -228,19 +267,28 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
         try {
           showToast("이미지 압축 중...", "info");
           const compressedFile = await imageCompression(file, options);
-          const compressionRatio = (((file.size - compressedFile.size) / file.size) * 100).toFixed(1);
-          showToast(`이미지 압축 완료 (${compressionRatio}% 크기 감소)`, "success");
+          const compressionRatio = (
+            ((file.size - compressedFile.size) / file.size) *
+            100
+          ).toFixed(1);
+          showToast(
+            `이미지 압축 완료 (${compressionRatio}% 크기 감소)`,
+            "success",
+          );
           return compressedFile;
         } catch (error) {
           console.error("이미지 압축 실패:", error);
-          showToast("이미지 압축에 실패했습니다. 원본 파일을 사용합니다.", "error");
+          showToast(
+            "이미지 압축에 실패했습니다. 원본 파일을 사용합니다.",
+            "error",
+          );
           return file;
         }
       }
 
       return file;
     },
-    [showToast]
+    [showToast],
   );
 
   const handleFileUpload = useCallback(
@@ -312,7 +360,12 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           uploadedAt: new Date().toISOString(),
           isTemporary: true,
           originalSize: file.size,
-          compressionRatio: file.size > 0 ? (((file.size - processedFile.size) / file.size) * 100).toFixed(1) : 0,
+          compressionRatio:
+            file.size > 0
+              ? (((file.size - processedFile.size) / file.size) * 100).toFixed(
+                  1,
+                )
+              : 0,
           file: base64Data, // base64 인코딩된 파일 데이터 저장
           ...(documentType === "passport" && {
             ocrResult: apiResult,
@@ -336,9 +389,18 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
         if (documentType === "passport" && apiResult && !apiResult.error) {
           const mapped = mapPassportDataToPersonalInfo(apiResult);
           setExtractedPassportInfo({ raw: apiResult, mapped });
-          Object.assign(update, { personalInfo: { ...(formData.personalInfo || {}), ...mapped } });
-          showToast(`여권에서 ${Object.keys(mapped).length}개 정보 추출`, "success");
-        } else if (documentType === "passport" && apiResult && apiResult.error) {
+          Object.assign(update, {
+            personalInfo: { ...(formData.personalInfo || {}), ...mapped },
+          });
+          showToast(
+            `여권에서 ${Object.keys(mapped).length}개 정보 추출`,
+            "success",
+          );
+        } else if (
+          documentType === "passport" &&
+          apiResult &&
+          apiResult.error
+        ) {
           showToast("OCR 오류, 수동입력 필요", "error");
         }
 
@@ -348,7 +410,10 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           if (result === "SUITABLE") {
             showToast("증명사진이 규정에 적합합니다!", "success");
           } else {
-            showToast("증명사진이 여권 규정에 부적합합니다. 다른 사진을 업로드해주세요.", "error");
+            showToast(
+              "증명사진이 여권 규정에 부적합합니다. 다른 사진을 업로드해주세요.",
+              "error",
+            );
           }
         }
 
@@ -373,7 +438,15 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
         }
       }
     },
-    [formData.documents, formData.personalInfo, extractPassportInfoRest, validateProfileImageRest, onUpdate, showToast, compressImage]
+    [
+      formData.documents,
+      formData.personalInfo,
+      extractPassportInfoRest,
+      validateProfileImageRest,
+      onUpdate,
+      showToast,
+      compressImage,
+    ],
   );
 
   const handleFileRemove = useCallback(
@@ -382,7 +455,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
       delete docs[type];
       onUpdate({ documents: docs });
     },
-    [formData.documents, onUpdate]
+    [formData.documents, onUpdate],
   );
 
   const handlePreview = useCallback(
@@ -390,7 +463,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
       const doc = formData.documents?.[type];
       if (doc) setPreviewFile({ type, ...doc });
     },
-    [formData.documents]
+    [formData.documents],
   );
 
   const isValid = validateStep(4, formData);
@@ -442,8 +515,12 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             <Upload className="w-8 h-8 text-white" />
           </div>
           <div className="flex-1">
-            <CardTitle className="mb-2 text-3xl font-bold">서류 업로드</CardTitle>
-            <p className="text-lg text-amber-100">필요한 서류들을 업로드해주세요</p>
+            <CardTitle className="mb-2 text-3xl font-bold">
+              서류 업로드
+            </CardTitle>
+            <p className="text-lg text-amber-100">
+              필요한 서류들을 업로드해주세요
+            </p>
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1 text-sm">
                 <span>완료율</span>
@@ -480,15 +557,25 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             const isUploading = uploadingFiles[doc.type] !== undefined;
 
             return (
-              <Card className={`border-2 transition-all duration-300 ${isUploaded ? "border-green-500 bg-green-50" : doc.required ? "border-orange-300 bg-orange-50" : "border-gray-200 bg-white"}`}>
+              <Card
+                className={`border-2 transition-all duration-300 ${isUploaded ? "border-green-500 bg-green-50" : doc.required ? "border-orange-300 bg-orange-50" : "border-gray-200 bg-white"}`}
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div
                       className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        isUploaded ? "bg-green-500 text-white" : doc.required ? "bg-orange-500 text-white" : "bg-gray-400 text-white"
+                        isUploaded
+                          ? "bg-green-500 text-white"
+                          : doc.required
+                            ? "bg-orange-500 text-white"
+                            : "bg-gray-400 text-white"
                       }`}
                     >
-                      {isUploaded ? <CheckCircle className="w-6 h-6" /> : doc.icon}
+                      {isUploaded ? (
+                        <CheckCircle className="w-6 h-6" />
+                      ) : (
+                        doc.icon
+                      )}
                     </div>
 
                     <div className="flex-1 space-y-3">
@@ -496,9 +583,15 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                         <div>
                           <h3 className="flex items-center gap-2 text-lg font-bold text-gray-800">
                             {doc.title}
-                            {doc.required && <span className="text-sm text-red-500">*필수</span>}
+                            {doc.required && (
+                              <span className="text-sm text-red-500">
+                                *필수
+                              </span>
+                            )}
                           </h3>
-                          <p className="mt-1 text-sm text-gray-600">{doc.description}</p>
+                          <p className="mt-1 text-sm text-gray-600">
+                            {doc.description}
+                          </p>
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -511,7 +604,10 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                       {/* 가이드라인 */}
                       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                         {doc.guidelines.map((guideline, index) => (
-                          <div key={index} className="flex items-start gap-2 text-xs text-gray-600">
+                          <div
+                            key={index}
+                            className="flex items-start gap-2 text-xs text-gray-600"
+                          >
                             <div className="flex-shrink-0 w-1 h-1 mt-2 bg-gray-400 rounded-full"></div>
                             <span>{guideline}</span>
                           </div>
@@ -525,47 +621,125 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                             <RefreshCw className="w-4 h-4 animate-spin" />
                             <span>업로드 중...</span>
                           </div>
-                          <Progress value={uploadingFiles[doc.type]} className="h-2" />
+                          <Progress
+                            value={uploadingFiles[doc.type]}
+                            className="h-2"
+                          />
                         </div>
                       ) : isUploaded ? (
                         <div className="flex items-center justify-between p-3 bg-white border rounded-lg">
                           <div className="flex items-center gap-3">
                             <CheckCircle className="w-5 h-5 text-green-500" />
                             <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-800">{uploadedDocuments[doc.type].fileName}</p>
+                              <p className="text-sm font-medium text-gray-800">
+                                {uploadedDocuments[doc.type].fileName}
+                              </p>
                               <div className="flex flex-wrap items-center gap-2">
-                                <p className="text-xs text-gray-500">{Math.round(uploadedDocuments[doc.type].fileSize / 1024)} KB</p>
-                                {uploadedDocuments[doc.type].compressionRatio && parseFloat(uploadedDocuments[doc.type].compressionRatio) > 0 && (
-                                  <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full">{uploadedDocuments[doc.type].compressionRatio}% 압축</span>
-                                )}
-                                {uploadedDocuments[doc.type].isTemporary && <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded-full">임시저장됨</span>}
-                                {/* 여권 OCR 결과가 있는 경우 추가 정보 표시 */}
-                                {doc.type === "passport" && uploadedDocuments[doc.type].ocrResult && !uploadedDocuments[doc.type].ocrResult.error && (
-                                  <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">정보 자동추출됨</span>
-                                )}
-                                {doc.type === "passport" && uploadedDocuments[doc.type].ocrResult && uploadedDocuments[doc.type].ocrResult.error && (
-                                  <span className="px-2 py-1 text-xs text-orange-700 bg-orange-100 rounded-full">수동입력 필요</span>
-                                )}
-                              </div>
-                              {/* OCR 추출 정보 미리보기 */}
-                              {doc.type === "passport" && uploadedDocuments[doc.type].ocrResult && !uploadedDocuments[doc.type].ocrResult.error && (
-                                <div className="mt-1 text-xs text-gray-600">
-                                  {uploadedDocuments[doc.type].ocrResult.given_names && uploadedDocuments[doc.type].ocrResult.surname && (
-                                    <span>
-                                      이름: {uploadedDocuments[doc.type].ocrResult.surname} {uploadedDocuments[doc.type].ocrResult.given_names} |
+                                <p className="text-xs text-gray-500">
+                                  {Math.round(
+                                    uploadedDocuments[doc.type].fileSize / 1024,
+                                  )}{" "}
+                                  KB
+                                </p>
+                                {uploadedDocuments[doc.type].compressionRatio &&
+                                  parseFloat(
+                                    uploadedDocuments[doc.type]
+                                      .compressionRatio,
+                                  ) > 0 && (
+                                    <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full">
+                                      {
+                                        uploadedDocuments[doc.type]
+                                          .compressionRatio
+                                      }
+                                      % 압축
                                     </span>
                                   )}
-                                  {uploadedDocuments[doc.type].ocrResult.korean_name && <span>한글명: {uploadedDocuments[doc.type].ocrResult.korean_name} | </span>}
-                                  {uploadedDocuments[doc.type].ocrResult.passport_no && <span>여권번호: {uploadedDocuments[doc.type].ocrResult.passport_no}</span>}
-                                </div>
-                              )}
+                                {uploadedDocuments[doc.type].isTemporary && (
+                                  <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded-full">
+                                    임시저장됨
+                                  </span>
+                                )}
+                                {/* 여권 OCR 결과가 있는 경우 추가 정보 표시 */}
+                                {doc.type === "passport" &&
+                                  uploadedDocuments[doc.type].ocrResult &&
+                                  !uploadedDocuments[doc.type].ocrResult
+                                    .error && (
+                                    <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                                      정보 자동추출됨
+                                    </span>
+                                  )}
+                                {doc.type === "passport" &&
+                                  uploadedDocuments[doc.type].ocrResult &&
+                                  uploadedDocuments[doc.type].ocrResult
+                                    .error && (
+                                    <span className="px-2 py-1 text-xs text-orange-700 bg-orange-100 rounded-full">
+                                      수동입력 필요
+                                    </span>
+                                  )}
+                              </div>
+                              {/* OCR 추출 정보 미리보기 */}
+                              {doc.type === "passport" &&
+                                uploadedDocuments[doc.type].ocrResult &&
+                                !uploadedDocuments[doc.type].ocrResult
+                                  .error && (
+                                  <div className="mt-1 text-xs text-gray-600">
+                                    {uploadedDocuments[doc.type].ocrResult
+                                      .given_names &&
+                                      uploadedDocuments[doc.type].ocrResult
+                                        .surname && (
+                                        <span>
+                                          이름:{" "}
+                                          {
+                                            uploadedDocuments[doc.type]
+                                              .ocrResult.surname
+                                          }{" "}
+                                          {
+                                            uploadedDocuments[doc.type]
+                                              .ocrResult.given_names
+                                          }{" "}
+                                          |
+                                        </span>
+                                      )}
+                                    {uploadedDocuments[doc.type].ocrResult
+                                      .korean_name && (
+                                      <span>
+                                        한글명:{" "}
+                                        {
+                                          uploadedDocuments[doc.type].ocrResult
+                                            .korean_name
+                                        }{" "}
+                                        |{" "}
+                                      </span>
+                                    )}
+                                    {uploadedDocuments[doc.type].ocrResult
+                                      .passport_no && (
+                                      <span>
+                                        여권번호:{" "}
+                                        {
+                                          uploadedDocuments[doc.type].ocrResult
+                                            .passport_no
+                                        }
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" onClick={() => handlePreview(doc.type)} className="px-3 py-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePreview(doc.type)}
+                              className="px-3 py-1"
+                            >
                               <Eye className="w-4 h-4" />
                             </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleFileRemove(doc.type)} className="px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleFileRemove(doc.type)}
+                              className="px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
                               <X className="w-4 h-4" />
                             </Button>
                           </div>
@@ -591,7 +765,10 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                               <Upload className="w-8 h-8 mb-2 text-gray-400" />
                               <p className="mb-2 text-sm text-gray-500">
-                                <span className="font-semibold">클릭하여 업로드</span> 또는 드래그 앤 드롭
+                                <span className="font-semibold">
+                                  클릭하여 업로드
+                                </span>{" "}
+                                또는 드래그 앤 드롭
                               </p>
                               <p className="text-xs text-gray-500">
                                 {doc.formats.join(", ")} (최대 {doc.maxSize})
@@ -615,8 +792,12 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                     <Sparkles className="w-6 h-6" />
                   </div>
                   <div>
-                    <div className="text-xl font-bold">추출된 여권 정보 확인 및 수정</div>
-                    <div className="mt-1 text-sm font-normal text-emerald-100">AI가 자동으로 추출한 정보입니다</div>
+                    <div className="text-xl font-bold">
+                      추출된 여권 정보 확인 및 수정
+                    </div>
+                    <div className="mt-1 text-sm font-normal text-emerald-100">
+                      AI가 자동으로 추출한 정보입니다
+                    </div>
                   </div>
                 </CardTitle>
               </CardHeader>
@@ -626,8 +807,13 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="flex items-start gap-3">
                     <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-blue-800">
-                      <p className="mb-1 font-medium">자동 추출된 정보를 확인해주세요</p>
-                      <p>정보가 정확하지 않은 경우 직접 수정할 수 있습니다. 수정된 내용은 개인정보 입력 단계에 자동으로 반영됩니다.</p>
+                      <p className="mb-1 font-medium">
+                        자동 추출된 정보를 확인해주세요
+                      </p>
+                      <p>
+                        정보가 정확하지 않은 경우 직접 수정할 수 있습니다.
+                        수정된 내용은 개인정보 입력 단계에 자동으로 반영됩니다.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -637,12 +823,20 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>여권 타입 (Passport Type)</span>
-                      {extractedPassportInfo.raw?.type && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.raw?.type && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="text"
                       title="여권타입(Passport Type)"
-                      value={editingPassportInfo?.passportType ?? extractedPassportInfo.raw?.type ?? ""}
+                      value={
+                        editingPassportInfo?.passportType ??
+                        extractedPassportInfo.raw?.type ??
+                        ""
+                      }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
@@ -657,12 +851,20 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>발급국가 코드 (Issuing Country Code)</span>
-                      {extractedPassportInfo.raw?.issuing_country && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.raw?.issuing_country && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="text"
                       title="발급국가코드(Issuing Country Code)"
-                      value={editingPassportInfo?.issuingCountryCode ?? extractedPassportInfo.raw?.issuing_country ?? ""}
+                      value={
+                        editingPassportInfo?.issuingCountryCode ??
+                        extractedPassportInfo.raw?.issuing_country ??
+                        ""
+                      }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
@@ -677,12 +879,20 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>성 (Surname)</span>
-                      {extractedPassportInfo.mapped?.lastName && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.mapped?.lastName && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="text"
                       title="성(Surname)"
-                      value={editingPassportInfo?.lastName ?? extractedPassportInfo.mapped?.lastName ?? ""}
+                      value={
+                        editingPassportInfo?.lastName ??
+                        extractedPassportInfo.mapped?.lastName ??
+                        ""
+                      }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
@@ -697,12 +907,20 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>이름 (Given Names)</span>
-                      {extractedPassportInfo.mapped?.firstName && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.mapped?.firstName && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="text"
                       title="이름(Given Names)"
-                      value={editingPassportInfo?.firstName ?? extractedPassportInfo.mapped?.firstName ?? ""}
+                      value={
+                        editingPassportInfo?.firstName ??
+                        extractedPassportInfo.mapped?.firstName ??
+                        ""
+                      }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
@@ -717,7 +935,11 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>한글 이름 (Korean Name)</span>
-                      {extractedPassportInfo.mapped?.koreanName && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.mapped?.koreanName && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="text"
@@ -725,9 +947,11 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                       value={
                         editingPassportInfo?.koreanName ??
                         extractedPassportInfo.mapped?.koreanName ??
-                        (extractedPassportInfo.raw?.korean_name && extractedPassportInfo.raw?.surname && extractedPassportInfo.raw?.given_names
+                        (extractedPassportInfo.raw?.korean_name &&
+                        extractedPassportInfo.raw?.surname &&
+                        extractedPassportInfo.raw?.given_names
                           ? `${extractedPassportInfo.raw.surname} ${extractedPassportInfo.raw.given_names}(${extractedPassportInfo.raw.korean_name})`
-                          : extractedPassportInfo.raw?.korean_name ?? "")
+                          : (extractedPassportInfo.raw?.korean_name ?? ""))
                       }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
@@ -743,12 +967,20 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>생년월일 (Date of Birth)</span>
-                      {extractedPassportInfo.mapped?.birthDate && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.mapped?.birthDate && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="date"
                       title="생년월일(Date of Birth)"
-                      value={editingPassportInfo?.birthDate ?? extractedPassportInfo.mapped?.birthDate ?? ""}
+                      value={
+                        editingPassportInfo?.birthDate ??
+                        extractedPassportInfo.mapped?.birthDate ??
+                        ""
+                      }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
@@ -762,12 +994,22 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>성별 (Sex)</span>
-                      {extractedPassportInfo.mapped?.gender && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.mapped?.gender && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="text"
                       title="성별(Sex)"
-                      value={editingPassportInfo?.gender ?? extractedPassportInfo.mapped?.gender ?? (extractedPassportInfo.raw?.sex ? extractedPassportInfo.raw.sex : "")}
+                      value={
+                        editingPassportInfo?.gender ??
+                        extractedPassportInfo.mapped?.gender ??
+                        (extractedPassportInfo.raw?.sex
+                          ? extractedPassportInfo.raw.sex
+                          : "")
+                      }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
@@ -782,12 +1024,22 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>국적 (Nationality)</span>
-                      {extractedPassportInfo.mapped?.nationality && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.mapped?.nationality && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="text"
                       title="국적(Nationality)"
-                      value={editingPassportInfo?.nationality ?? extractedPassportInfo.mapped?.nationality ?? (extractedPassportInfo.raw?.nationality ? extractedPassportInfo.raw.nationality : "")}
+                      value={
+                        editingPassportInfo?.nationality ??
+                        extractedPassportInfo.mapped?.nationality ??
+                        (extractedPassportInfo.raw?.nationality
+                          ? extractedPassportInfo.raw.nationality
+                          : "")
+                      }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
@@ -802,12 +1054,20 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>여권번호 (Passport Number)</span>
-                      {extractedPassportInfo.mapped?.passportNumber && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.mapped?.passportNumber && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="text"
                       title="여권번호(Passport Number)"
-                      value={editingPassportInfo?.passportNumber ?? extractedPassportInfo.mapped?.passportNumber ?? ""}
+                      value={
+                        editingPassportInfo?.passportNumber ??
+                        extractedPassportInfo.mapped?.passportNumber ??
+                        ""
+                      }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
@@ -866,12 +1126,20 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>여권 발급일 (Date of Issue)</span>
-                      {extractedPassportInfo.mapped?.passportIssueDate && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.mapped?.passportIssueDate && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="date"
                       title="여권발급일(Date of Issue)"
-                      value={editingPassportInfo?.passportIssueDate ?? extractedPassportInfo.mapped?.passportIssueDate ?? ""}
+                      value={
+                        editingPassportInfo?.passportIssueDate ??
+                        extractedPassportInfo.mapped?.passportIssueDate ??
+                        ""
+                      }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
@@ -885,12 +1153,20 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>여권 만료일 (Date of Expiry)</span>
-                      {extractedPassportInfo.mapped?.passportExpiryDate && <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">자동추출</span>}
+                      {extractedPassportInfo.mapped?.passportExpiryDate && (
+                        <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                          자동추출
+                        </span>
+                      )}
                     </label>
                     <input
                       type="date"
                       title="여권만료일(Date of Expiry)"
-                      value={editingPassportInfo?.passportExpiryDate ?? extractedPassportInfo.mapped?.passportExpiryDate ?? ""}
+                      value={
+                        editingPassportInfo?.passportExpiryDate ??
+                        extractedPassportInfo.mapped?.passportExpiryDate ??
+                        ""
+                      }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
@@ -924,7 +1200,8 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                 {/* 저장 버튼 */}
                 <div className="flex items-center justify-between gap-4 pt-6 mt-6 border-t border-emerald-200">
                   <div className="text-sm text-gray-600">
-                    <span className="font-medium">수정사항이 있나요?</span> 저장하시면 개인정보 입력 단계에 반영됩니다.
+                    <span className="font-medium">수정사항이 있나요?</span>{" "}
+                    저장하시면 개인정보 입력 단계에 반영됩니다.
                   </div>
                   <div className="flex gap-3">
                     <Button
@@ -950,8 +1227,12 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                 {/* 원본 OCR 데이터 미리보기 (개발자용) */}
                 {process.env.NODE_ENV === "development" && (
                   <details className="mt-4">
-                    <summary className="text-xs text-gray-500 cursor-pointer">원본 OCR 데이터 보기 (개발용)</summary>
-                    <pre className="p-2 mt-2 overflow-auto text-xs bg-gray-100 rounded">{JSON.stringify(extractedPassportInfo.raw, null, 2)}</pre>
+                    <summary className="text-xs text-gray-500 cursor-pointer">
+                      원본 OCR 데이터 보기 (개발용)
+                    </summary>
+                    <pre className="p-2 mt-2 overflow-auto text-xs bg-gray-100 rounded">
+                      {JSON.stringify(extractedPassportInfo.raw, null, 2)}
+                    </pre>
                   </details>
                 )}
               </CardContent>
@@ -965,15 +1246,25 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             const isUploading = uploadingFiles[doc.type] !== undefined;
 
             return (
-              <Card className={`border-2 transition-all duration-300 ${isUploaded ? "border-green-500 bg-green-50" : doc.required ? "border-orange-300 bg-orange-50" : "border-gray-200 bg-white"}`}>
+              <Card
+                className={`border-2 transition-all duration-300 ${isUploaded ? "border-green-500 bg-green-50" : doc.required ? "border-orange-300 bg-orange-50" : "border-gray-200 bg-white"}`}
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div
                       className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        isUploaded ? "bg-green-500 text-white" : doc.required ? "bg-orange-500 text-white" : "bg-gray-400 text-white"
+                        isUploaded
+                          ? "bg-green-500 text-white"
+                          : doc.required
+                            ? "bg-orange-500 text-white"
+                            : "bg-gray-400 text-white"
                       }`}
                     >
-                      {isUploaded ? <CheckCircle className="w-6 h-6" /> : doc.icon}
+                      {isUploaded ? (
+                        <CheckCircle className="w-6 h-6" />
+                      ) : (
+                        doc.icon
+                      )}
                     </div>
 
                     <div className="flex-1 space-y-3">
@@ -981,9 +1272,15 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                         <div>
                           <h3 className="flex items-center gap-2 text-lg font-bold text-gray-800">
                             {doc.title}
-                            {doc.required && <span className="text-sm text-red-500">*필수</span>}
+                            {doc.required && (
+                              <span className="text-sm text-red-500">
+                                *필수
+                              </span>
+                            )}
                           </h3>
-                          <p className="mt-1 text-sm text-gray-600">{doc.description}</p>
+                          <p className="mt-1 text-sm text-gray-600">
+                            {doc.description}
+                          </p>
                         </div>
 
                         <div className="flex items-center gap-2">
@@ -996,7 +1293,10 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                       {/* 가이드라인 */}
                       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
                         {doc.guidelines.map((guideline, index) => (
-                          <div key={index} className="flex items-start gap-2 text-xs text-gray-600">
+                          <div
+                            key={index}
+                            className="flex items-start gap-2 text-xs text-gray-600"
+                          >
                             <div className="flex-shrink-0 w-1 h-1 mt-2 bg-gray-400 rounded-full"></div>
                             <span>{guideline}</span>
                           </div>
@@ -1010,7 +1310,10 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                             <RefreshCw className="w-4 h-4 animate-spin" />
                             <span>업로드 중...</span>
                           </div>
-                          <Progress value={uploadingFiles[doc.type]} className="h-2" />
+                          <Progress
+                            value={uploadingFiles[doc.type]}
+                            className="h-2"
+                          />
                         </div>
                       ) : isUploaded ? (
                         <div className="space-y-3">
@@ -1018,25 +1321,38 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                           {uploadedDocuments[doc.type].validationResult && (
                             <div
                               className={`p-3 rounded-lg border-2 ${
-                                (uploadedDocuments[doc.type].validationResult.result || uploadedDocuments[doc.type].validationResult) === "SUITABLE"
+                                (uploadedDocuments[doc.type].validationResult
+                                  .result ||
+                                  uploadedDocuments[doc.type]
+                                    .validationResult) === "SUITABLE"
                                   ? "bg-green-50 border-green-200"
                                   : "bg-red-50 border-red-200"
                               }`}
                             >
                               <div className="flex items-center gap-2">
-                                {(uploadedDocuments[doc.type].validationResult.result || uploadedDocuments[doc.type].validationResult) === "SUITABLE" ? (
+                                {(uploadedDocuments[doc.type].validationResult
+                                  .result ||
+                                  uploadedDocuments[doc.type]
+                                    .validationResult) === "SUITABLE" ? (
                                   <>
                                     <CheckCircle className="w-5 h-5 text-green-600" />
-                                    <span className="text-sm font-medium text-green-800">여권 규정에 적합한 증명사진입니다</span>
+                                    <span className="text-sm font-medium text-green-800">
+                                      여권 규정에 적합한 증명사진입니다
+                                    </span>
                                   </>
                                 ) : (
                                   <>
                                     <AlertCircle className="w-5 h-5 text-red-600" />
-                                    <span className="text-sm font-medium text-red-800">여권 규정에 부적합한 증명사진입니다</span>
+                                    <span className="text-sm font-medium text-red-800">
+                                      여권 규정에 부적합한 증명사진입니다
+                                    </span>
                                   </>
                                 )}
                               </div>
-                              {(uploadedDocuments[doc.type].validationResult.result || uploadedDocuments[doc.type].validationResult) !== "SUITABLE" && (
+                              {(uploadedDocuments[doc.type].validationResult
+                                .result ||
+                                uploadedDocuments[doc.type]
+                                  .validationResult) !== "SUITABLE" && (
                                 <div className="mt-2 text-xs text-red-700">
                                   <p>다음 사항을 확인해주세요:</p>
                                   <ul className="mt-1 ml-4 list-disc">
@@ -1054,56 +1370,101 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                             <div className="flex items-center gap-3">
                               <CheckCircle className="w-5 h-5 text-green-500" />
                               <div className="flex-1">
-                                <p className="text-sm font-medium text-gray-800">{uploadedDocuments[doc.type].fileName}</p>
+                                <p className="text-sm font-medium text-gray-800">
+                                  {uploadedDocuments[doc.type].fileName}
+                                </p>
                                 <div className="flex flex-wrap items-center gap-2">
-                                  <p className="text-xs text-gray-500">{Math.round(uploadedDocuments[doc.type].fileSize / 1024)} KB</p>
-                                  {uploadedDocuments[doc.type].compressionRatio && parseFloat(uploadedDocuments[doc.type].compressionRatio) > 0 && (
-                                    <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full">{uploadedDocuments[doc.type].compressionRatio}% 압축</span>
+                                  <p className="text-xs text-gray-500">
+                                    {Math.round(
+                                      uploadedDocuments[doc.type].fileSize /
+                                        1024,
+                                    )}{" "}
+                                    KB
+                                  </p>
+                                  {uploadedDocuments[doc.type]
+                                    .compressionRatio &&
+                                    parseFloat(
+                                      uploadedDocuments[doc.type]
+                                        .compressionRatio,
+                                    ) > 0 && (
+                                      <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full">
+                                        {
+                                          uploadedDocuments[doc.type]
+                                            .compressionRatio
+                                        }
+                                        % 압축
+                                      </span>
+                                    )}
+                                  {uploadedDocuments[doc.type].isTemporary && (
+                                    <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded-full">
+                                      임시저장됨
+                                    </span>
                                   )}
-                                  {uploadedDocuments[doc.type].isTemporary && <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded-full">임시저장됨</span>}
                                   {/* 검증 결과 배지 */}
-                                  {(uploadedDocuments[doc.type].validationResult?.result || uploadedDocuments[doc.type].validationResult) === "SUITABLE" ? (
-                                    <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">규정 적합</span>
-                                  ) : uploadedDocuments[doc.type].validationResult ? (
-                                    <span className="px-2 py-1 text-xs text-red-700 bg-red-100 rounded-full">규정 부적합</span>
+                                  {(uploadedDocuments[doc.type].validationResult
+                                    ?.result ||
+                                    uploadedDocuments[doc.type]
+                                      .validationResult) === "SUITABLE" ? (
+                                    <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
+                                      규정 적합
+                                    </span>
+                                  ) : uploadedDocuments[doc.type]
+                                      .validationResult ? (
+                                    <span className="px-2 py-1 text-xs text-red-700 bg-red-100 rounded-full">
+                                      규정 부적합
+                                    </span>
                                   ) : null}
                                 </div>
                               </div>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Button variant="outline" size="sm" onClick={() => handlePreview(doc.type)} className="px-3 py-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handlePreview(doc.type)}
+                                className="px-3 py-1"
+                              >
                                 <Eye className="w-4 h-4" />
                               </Button>
-                              <Button variant="outline" size="sm" onClick={() => handleFileRemove(doc.type)} className="px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleFileRemove(doc.type)}
+                                className="px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
                                 <X className="w-4 h-4" />
                               </Button>
                             </div>
                           </div>
 
                           {/* 부적합한 경우 재업로드 버튼 표시 */}
-                          {uploadedDocuments[doc.type].validationResult && (uploadedDocuments[doc.type].validationResult?.result || uploadedDocuments[doc.type].validationResult) !== "SUITABLE" && (
-                            <div className="mt-3">
-                              <input
-                                type="file"
-                                accept=".jpg,.jpeg,.png"
-                                onChange={(e) => {
-                                  const file = e.target.files?.[0];
-                                  if (file) {
-                                    handleFileUpload(doc.type, file);
-                                  }
-                                }}
-                                className="hidden"
-                                id={`file-retry-${doc.type}`}
-                              />
-                              <label
-                                htmlFor={`file-retry-${doc.type}`}
-                                className="flex items-center justify-center w-full p-3 text-sm font-medium text-orange-700 transition-all duration-200 border-2 border-orange-300 rounded-lg cursor-pointer bg-orange-50 hover:bg-orange-100"
-                              >
-                                <Upload className="w-4 h-4 mr-2" />
-                                다른 증명사진 업로드
-                              </label>
-                            </div>
-                          )}
+                          {uploadedDocuments[doc.type].validationResult &&
+                            (uploadedDocuments[doc.type].validationResult
+                              ?.result ||
+                              uploadedDocuments[doc.type].validationResult) !==
+                              "SUITABLE" && (
+                              <div className="mt-3">
+                                <input
+                                  type="file"
+                                  accept=".jpg,.jpeg,.png"
+                                  onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                      handleFileUpload(doc.type, file);
+                                    }
+                                  }}
+                                  className="hidden"
+                                  id={`file-retry-${doc.type}`}
+                                />
+                                <label
+                                  htmlFor={`file-retry-${doc.type}`}
+                                  className="flex items-center justify-center w-full p-3 text-sm font-medium text-orange-700 transition-all duration-200 border-2 border-orange-300 rounded-lg cursor-pointer bg-orange-50 hover:bg-orange-100"
+                                >
+                                  <Upload className="w-4 h-4 mr-2" />
+                                  다른 증명사진 업로드
+                                </label>
+                              </div>
+                            )}
                         </div>
                       ) : (
                         <div className="space-y-3">
@@ -1126,7 +1487,10 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                               <Upload className="w-8 h-8 mb-2 text-gray-400" />
                               <p className="mb-2 text-sm text-gray-500">
-                                <span className="font-semibold">클릭하여 업로드</span> 또는 드래그 앤 드롭
+                                <span className="font-semibold">
+                                  클릭하여 업로드
+                                </span>{" "}
+                                또는 드래그 앤 드롭
                               </p>
                               <p className="text-xs text-gray-500">
                                 {doc.formats.join(", ")} (최대 {doc.maxSize})
@@ -1151,21 +1515,29 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <Loader2 className="w-6 h-6 text-amber-600 animate-spin" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-amber-800">여권 정보 자동 추출 중</h3>
+                  <h3 className="text-lg font-semibold text-amber-800">
+                    여권 정보 자동 추출 중
+                  </h3>
                   <p className="mb-3 text-sm text-amber-600">{ocrStatus}</p>
                   <div className="space-y-2">
                     <div className="flex justify-between text-xs text-amber-600">
                       <span>진행률</span>
                       <span>{ocrProgress}%</span>
                     </div>
-                    <Progress value={ocrProgress} className="h-2 bg-amber-200" />
+                    <Progress
+                      value={ocrProgress}
+                      className="h-2 bg-amber-200"
+                    />
                   </div>
                 </div>
               </div>
               <div className="p-3 mt-4 rounded-lg bg-amber-100/50">
                 <div className="flex items-center gap-2 text-sm text-amber-700">
                   <Sparkles className="w-4 h-4" />
-                  <span>AI가 여권에서 개인정보를 자동으로 추출하고 있습니다. 잠시만 기다려주세요.</span>
+                  <span>
+                    AI가 여권에서 개인정보를 자동으로 추출하고 있습니다. 잠시만
+                    기다려주세요.
+                  </span>
                 </div>
               </div>
             </CardContent>
@@ -1173,7 +1545,11 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
         )}
         {/* 네비게이션 버튼 */}
         <div className="flex justify-between pt-8 border-t border-gray-200">
-          <Button onClick={onPrevious} variant="outline" className="px-8 py-4 text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-2xl">
+          <Button
+            onClick={onPrevious}
+            variant="outline"
+            className="px-8 py-4 text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-2xl"
+          >
             <ArrowLeft className="w-6 h-6 mr-3" />
             <span>이전</span>
           </Button>
@@ -1194,7 +1570,11 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           <div className="max-w-4xl max-h-screen overflow-auto bg-white rounded-lg">
             <div className="flex items-center justify-between p-4 border-b">
               <h3 className="text-lg font-bold">파일 미리보기</h3>
-              <Button variant="outline" size="sm" onClick={() => setPreviewFile(null)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPreviewFile(null)}
+              >
                 <X className="w-4 h-4" />
               </Button>
             </div>
@@ -1203,10 +1583,16 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                 <div className="py-8 text-center">
                   <FileText className="w-16 h-16 mx-auto mb-4 text-gray-400" />
                   <p className="mb-4 text-gray-600">PDF 파일</p>
-                  <p className="text-sm text-gray-500">{previewFile.fileName}</p>
+                  <p className="text-sm text-gray-500">
+                    {previewFile.fileName}
+                  </p>
                 </div>
               ) : (
-                <img src={previewFile.file} alt="미리보기" className="max-w-full mx-auto max-h-96" />
+                <img
+                  src={previewFile.file}
+                  alt="미리보기"
+                  className="max-w-full mx-auto max-h-96"
+                />
               )}
             </div>
           </div>
@@ -1223,14 +1609,23 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           >
             <div className="flex items-start gap-3">
               <div className="flex-shrink-0">
-                {toastType === "success" && <CheckCircle className="w-5 h-5 text-green-600" />}
-                {toastType === "error" && <AlertCircle className="w-5 h-5 text-red-600" />}
-                {toastType === "info" && <Info className="w-5 h-5 text-blue-600" />}
+                {toastType === "success" && (
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                )}
+                {toastType === "error" && (
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                )}
+                {toastType === "info" && (
+                  <Info className="w-5 h-5 text-blue-600" />
+                )}
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium">{toastMessage}</p>
               </div>
-              <button onClick={() => setToastMessage(null)} className="flex-shrink-0 text-gray-400 hover:text-gray-600">
+              <button
+                onClick={() => setToastMessage(null)}
+                className="flex-shrink-0 text-gray-400 hover:text-gray-600"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>

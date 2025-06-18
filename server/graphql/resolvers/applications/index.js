@@ -41,6 +41,7 @@ const resolvers = {
           "ADMIN",
           "MANAGER",
           "STAFF",
+          "USER",
         ]);
 
         console.log("✅ 인증된 사용자:", user.role);
