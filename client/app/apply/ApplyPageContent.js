@@ -11,7 +11,12 @@ import { CREATE_APPLICATION_MUTATION } from "../src/lib/graphql/mutation/applica
 
 // Import utilities and types
 import { initialFormData } from "./_components/types";
-import { validateStep, safeLocalStorage, generateApplicationId, calculateTotalPrice } from "./_components/utils";
+import {
+  validateStep,
+  safeLocalStorage,
+  generateApplicationId,
+  calculateTotalPrice,
+} from "./_components/utils";
 
 // Import token refresh test (development only)
 if (process.env.NODE_ENV === "development") {
@@ -120,7 +125,8 @@ export default function ApplyPageContent() {
       if (error.graphQLErrors && error.graphQLErrors.length > 0) {
         errorMessage = error.graphQLErrors[0].message;
       } else if (error.networkError) {
-        errorMessage = "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.";
+        errorMessage =
+          "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.";
       }
 
       alert(`${errorMessage} 다시 시도해주세요.`);
@@ -159,7 +165,10 @@ export default function ApplyPageContent() {
       const newData = { ...prev, ...updates };
       // Auto-save to localStorage
       if (currentStep < 6) {
-        safeLocalStorage.setItem("visa-application-form", JSON.stringify(newData));
+        safeLocalStorage.setItem(
+          "visa-application-form",
+          JSON.stringify(newData),
+        );
       }
       return newData;
     });
@@ -230,11 +239,17 @@ export default function ApplyPageContent() {
               // 이미 camelCase로 변환된 extractedInfo 사용 (우선순위)
               if (docData.extractedInfo) {
                 extractedInfo = docData.extractedInfo;
-                console.log(`🔍 Using camelCase extractedInfo for ${docType}:`, extractedInfo);
+                console.log(
+                  `🔍 Using camelCase extractedInfo for ${docType}:`,
+                  extractedInfo,
+                );
               } else if (docData.ocrResult && !docData.ocrResult.error) {
                 // fallback: ocrResult가 있지만 extractedInfo가 없는 경우 - snake_case를 camelCase로 변환
                 extractedInfo = convertOcrDataToCamelCase(docData.ocrResult);
-                console.log(`🔍 Fallback: converted snake_case OCR Result to camelCase for ${docType}:`, extractedInfo);
+                console.log(
+                  `🔍 Fallback: converted snake_case OCR Result to camelCase for ${docType}:`,
+                  extractedInfo,
+                );
               }
             } else if (docData.extractedInfo) {
               extractedInfo = docData.extractedInfo;
@@ -242,17 +257,23 @@ export default function ApplyPageContent() {
 
             // 파일 데이터 처리 - Base64 문자열인지 확인
             let fileDataToSend = docData.file;
-            if (typeof docData.file === "string" && docData.file.startsWith("data:")) {
+            if (
+              typeof docData.file === "string" &&
+              docData.file.startsWith("data:")
+            ) {
               // 이미 Base64 형태인 경우 그대로 사용
               fileDataToSend = docData.file;
             } else if (docData.file && typeof docData.file === "object") {
               // File 객체인 경우 - 실제로는 이미 Base64로 변환되어 저장되어야 함
-              console.warn(`File object found for ${docType}, should be Base64 string`);
+              console.warn(
+                `File object found for ${docType}, should be Base64 string`,
+              );
               fileDataToSend = null;
             }
 
             documentsData[docType] = {
-              fileName: docData.fileName || docData.file?.name || `${docType}.jpg`,
+              fileName:
+                docData.fileName || docData.file?.name || `${docType}.jpg`,
               fileSize: docData.fileSize || docData.file?.size || 0,
               fileType: docData.fileType || docData.file?.type || "image/jpeg",
               fileData: fileDataToSend,
@@ -265,8 +286,12 @@ export default function ApplyPageContent() {
               hasFileData: !!documentsData[docType].fileData,
               fileDataType: typeof documentsData[docType].fileData,
               hasExtractedInfo: !!documentsData[docType].extractedInfo,
-              extractedInfoKeys: extractedInfo ? Object.keys(extractedInfo) : [],
-              extractedInfoSample: extractedInfo ? JSON.stringify(extractedInfo).substring(0, 200) + "..." : "none",
+              extractedInfoKeys: extractedInfo
+                ? Object.keys(extractedInfo)
+                : [],
+              extractedInfoSample: extractedInfo
+                ? JSON.stringify(extractedInfo).substring(0, 200) + "..."
+                : "none",
             });
           }
         });
@@ -291,18 +316,30 @@ export default function ApplyPageContent() {
           visaType: formData.visaType || "",
         },
         additionalServiceIds: formData.additionalServices || [],
-        documents: Object.keys(documentsData).length > 0 ? documentsData : undefined,
+        documents:
+          Object.keys(documentsData).length > 0 ? documentsData : undefined,
       };
-      console.log("🔍 Simplified applicationData:", JSON.stringify(applicationData, null, 2));
+      console.log(
+        "🔍 Simplified applicationData:",
+        JSON.stringify(applicationData, null, 2),
+      );
 
       // 🔍 Debug: Check documents data before GraphQL submission
       if (applicationData.documents) {
-        Object.entries(applicationData.documents).forEach(([docType, docData]) => {
-          if (docData.extractedInfo) {
-            console.log(`🔍 ${docType} extractedInfo being sent to GraphQL:`, docData.extractedInfo);
-            console.log(`🔍 ${docType} extractedInfo keys:`, Object.keys(docData.extractedInfo));
-          }
-        });
+        Object.entries(applicationData.documents).forEach(
+          ([docType, docData]) => {
+            if (docData.extractedInfo) {
+              console.log(
+                `🔍 ${docType} extractedInfo being sent to GraphQL:`,
+                docData.extractedInfo,
+              );
+              console.log(
+                `🔍 ${docType} extractedInfo keys:`,
+                Object.keys(docData.extractedInfo),
+              );
+            }
+          },
+        );
       } // Submit via Apollo Client mutation
       console.log("🔄 Calling createApplication mutation...");
       await createApplication({
@@ -325,14 +362,17 @@ export default function ApplyPageContent() {
     const handleBeforeUnload = (e) => {
       if (currentStep > 1 && currentStep < 6) {
         e.preventDefault();
-        e.returnValue = "작성 중인 신청서가 있습니다. 정말 페이지를 나가시겠습니까?";
+        e.returnValue =
+          "작성 중인 신청서가 있습니다. 정말 페이지를 나가시겠습니까?";
         return e.returnValue;
       }
     };
 
     const handlePopState = (e) => {
       if (currentStep > 1 && currentStep < 6) {
-        const confirmLeave = window.confirm("작성 중인 신청서가 있습니다. 정말 페이지를 나가시겠습니까?");
+        const confirmLeave = window.confirm(
+          "작성 중인 신청서가 있습니다. 정말 페이지를 나가시겠습니까?",
+        );
         if (!confirmLeave) {
           window.history.pushState(null, "", window.location.href);
         }
@@ -362,21 +402,65 @@ export default function ApplyPageContent() {
 
   // Render current step component
   const renderStepComponent = () => {
-    switch (currentStep) {
+    // switch (currentStep) {
+    switch (4) {
       case 1:
-        return <ServiceSelectionStep formData={formData} onUpdate={updateFormData} onNext={handleNext} />;
+        return (
+          <ServiceSelectionStep
+            formData={formData}
+            onUpdate={updateFormData}
+            onNext={handleNext}
+          />
+        );
       case 2:
-        return <PersonalInfoStep formData={formData} onUpdate={updateFormData} onNext={handleNext} onPrevious={handlePrevious} />;
+        return (
+          <PersonalInfoStep
+            formData={formData}
+            onUpdate={updateFormData}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        );
       case 3:
-        return <TravelInfoStep formData={formData} onUpdate={updateFormData} onNext={handleNext} onPrevious={handlePrevious} />;
+        return (
+          <TravelInfoStep
+            formData={formData}
+            onUpdate={updateFormData}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        );
       case 4:
-        return <DocumentUploadStep formData={formData} onUpdate={updateFormData} onNext={handleNext} onPrevious={handlePrevious} />;
+        return (
+          <DocumentUploadStep
+            formData={formData}
+            onUpdate={updateFormData}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        );
       case 5:
-        return <ReviewStep formData={formData} onNext={handleApplicationSubmit} onPrevious={handlePrevious} onEdit={handleEdit} isSubmitting={isSubmitting} />;
+        return (
+          <ReviewStep
+            formData={formData}
+            onNext={handleApplicationSubmit}
+            onPrevious={handlePrevious}
+            onEdit={handleEdit}
+            isSubmitting={isSubmitting}
+          />
+        );
       case 6:
-        return <ConfirmationStep formData={formData} applicationId={applicationId} />;
+        return (
+          <ConfirmationStep formData={formData} applicationId={applicationId} />
+        );
       default:
-        return <ServiceSelectionStep formData={formData} onUpdate={updateFormData} onNext={handleNext} />;
+        return (
+          <ServiceSelectionStep
+            formData={formData}
+            onUpdate={updateFormData}
+            onNext={handleNext}
+          />
+        );
     }
   };
 
@@ -387,7 +471,11 @@ export default function ApplyPageContent() {
       <main className="container px-4 py-8 mx-auto">
         {/* Progress Indicator */}
         <div className="mb-8">
-          <ProgressIndicator currentStep={currentStep} totalSteps={TOTAL_STEPS} stepNames={STEP_NAMES} />
+          <ProgressIndicator
+            currentStep={currentStep}
+            totalSteps={TOTAL_STEPS}
+            stepNames={STEP_NAMES}
+          />
         </div>
 
         {/* Step Content */}
