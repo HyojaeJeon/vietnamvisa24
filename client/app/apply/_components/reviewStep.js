@@ -1,15 +1,44 @@
-
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../src/components/ui/card";
 import { Button } from "../../src/components/ui/button";
 import { Badge } from "../../src/components/ui/badge";
-import { CheckCircle, FileText, User, Edit2, Globe, Calendar, ArrowRight, ArrowLeft, Phone, MapPin, Plane, Hotel, Send, Edit, Loader2, CreditCard, IdCard } from "lucide-react";
+import {
+  CheckCircle,
+  FileText,
+  User,
+  Edit2,
+  Globe,
+  Calendar,
+  ArrowRight,
+  ArrowLeft,
+  Phone,
+  MapPin,
+  Plane,
+  Hotel,
+  Send,
+  Edit,
+  Loader2,
+  CreditCard,
+  IdCard,
+} from "lucide-react";
 import { formatCurrency, calculateTotalPrice, formatDate } from "./utils";
 import { VISA_TYPES, PROCESSING_TYPES, ADDITIONAL_SERVICES } from "./types";
 
-const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, updateFormData }) => {
+const ReviewStep = ({
+  formData,
+  onNext,
+  onPrevious,
+  onEdit,
+  isSubmitting,
+  updateFormData,
+}) => {
   const [isEditingPassport, setIsEditingPassport] = useState(false);
   const [editedPassportInfo, setEditedPassportInfo] = useState(null);
   const currentPrice = calculateTotalPrice(formData);
@@ -17,10 +46,11 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
   // 여권 정보 수정 시작
   const startEditingPassport = () => {
     setEditedPassportInfo({
-      passportNo: formData.personalInfo?.passportNo || "",
+      passportNo: formData.personalInfo?.passportNumber || "",
       surname: formData.personalInfo?.lastName || "",
       givenNames: formData.personalInfo?.firstName || "",
       koreanName: formData.personalInfo?.koreanName || "",
+      authority: formData.personalInfo?.authority || "",
       nationality: formData.personalInfo?.nationality || "",
       issuingCountry: formData.personalInfo?.issuingCountry || "",
       sex: formData.personalInfo?.gender || "",
@@ -28,7 +58,6 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
       dateOfIssue: formData.personalInfo?.passportIssueDate || "",
       dateOfExpiry: formData.personalInfo?.passportExpiryDate || "",
       type: formData.personalInfo?.passportType || "",
-      authority: formData.personalInfo?.authority || "",
       personalNo: formData.personalInfo?.personalNo || "",
     });
     setIsEditingPassport(true);
@@ -39,7 +68,7 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
     updateFormData({
       personalInfo: {
         ...formData.personalInfo,
-        passportNo: editedPassportInfo.passportNo,
+        passportNo: editedPassportInfo.passportNumber,
         lastName: editedPassportInfo.surname,
         firstName: editedPassportInfo.givenNames,
         koreanName: editedPassportInfo.koreanName,
@@ -52,7 +81,7 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
         passportType: editedPassportInfo.type,
         authority: editedPassportInfo.authority,
         personalNo: editedPassportInfo.personalNo,
-      }
+      },
     });
     setIsEditingPassport(false);
     setEditedPassportInfo(null);
@@ -67,8 +96,10 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
   const getVisaTypeLabel = (type) => {
     const labels = {
       [VISA_TYPES.E_VISA_GENERAL]: "E-VISA (전자비자) / 일반 (3-4일 소요)",
-      [VISA_TYPES.E_VISA_URGENT]: "E-VISA (전자비자) / 긴급 (선택 옵션에 따라 1시간 ~ 2일 소요)",
-      [VISA_TYPES.E_VISA_TRANSIT]: "E-VISA (전자비자) / 목바이 경유 (당일 발급)",
+      [VISA_TYPES.E_VISA_URGENT]:
+        "E-VISA (전자비자) / 긴급 (선택 옵션에 따라 1시간 ~ 2일 소요)",
+      [VISA_TYPES.E_VISA_TRANSIT]:
+        "E-VISA (전자비자) / 목바이 경유 (당일 발급)",
     };
     return labels[type] || type;
   };
@@ -130,8 +161,12 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
               <CheckCircle className="w-8 h-8 text-white" />
             </div>
             <div>
-              <CardTitle className="mb-2 text-3xl font-bold">신청 정보 최종 확인</CardTitle>
-              <p className="text-lg text-indigo-100">입력하신 정보를 확인하고 수정하세요</p>
+              <CardTitle className="mb-2 text-3xl font-bold">
+                신청 정보 최종 확인
+              </CardTitle>
+              <p className="text-lg text-indigo-100">
+                입력하신 정보를 확인하고 수정하세요
+              </p>
             </div>
           </div>
         </CardHeader>
@@ -144,9 +179,16 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                 <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl shadow-lg">
                   <Globe className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800">선택한 서비스</h3>
+                <h3 className="text-2xl font-bold text-gray-800">
+                  선택한 서비스
+                </h3>
               </div>
-              <Button variant="outline" size="sm" onClick={() => onEdit(1)} className="text-blue-600 hover:text-blue-700 border-blue-200 hover:border-blue-300">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(1)}
+                className="text-blue-600 hover:text-blue-700 border-blue-200 hover:border-blue-300"
+              >
                 <Edit className="w-4 h-4 mr-2" />
                 수정
               </Button>
@@ -156,25 +198,40 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div>
-                    <p className="mb-2 text-sm font-semibold text-gray-600 uppercase tracking-wide">비자 유형</p>
-                    <p className="text-lg font-bold text-gray-800">{getVisaTypeLabel(formData.visaType)}</p>
+                    <p className="mb-2 text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                      비자 유형
+                    </p>
+                    <p className="text-lg font-bold text-gray-800">
+                      {getVisaTypeLabel(formData.visaType)}
+                    </p>
                   </div>
                   <div>
-                    <p className="mb-2 text-sm font-semibold text-gray-600 uppercase tracking-wide">처리 속도</p>
-                    <p className="text-lg font-bold text-gray-800">{getProcessingTypeLabel(formData.processingType)}</p>
+                    <p className="mb-2 text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                      처리 속도
+                    </p>
+                    <p className="text-lg font-bold text-gray-800">
+                      {getProcessingTypeLabel(formData.processingType)}
+                    </p>
                   </div>
-                  {formData.additionalServices && formData.additionalServices.length > 0 && (
-                    <div className="md:col-span-2">
-                      <p className="mb-3 text-sm font-semibold text-gray-600 uppercase tracking-wide">추가 서비스</p>
-                      <div className="flex flex-wrap gap-2">
-                        {formData.additionalServices.map((service) => (
-                          <Badge key={service} variant="secondary" className="px-3 py-1 text-sm bg-blue-100 text-blue-800">
-                            {getAdditionalServiceLabel(service)}
-                          </Badge>
-                        ))}
+                  {formData.additionalServices &&
+                    formData.additionalServices.length > 0 && (
+                      <div className="md:col-span-2">
+                        <p className="mb-3 text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                          추가 서비스
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                          {formData.additionalServices.map((service) => (
+                            <Badge
+                              key={service}
+                              variant="secondary"
+                              className="px-3 py-1 text-sm bg-blue-100 text-blue-800"
+                            >
+                              {getAdditionalServiceLabel(service)}
+                            </Badge>
+                          ))}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                 </div>
               </CardContent>
             </Card>
@@ -190,7 +247,12 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                 <h3 className="text-2xl font-bold text-gray-800">여권 정보</h3>
               </div>
               {!isEditingPassport && (
-                <Button variant="outline" size="sm" onClick={startEditingPassport} className="text-emerald-600 hover:text-emerald-700 border-emerald-200 hover:border-emerald-300">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={startEditingPassport}
+                  className="text-emerald-600 hover:text-emerald-700 border-emerald-200 hover:border-emerald-300"
+                >
                   <Edit2 className="w-4 h-4 mr-2" />
                   수정
                 </Button>
@@ -203,64 +265,113 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">여권번호</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          여권번호
+                        </label>
                         <input
                           type="text"
-                          value={editedPassportInfo.passportNo}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, passportNo: e.target.value})}
+                          value={editedPassportInfo.passportNumber}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              passportNo: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">성 (Surname)</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          성 (Surname)
+                        </label>
                         <input
                           type="text"
                           value={editedPassportInfo.surname}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, surname: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              surname: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">이름 (Given Names)</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          이름 (Given Names)
+                        </label>
                         <input
                           type="text"
                           value={editedPassportInfo.givenNames}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, givenNames: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              givenNames: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">한글 이름</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          한글 이름
+                        </label>
                         <input
                           type="text"
                           value={editedPassportInfo.koreanName}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, koreanName: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              koreanName: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">국적</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          국적
+                        </label>
                         <input
                           type="text"
                           value={editedPassportInfo.nationality}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, nationality: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              nationality: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">발급 국가</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          발급 국가
+                        </label>
                         <input
                           type="text"
                           value={editedPassportInfo.issuingCountry}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, issuingCountry: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              issuingCountry: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">성별</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          성별
+                        </label>
                         <select
                           value={editedPassportInfo.sex}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, sex: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              sex: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         >
                           <option value="">선택하세요</option>
@@ -269,62 +380,107 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                         </select>
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">생년월일</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          생년월일
+                        </label>
                         <input
                           type="date"
                           value={editedPassportInfo.dateOfBirth}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, dateOfBirth: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              dateOfBirth: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">발급일</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          발급일
+                        </label>
                         <input
                           type="date"
                           value={editedPassportInfo.dateOfIssue}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, dateOfIssue: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              dateOfIssue: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">만료일</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          만료일
+                        </label>
                         <input
                           type="date"
                           value={editedPassportInfo.dateOfExpiry}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, dateOfExpiry: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              dateOfExpiry: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">여권 유형</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          여권 유형
+                        </label>
                         <input
                           type="text"
                           value={editedPassportInfo.type}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, type: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              type: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">발급 기관</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          발급 기관
+                        </label>
                         <input
                           type="text"
                           value={editedPassportInfo.authority}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, authority: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              authority: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">개인번호</label>
+                      {/* <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          개인번호
+                        </label>
                         <input
                           type="text"
                           value={editedPassportInfo.personalNo}
-                          onChange={(e) => setEditedPassportInfo({...editedPassportInfo, personalNo: e.target.value})}
+                          onChange={(e) =>
+                            setEditedPassportInfo({
+                              ...editedPassportInfo,
+                              personalNo: e.target.value,
+                            })
+                          }
                           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
-                      </div>
+                      </div> */}
                     </div>
                     <div className="flex gap-3 pt-4 border-t">
-                      <Button onClick={savePassportInfo} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                      <Button
+                        onClick={savePassportInfo}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                      >
                         저장
                       </Button>
                       <Button onClick={cancelEditingPassport} variant="outline">
@@ -335,68 +491,142 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                 ) : (
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">여권번호</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.passportNo || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        여권번호
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.passportNo || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">성 (Surname)</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.lastName || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        성 (Surname)
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.lastName || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">이름 (Given Names)</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.firstName || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        이름 (Given Names)
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.firstName || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">한글 이름</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.koreanName || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        한글 이름
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.koreanName || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">국적</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.nationality || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        국적
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.nationality || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">발급 국가</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.issuingCountry || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        발급 국가
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.issuingCountry || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">성별</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.gender === "M" ? "남성" : formData.personalInfo?.gender === "F" ? "여성" : "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        성별
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.gender === "M"
+                          ? "남성"
+                          : formData.personalInfo?.gender === "F"
+                            ? "여성"
+                            : "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">생년월일</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.birthDate ? formatDate(formData.personalInfo.birthDate) : "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        생년월일
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.birthDate
+                          ? formatDate(formData.personalInfo.birthDate)
+                          : "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">발급일</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.passportIssueDate ? formatDate(formData.personalInfo.passportIssueDate) : "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        발급일
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.passportIssueDate
+                          ? formatDate(formData.personalInfo.passportIssueDate)
+                          : "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">만료일</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.passportExpiryDate ? formatDate(formData.personalInfo.passportExpiryDate) : "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        만료일
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.passportExpiryDate
+                          ? formatDate(formData.personalInfo.passportExpiryDate)
+                          : "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">여권 유형</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.passportType || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        여권 유형
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.passportType || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">발급 기관</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.authority || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        발급 기관
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.authority || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">개인번호</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.personalNo || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        개인번호
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.personalNo || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">이메일</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.email || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        이메일
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.email || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">휴대폰</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.phone || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        휴대폰
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.phone || "-"}
+                      </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow-sm md:col-span-2">
-                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">주소</p>
-                      <p className="text-lg font-bold text-gray-800">{formData.personalInfo?.address || "-"}</p>
+                      <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                        주소
+                      </p>
+                      <p className="text-lg font-bold text-gray-800">
+                        {formData.personalInfo?.address || "-"}
+                      </p>
                     </div>
                   </div>
                 )}
@@ -413,7 +643,12 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                 </div>
                 <h3 className="text-2xl font-bold text-gray-800">여행 정보</h3>
               </div>
-              <Button variant="outline" size="sm" onClick={() => onEdit(3)} className="text-purple-600 hover:text-purple-700 border-purple-200 hover:border-purple-300">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(3)}
+                className="text-purple-600 hover:text-purple-700 border-purple-200 hover:border-purple-300"
+              >
                 <Edit className="w-4 h-4 mr-2" />
                 수정
               </Button>
@@ -423,12 +658,22 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                   <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <p className="mb-2 text-sm font-semibold text-gray-600 uppercase tracking-wide">입국 예정일</p>
-                    <p className="text-lg font-bold text-gray-800">{formData.travelInfo?.entryDate ? formatDate(formData.travelInfo.entryDate) : "-"}</p>
+                    <p className="mb-2 text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                      입국 예정일
+                    </p>
+                    <p className="text-lg font-bold text-gray-800">
+                      {formData.travelInfo?.entryDate
+                        ? formatDate(formData.travelInfo.entryDate)
+                        : "-"}
+                    </p>
                   </div>
                   <div className="bg-white p-4 rounded-lg shadow-sm">
-                    <p className="mb-2 text-sm font-semibold text-gray-600 uppercase tracking-wide">입국 공항</p>
-                    <p className="text-lg font-bold text-gray-800">{getEntryPortLabel(formData.travelInfo?.entryPort)}</p>
+                    <p className="mb-2 text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                      입국 공항
+                    </p>
+                    <p className="text-lg font-bold text-gray-800">
+                      {getEntryPortLabel(formData.travelInfo?.entryPort)}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -442,9 +687,16 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                 <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl shadow-lg">
                   <FileText className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-800">업로드된 서류</h3>
+                <h3 className="text-2xl font-bold text-gray-800">
+                  업로드된 서류
+                </h3>
               </div>
-              <Button variant="outline" size="sm" onClick={() => onEdit(4)} className="text-orange-600 hover:text-orange-700 border-orange-200 hover:border-orange-300">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEdit(4)}
+                className="text-orange-600 hover:text-orange-700 border-orange-200 hover:border-orange-300"
+              >
                 <Edit className="w-4 h-4 mr-2" />
                 수정
               </Button>
@@ -453,18 +705,29 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
             <Card className="border-2 border-orange-200 bg-gradient-to-r from-orange-50 to-red-50 shadow-lg">
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  {Object.entries(uploadedDocuments).map(([docType, document]) => (
-                    <div key={docType} className="flex items-center gap-3 p-4 bg-white border rounded-lg shadow-sm">
-                      <CheckCircle className="w-5 h-5 text-green-500" />
-                      <div>
-                        <p className="text-sm font-semibold text-gray-800">{documentLabels[docType] || docType}</p>
-                        <p className="text-xs text-gray-500">{document.fileName}</p>
+                  {Object.entries(uploadedDocuments).map(
+                    ([docType, document]) => (
+                      <div
+                        key={docType}
+                        className="flex items-center gap-3 p-4 bg-white border rounded-lg shadow-sm"
+                      >
+                        <CheckCircle className="w-5 h-5 text-green-500" />
+                        <div>
+                          <p className="text-sm font-semibold text-gray-800">
+                            {documentLabels[docType] || docType}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {document.fileName}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
                 {Object.keys(uploadedDocuments).length === 0 && (
-                  <p className="py-8 text-center text-gray-500">업로드된 서류가 없습니다.</p>
+                  <p className="py-8 text-center text-gray-500">
+                    업로드된 서류가 없습니다.
+                  </p>
                 )}
               </CardContent>
             </Card>
@@ -481,25 +744,34 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
               <div className="mb-6 space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-lg">기본 비자 요금</span>
-                  <span className="text-lg font-semibold">{formatCurrency(30)}</span>
+                  <span className="text-lg font-semibold">
+                    {formatCurrency(30)}
+                  </span>
                 </div>
                 {formData.processingType !== PROCESSING_TYPES.NORMAL && (
                   <div className="flex items-center justify-between">
                     <span className="text-lg">급행 처리 요금</span>
-                    <span className="text-lg font-semibold">{formatCurrency(20)}</span>
+                    <span className="text-lg font-semibold">
+                      {formatCurrency(20)}
+                    </span>
                   </div>
                 )}
-                {formData.additionalServices && formData.additionalServices.length > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg">추가 서비스</span>
-                    <span className="text-lg font-semibold">{formatCurrency(25)}</span>
-                  </div>
-                )}
+                {formData.additionalServices &&
+                  formData.additionalServices.length > 0 && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg">추가 서비스</span>
+                      <span className="text-lg font-semibold">
+                        {formatCurrency(25)}
+                      </span>
+                    </div>
+                  )}
               </div>
               <div className="pt-4 border-t border-white/20">
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold">총 결제 금액</span>
-                  <span className="text-3xl font-bold text-green-400">{formatCurrency(currentPrice)}</span>
+                  <span className="text-3xl font-bold text-green-400">
+                    {formatCurrency(currentPrice)}
+                  </span>
                 </div>
                 <p className="mt-2 text-center text-gray-300">부가세 포함</p>
               </div>
@@ -508,7 +780,11 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
 
           {/* 네비게이션 버튼 */}
           <div className="flex justify-between pt-8 border-t border-gray-200">
-            <Button onClick={onPrevious} variant="outline" className="px-8 py-4 text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-2xl">
+            <Button
+              onClick={onPrevious}
+              variant="outline"
+              className="px-8 py-4 text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-2xl"
+            >
               <ArrowLeft className="w-6 h-6 mr-3" />
               <span>이전</span>
             </Button>
