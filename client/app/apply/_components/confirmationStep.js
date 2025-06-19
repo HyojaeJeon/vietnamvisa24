@@ -233,64 +233,64 @@ const ConfirmationStep = ({ formData, applicationId }) => {
           minHeight: '297mm',
           backgroundColor: '#ffffff',
           fontFamily: "'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif",
-          padding: '20mm',
+          padding: '15mm',
           boxSizing: 'border-box'
         }}
       >
         {/* 헤더 섹션 */}
         <div style={{ 
           background: 'linear-gradient(135deg, #4F8FFF 0%, #2563EB 100%)',
-          padding: '30px',
-          borderRadius: '12px',
+          padding: '18px',
+          borderRadius: '8px',
           color: 'white',
           textAlign: 'center',
-          marginBottom: '30px',
+          marginBottom: '18px',
           position: 'relative',
           overflow: 'hidden'
         }}>
           {/* 장식 요소 */}
           <div style={{
             position: 'absolute',
-            top: '-20px',
-            right: '-20px',
-            width: '80px',
-            height: '80px',
+            top: '-15px',
+            right: '-15px',
+            width: '50px',
+            height: '50px',
             backgroundColor: 'rgba(255,255,255,0.1)',
             borderRadius: '50%'
           }}></div>
           <div style={{
             position: 'absolute',
-            bottom: '-30px',
-            left: '-30px',
-            width: '100px',
-            height: '100px',
+            bottom: '-20px',
+            left: '-20px',
+            width: '60px',
+            height: '60px',
             backgroundColor: 'rgba(255,255,255,0.05)',
             borderRadius: '50%'
           }}></div>
           
           <h1 style={{ 
-            fontSize: '32px', 
+            fontSize: '22px', 
             fontWeight: 'bold', 
-            margin: '0 0 8px 0',
-            letterSpacing: '1px'
+            margin: '0 0 4px 0',
+            letterSpacing: '0.5px'
           }}>
             VIETNAM VISA 24
           </h1>
           <p style={{ 
-            fontSize: '14px', 
-            margin: '0 0 15px 0',
+            fontSize: '11px', 
+            margin: '0 0 8px 0',
             opacity: '0.9'
           }}>
             Professional Visa Service
           </p>
           <div style={{
-            width: '60px',
-            height: '2px',
+            width: '40px',
+            height: '1px',
             backgroundColor: 'rgba(255,255,255,0.6)',
-            margin: '0 auto 15px auto'
+            margin: '0 auto 8px auto'
           }}></div>
           <p style={{ 
-            fontSize: '11px', 
+            fontSize: '9px', 
             margin: '0',
             opacity: '0.8'
           }}>
@@ -299,24 +299,24 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         </div>
 
         {/* 메인 타이틀 */}
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '18px' }}>
           <h2 style={{ 
-            fontSize: '28px', 
+            fontSize: '20px', 
             fontWeight: 'bold', 
             color: '#1F2937',
-            margin: '0 0 8px 0'
+            margin: '0 0 4px 0'
           }}>
             비자 신청 접수증
           </h2>
           <p style={{ 
-            fontSize: '16px', 
+            fontSize: '12px', 
             color: '#6B7280',
-            margin: '0 0 6px 0'
+            margin: '0 0 3px 0'
           }}>
             VISA APPLICATION RECEIPT
           </p>
           <p style={{ 
-            fontSize: '14px', 
+            fontSize: '10px', 
             color: '#9CA3AF',
             margin: '0'
           }}>
@@ -327,28 +327,28 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         {/* 접수 정보 박스 */}
         <div style={{
           backgroundColor: '#F8FAFC',
-          border: '2px solid #E2E8F0',
-          borderRadius: '12px',
-          padding: '25px',
-          marginBottom: '35px'
+          border: '1px solid #E2E8F0',
+          borderRadius: '6px',
+          padding: '15px',
+          marginBottom: '18px'
         }}>
           <div style={{ 
             display: 'flex', 
             justifyContent: 'space-between', 
             alignItems: 'center',
-            marginBottom: '15px'
+            marginBottom: '8px'
           }}>
             <div>
               <p style={{ 
-                fontSize: '14px', 
+                fontSize: '10px', 
                 color: '#4B5563',
-                margin: '0 0 5px 0',
+                margin: '0 0 3px 0',
                 fontWeight: '600'
               }}>
                 접수일시
               </p>
               <p style={{ 
-                fontSize: '16px', 
+                fontSize: '12px', 
                 color: '#1F2937',
                 margin: '0',
                 fontWeight: 'bold'
@@ -358,19 +358,19 @@ const ConfirmationStep = ({ formData, applicationId }) => {
             </div>
             <div style={{ textAlign: 'right' }}>
               <p style={{ 
-                fontSize: '14px', 
+                fontSize: '10px', 
                 color: '#4B5563',
-                margin: '0 0 5px 0',
+                margin: '0 0 3px 0',
                 fontWeight: '600'
               }}>
                 신청번호
               </p>
               <p style={{ 
-                fontSize: '20px', 
+                fontSize: '14px', 
                 color: '#2563EB',
                 margin: '0',
                 fontWeight: 'bold',
-                letterSpacing: '1px'
+                letterSpacing: '0.5px'
               }}>
                 {applicationId}
               </p>
@@ -379,10 +379,10 @@ const ConfirmationStep = ({ formData, applicationId }) => {
           <div style={{
             height: '1px',
             backgroundColor: '#E5E7EB',
-            margin: '15px 0'
+            margin: '8px 0'
           }}></div>
           <p style={{ 
-            fontSize: '12px', 
+            fontSize: '9px', 
             color: '#6B7280',
             margin: '0',
             textAlign: 'center'
@@ -392,66 +392,66 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         </div>
 
         {/* 신청자 정보 섹션 */}
-        <div style={{ marginBottom: '30px' }}>
+        <div style={{ marginBottom: '16px' }}>
           <div style={{
             backgroundColor: '#2563EB',
             color: 'white',
-            padding: '15px 20px',
-            borderRadius: '8px 8px 0 0',
-            fontSize: '16px',
+            padding: '8px 12px',
+            borderRadius: '4px 4px 0 0',
+            fontSize: '12px',
             fontWeight: 'bold'
           }}>
             <span>신청자 정보</span>
-            <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px' }}>
+            <span style={{ fontSize: '9px', fontWeight: 'normal', marginLeft: '8px' }}>
               APPLICANT INFORMATION
             </span>
           </div>
           <div style={{
             backgroundColor: '#FFFFFF',
-            border: '2px solid #E5E7EB',
+            border: '1px solid #E5E7EB',
             borderTop: 'none',
-            borderRadius: '0 0 8px 8px',
-            padding: '25px'
+            borderRadius: '0 0 4px 4px',
+            padding: '12px'
           }}>
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: '1fr 1fr', 
-              gap: '20px 40px',
-              fontSize: '14px'
+              gap: '8px 20px',
+              fontSize: '10px'
             }}>
               <div>
                 <span style={{ color: '#6B7280', fontWeight: '600' }}>신청자명:</span>
-                <span style={{ marginLeft: '10px', color: '#1F2937', fontWeight: 'bold' }}>
+                <span style={{ marginLeft: '6px', color: '#1F2937', fontWeight: 'bold' }}>
                   {formData.personalInfo?.firstName} {formData.personalInfo?.lastName}
                 </span>
               </div>
               <div>
                 <span style={{ color: '#6B7280', fontWeight: '600' }}>여권번호:</span>
-                <span style={{ marginLeft: '10px', color: '#1F2937', fontWeight: 'bold' }}>
+                <span style={{ marginLeft: '6px', color: '#1F2937', fontWeight: 'bold' }}>
                   {formData.personalInfo?.passportNumber || "정보 없음"}
                 </span>
               </div>
               <div>
                 <span style={{ color: '#6B7280', fontWeight: '600' }}>국적:</span>
-                <span style={{ marginLeft: '10px', color: '#1F2937', fontWeight: 'bold' }}>
+                <span style={{ marginLeft: '6px', color: '#1F2937', fontWeight: 'bold' }}>
                   대한민국
                 </span>
               </div>
               <div>
                 <span style={{ color: '#6B7280', fontWeight: '600' }}>생년월일:</span>
-                <span style={{ marginLeft: '10px', color: '#1F2937', fontWeight: 'bold' }}>
+                <span style={{ marginLeft: '6px', color: '#1F2937', fontWeight: 'bold' }}>
                   {formData.personalInfo?.dateOfBirth || "정보 없음"}
                 </span>
               </div>
               <div>
                 <span style={{ color: '#6B7280', fontWeight: '600' }}>이메일:</span>
-                <span style={{ marginLeft: '10px', color: '#1F2937', fontWeight: 'bold' }}>
+                <span style={{ marginLeft: '6px', color: '#1F2937', fontWeight: 'bold' }}>
                   {formData.personalInfo?.email || "정보 없음"}
                 </span>
               </div>
               <div>
                 <span style={{ color: '#6B7280', fontWeight: '600' }}>연락처:</span>
-                <span style={{ marginLeft: '10px', color: '#1F2937', fontWeight: 'bold' }}>
+                <span style={{ marginLeft: '6px', color: '#1F2937', fontWeight: 'bold' }}>
                   {formData.personalInfo?.phone || "정보 없음"}
                 </span>
               </div>
@@ -460,54 +460,54 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         </div>
 
         {/* 비자 정보 섹션 */}
-        <div style={{ marginBottom: '30px' }}>
+        <div style={{ marginBottom: '16px' }}>
           <div style={{
             backgroundColor: '#059669',
             color: 'white',
-            padding: '15px 20px',
-            borderRadius: '8px 8px 0 0',
-            fontSize: '16px',
+            padding: '8px 12px',
+            borderRadius: '4px 4px 0 0',
+            fontSize: '12px',
             fontWeight: 'bold'
           }}>
             <span>비자 정보</span>
-            <span style={{ fontSize: '12px', fontWeight: 'normal', marginLeft: '10px' }}>
+            <span style={{ fontSize: '9px', fontWeight: 'normal', marginLeft: '8px' }}>
               VISA INFORMATION
             </span>
           </div>
           <div style={{
             backgroundColor: '#FFFFFF',
-            border: '2px solid #E5E7EB',
+            border: '1px solid #E5E7EB',
             borderTop: 'none',
-            borderRadius: '0 0 8px 8px',
-            padding: '25px'
+            borderRadius: '0 0 4px 4px',
+            padding: '12px'
           }}>
             <div style={{ 
               display: 'grid', 
               gridTemplateColumns: '1fr 1fr', 
-              gap: '20px 40px',
-              fontSize: '14px'
+              gap: '8px 20px',
+              fontSize: '10px'
             }}>
               <div>
                 <span style={{ color: '#6B7280', fontWeight: '600' }}>비자유형:</span>
-                <span style={{ marginLeft: '10px', color: '#1F2937', fontWeight: 'bold' }}>
+                <span style={{ marginLeft: '6px', color: '#1F2937', fontWeight: 'bold' }}>
                   {formData.visaType || "E-VISA"}
                 </span>
               </div>
               <div>
                 <span style={{ color: '#6B7280', fontWeight: '600' }}>처리유형:</span>
-                <span style={{ marginLeft: '10px', color: '#1F2937', fontWeight: 'bold' }}>
+                <span style={{ marginLeft: '6px', color: '#1F2937', fontWeight: 'bold' }}>
                   {formData.processingType === "fast" ? "긴급 처리" : "일반 처리"}
                 </span>
               </div>
               <div>
                 <span style={{ color: '#6B7280', fontWeight: '600' }}>입국예정일:</span>
-                <span style={{ marginLeft: '10px', color: '#1F2937', fontWeight: 'bold' }}>
+                <span style={{ marginLeft: '6px', color: '#1F2937', fontWeight: 'bold' }}>
                   {formData.travelInfo?.entryDate || "미정"}
                 </span>
               </div>
               <div>
                 <span style={{ color: '#6B7280', fontWeight: '600' }}>완료예정:</span>
-                <span style={{ marginLeft: '10px', color: '#1F2937', fontWeight: 'bold' }}>
+                <span style={{ marginLeft: '6px', color: '#1F2937', fontWeight: 'bold' }}>
                   {formData.processingType === "fast" ? "24시간 이내" : "2-3 영업일"}
                 </span>
               </div>
@@ -518,22 +518,22 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         {/* 결제 정보 */}
         <div style={{
           backgroundColor: '#F0FDF4',
-          border: '2px solid #10B981',
-          borderRadius: '12px',
-          padding: '25px',
+          border: '1px solid #10B981',
+          borderRadius: '6px',
+          padding: '12px',
           textAlign: 'center',
-          marginBottom: '35px'
+          marginBottom: '16px'
         }}>
           <h3 style={{ 
-            fontSize: '18px', 
+            fontSize: '12px', 
             color: '#059669',
-            margin: '0 0 10px 0',
+            margin: '0 0 4px 0',
             fontWeight: 'bold'
           }}>
             결제 정보 | PAYMENT INFORMATION
           </h3>
           <p style={{ 
-            fontSize: '24px', 
+            fontSize: '16px', 
             color: '#059669',
             margin: '0',
             fontWeight: 'bold'
@@ -543,11 +543,11 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         </div>
 
         {/* 고객지원 정보 */}
-        <div style={{ marginBottom: '30px' }}>
+        <div style={{ marginBottom: '16px' }}>
           <h3 style={{ 
-            fontSize: '18px', 
+            fontSize: '12px', 
             color: '#1F2937',
-            margin: '0 0 20px 0',
+            margin: '0 0 10px 0',
             fontWeight: 'bold',
             textAlign: 'center'
           }}>
@@ -556,33 +556,33 @@ const ConfirmationStep = ({ formData, applicationId }) => {
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: '1fr 1fr 1fr', 
-            gap: '15px'
+            gap: '8px'
           }}>
             <div style={{
               backgroundColor: '#FEF2F2',
-              border: '2px solid #F87171',
-              borderRadius: '8px',
-              padding: '20px',
+              border: '1px solid #F87171',
+              borderRadius: '4px',
+              padding: '8px',
               textAlign: 'center'
             }}>
               <h4 style={{ 
-                fontSize: '14px', 
+                fontSize: '9px', 
                 color: '#DC2626',
-                margin: '0 0 8px 0',
+                margin: '0 0 3px 0',
                 fontWeight: 'bold'
               }}>
                 전화 문의
               </h4>
               <p style={{ 
-                fontSize: '16px', 
+                fontSize: '10px', 
                 color: '#DC2626',
-                margin: '0 0 5px 0',
+                margin: '0 0 2px 0',
                 fontWeight: 'bold'
               }}>
                 1588-1234
               </p>
               <p style={{ 
-                fontSize: '12px', 
+                fontSize: '8px', 
                 color: '#6B7280',
                 margin: '0'
               }}>
@@ -591,29 +591,29 @@ const ConfirmationStep = ({ formData, applicationId }) => {
             </div>
             <div style={{
               backgroundColor: '#F0FDF4',
-              border: '2px solid #10B981',
-              borderRadius: '8px',
-              padding: '20px',
+              border: '1px solid #10B981',
+              borderRadius: '4px',
+              padding: '8px',
               textAlign: 'center'
             }}>
               <h4 style={{ 
-                fontSize: '14px', 
+                fontSize: '9px', 
                 color: '#059669',
-                margin: '0 0 8px 0',
+                margin: '0 0 3px 0',
                 fontWeight: 'bold'
               }}>
                 카카오톡
               </h4>
               <p style={{ 
-                fontSize: '16px', 
+                fontSize: '10px', 
                 color: '#059669',
-                margin: '0 0 5px 0',
+                margin: '0 0 2px 0',
                 fontWeight: 'bold'
               }}>
                 @vietnamvisa24
               </p>
               <p style={{ 
-                fontSize: '12px', 
+                fontSize: '8px', 
                 color: '#6B7280',
                 margin: '0'
               }}>
@@ -622,29 +622,29 @@ const ConfirmationStep = ({ formData, applicationId }) => {
             </div>
             <div style={{
               backgroundColor: '#FDF4FF',
-              border: '2px solid #A855F7',
-              borderRadius: '8px',
-              padding: '20px',
+              border: '1px solid #A855F7',
+              borderRadius: '4px',
+              padding: '8px',
               textAlign: 'center'
             }}>
               <h4 style={{ 
-                fontSize: '14px', 
+                fontSize: '9px', 
                 color: '#7C3AED',
-                margin: '0 0 8px 0',
+                margin: '0 0 3px 0',
                 fontWeight: 'bold'
               }}>
                 이메일
               </h4>
               <p style={{ 
-                fontSize: '13px', 
+                fontSize: '9px', 
                 color: '#7C3AED',
-                margin: '0 0 5px 0',
+                margin: '0 0 2px 0',
                 fontWeight: 'bold'
               }}>
                 support@vietnamvisa24.com
               </p>
               <p style={{ 
-                fontSize: '12px', 
+                fontSize: '8px', 
                 color: '#6B7280',
                 margin: '0'
               }}>
@@ -657,29 +657,29 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         {/* 중요 안내사항 */}
         <div style={{
           backgroundColor: '#FEF2F2',
-          border: '2px solid #F87171',
-          borderRadius: '8px',
-          padding: '20px',
-          marginBottom: '30px'
+          border: '1px solid #F87171',
+          borderRadius: '4px',
+          padding: '10px',
+          marginBottom: '16px'
         }}>
           <h4 style={{ 
-            fontSize: '16px', 
+            fontSize: '11px', 
             color: '#DC2626',
-            margin: '0 0 15px 0',
+            margin: '0 0 8px 0',
             fontWeight: 'bold'
           }}>
             중요 안내사항
           </h4>
           <ul style={{ 
-            fontSize: '13px', 
+            fontSize: '9px', 
             color: '#6B7280',
             margin: '0',
-            paddingLeft: '20px',
-            lineHeight: '1.6'
+            paddingLeft: '12px',
+            lineHeight: '1.4'
           }}>
-            <li style={{ marginBottom: '8px' }}>본 접수증은 공식 비자 승인서가 아닙니다.</li>
-            <li style={{ marginBottom: '8px' }}>처리 상황은 실시간으로 이메일과 SMS로 안내됩니다.</li>
-            <li style={{ marginBottom: '8px' }}>추가 서류 요청 시 즉시 제출해주세요.</li>
+            <li style={{ marginBottom: '3px' }}>본 접수증은 공식 비자 승인서가 아닙니다.</li>
+            <li style={{ marginBottom: '3px' }}>처리 상황은 실시간으로 이메일과 SMS로 안내됩니다.</li>
+            <li style={{ marginBottom: '3px' }}>추가 서류 요청 시 즉시 제출해주세요.</li>
             <li>문의사항이 있으시면 언제든지 고객지원팀에 연락주세요.</li>
           </ul>
         </div>
@@ -687,25 +687,25 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         {/* 푸터 */}
         <div style={{
           borderTop: '1px solid #E5E7EB',
-          paddingTop: '20px',
+          paddingTop: '10px',
           textAlign: 'center'
         }}>
           <p style={{ 
-            fontSize: '12px', 
+            fontSize: '9px', 
             color: '#9CA3AF',
-            margin: '0 0 5px 0'
+            margin: '0 0 2px 0'
           }}>
             Vietnam Visa 24 - 전문 베트남 비자 서비스
           </p>
           <p style={{ 
-            fontSize: '11px', 
+            fontSize: '8px', 
             color: '#9CA3AF',
-            margin: '0 0 5px 0'
+            margin: '0 0 2px 0'
           }}>
             발급일시: {new Date().toLocaleString('ko-KR')}
           </p>
           <p style={{ 
-            fontSize: '11px', 
+            fontSize: '8px', 
             color: '#9CA3AF',
             margin: '0'
           }}>
