@@ -1166,4 +1166,5 @@ ConfirmationStep.propTypes = {
   applicationId: PropTypes.string.isRequired,
 };
 
+
 export default ConfirmationStep;

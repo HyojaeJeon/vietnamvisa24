@@ -2,11 +2,30 @@
 
 import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
-import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../src/components/ui/card";
 import { Button } from "../../src/components/ui/button";
 import { Input } from "../../src/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../src/components/ui/select";
-import { ArrowRight, ArrowLeft, Calendar, MapPin, Plane, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../src/components/ui/select";
+import {
+  ArrowRight,
+  ArrowLeft,
+  Calendar,
+  MapPin,
+  Plane,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 import { validateStep } from "./utils";
 
 const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
@@ -61,7 +80,8 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
     setFieldErrors(errors);
   };
 
-  const isValid = validateStep(3, formData) && Object.keys(fieldErrors).length === 0;
+  const isValid =
+    validateStep(3, formData) && Object.keys(fieldErrors).length === 0;
 
   const getFieldValidationState = (field) => {
     const value = formData.travelInfo?.[field] || "";
@@ -108,8 +128,12 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           <div className="flex items-center justify-center w-12 h-12 md:w-20 md:h-20 mx-auto mb-2 md:mb-4 bg-white/20 backdrop-blur-sm rounded-2xl md:rounded-3xl">
             <Plane className="w-6 h-6 md:w-10 md:h-10 text-white" />
           </div>
-          <CardTitle className="mb-2 md:mb-3 text-2xl md:text-4xl font-bold">여행 정보</CardTitle>
-          <p className="text-sm md:text-xl text-purple-100">베트남 방문 계획을 알려주세요</p>
+          <CardTitle className="mb-2 md:mb-3 text-2xl md:text-4xl font-bold">
+            여행 정보
+          </CardTitle>
+          <p className="text-sm md:text-xl text-purple-100">
+            베트남 방문 계획을 알려주세요
+          </p>
         </div>
       </CardHeader>
 
@@ -120,15 +144,20 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             <div className="flex items-center justify-center w-8 h-8 md:w-12 md:h-12 bg-blue-100 rounded-xl md:rounded-2xl">
               <Calendar className="w-4 h-4 md:w-6 md:h-6 text-blue-600" />
             </div>
-            <h3 className="text-lg md:text-2xl font-bold text-gray-800">입국 정보</h3>
+            <h3 className="text-lg md:text-2xl font-bold text-gray-800">
+              입국 정보
+            </h3>
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:gap-6 lg:grid-cols-2">
             {/* 입국 예정일 */}
             <div className="space-y-2 md:space-y-3">
-              <label htmlFor="entryDate" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-bold tracking-wide text-gray-800 uppercase">
+              <label
+                htmlFor="entryDate"
+                className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-bold tracking-wide text-gray-800 uppercase"
+              >
                 <Calendar className="w-3 h-3 md:w-4 md:h-4 text-blue-500" />
-                입국 예정일 
+                입국 예정일
                 <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -137,12 +166,18 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   id="entryDate"
                   type="date"
                   value={formData.travelInfo?.entryDate || ""}
-                  onChange={(e) => handleInputChange("entryDate", e.target.value)}
-                  onBlur={() => setFieldTouched({ ...fieldTouched, entryDate: true })}
+                  onChange={(e) =>
+                    handleInputChange("entryDate", e.target.value)
+                  }
+                  onBlur={() =>
+                    setFieldTouched({ ...fieldTouched, entryDate: true })
+                  }
                   className={`${getInputClassName("entryDate")} pl-8 md:pl-10 h-10 md:h-12 text-sm md:text-lg`}
-                  min={new Date().toISOString().split('T')[0]}
+                  min={new Date().toISOString().split("T")[0]}
                   aria-invalid={!!fieldErrors.entryDate}
-                  aria-describedby={fieldErrors.entryDate ? "entryDate-error" : undefined}
+                  aria-describedby={
+                    fieldErrors.entryDate ? "entryDate-error" : undefined
+                  }
                 />
                 {getFieldValidationState("entryDate") === "success" && (
                   <CheckCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-green-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />
@@ -151,9 +186,14 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />
                 )}
               </div>
-              <p className="text-xs text-gray-500">비자 신청 후 최소 3일 이후 날짜를 선택해주세요</p>
+              <p className="text-xs text-gray-500">
+                비자 신청 후 최소 3일 이후 날짜를 선택해주세요
+              </p>
               {fieldErrors.entryDate && fieldTouched.entryDate && (
-                <p id="entryDate-error" className="flex items-center gap-1 mt-1 text-xs md:text-sm text-red-500">
+                <p
+                  id="entryDate-error"
+                  className="flex items-center gap-1 mt-1 text-xs md:text-sm text-red-500"
+                >
                   <AlertCircle className="w-3 h-3 md:w-4 md:h-4" />
                   {fieldErrors.entryDate}
                 </p>
@@ -162,21 +202,28 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
 
             {/* 입국 공항 */}
             <div className="space-y-2 md:space-y-3">
-              <label htmlFor="entryPort" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-bold tracking-wide text-gray-800 uppercase">
+              <label
+                htmlFor="entryPort"
+                className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-bold tracking-wide text-gray-800 uppercase"
+              >
                 <MapPin className="w-3 h-3 md:w-4 md:h-4 text-purple-500" />
-                입국 공항 
+                입국 공항
                 <span className="text-red-500">*</span>
               </label>
               <div className="relative">
                 <MapPin className="absolute w-4 h-4 md:w-5 md:h-5 text-gray-400 transform -translate-y-1/2 left-2 md:left-3 top-1/2 z-10" />
                 <Select
                   value={formData.travelInfo?.entryPort || ""}
-                  onValueChange={(value) => handleInputChange("entryPort", value)}
+                  onValueChange={(value) =>
+                    handleInputChange("entryPort", value)
+                  }
                 >
-                  <SelectTrigger 
+                  <SelectTrigger
                     className={`${getInputClassName("entryPort")} pl-8 md:pl-10 h-10 md:h-12 text-sm md:text-lg`}
                     aria-invalid={!!fieldErrors.entryPort}
-                    aria-describedby={fieldErrors.entryPort ? "entryPort-error" : undefined}
+                    aria-describedby={
+                      fieldErrors.entryPort ? "entryPort-error" : undefined
+                    }
                   >
                     <SelectValue placeholder="입국할 공항을 선택하세요" />
                   </SelectTrigger>
@@ -185,7 +232,9 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                       <SelectItem key={airport.code} value={airport.code}>
                         <div className="flex flex-col">
                           <span className="font-medium">{airport.name}</span>
-                          <span className="text-sm text-gray-500">{airport.city}</span>
+                          <span className="text-sm text-gray-500">
+                            {airport.city}
+                          </span>
                         </div>
                       </SelectItem>
                     ))}
@@ -198,9 +247,14 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-8 md:right-10 top-1/2 z-10" />
                 )}
               </div>
-              <p className="text-xs text-gray-500">e-Visa는 모든 베트남 국제공항에서 사용 가능합니다</p>
+              <p className="text-xs text-gray-500">
+                e-Visa는 모든 베트남 국제공항에서 사용 가능합니다
+              </p>
               {fieldErrors.entryPort && fieldTouched.entryPort && (
-                <p id="entryPort-error" className="flex items-center gap-1 mt-1 text-xs md:text-sm text-red-500">
+                <p
+                  id="entryPort-error"
+                  className="flex items-center gap-1 mt-1 text-xs md:text-sm text-red-500"
+                >
                   <AlertCircle className="w-3 h-3 md:w-4 md:h-4" />
                   {fieldErrors.entryPort}
                 </p>
@@ -216,10 +270,15 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
               <AlertCircle className="w-3 h-3 md:w-5 md:h-5 text-blue-600" />
             </div>
             <div>
-              <h4 className="mb-1 md:mb-2 text-sm md:text-base font-bold text-blue-900">중요 안내사항</h4>
+              <h4 className="mb-1 md:mb-2 text-sm md:text-base font-bold text-blue-900">
+                중요 안내사항
+              </h4>
               <ul className="space-y-1 text-xs md:text-sm text-blue-800">
                 <li>• e-Visa는 입국일로부터 30일간 유효합니다</li>
-                <li>• 여권 유효기간이 입국일로부터 최소 6개월 이상 남아있어야 합니다</li>
+                <li>
+                  • 여권 유효기간이 입국일로부터 최소 6개월 이상 남아있어야
+                  합니다
+                </li>
                 <li>• 입국 시 여권과 e-Visa 승인서를 함께 지참해주세요</li>
                 <li>• 선택하신 공항에서만 입국이 가능합니다</li>
               </ul>
@@ -229,9 +288,9 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
 
         {/* 네비게이션 버튼 */}
         <div className="flex flex-col gap-3 md:gap-4 pt-4 md:pt-8 border-t border-gray-200 sm:flex-row sm:justify-between">
-          <Button 
-            onClick={onPrevious} 
-            variant="outline" 
+          <Button
+            onClick={onPrevious}
+            variant="outline"
             className="px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-xl md:rounded-2xl order-2 sm:order-1"
           >
             <ArrowLeft className="w-4 h-4 md:w-6 md:h-6 mr-2 md:mr-3" />
@@ -251,3 +310,16 @@ const TravelInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
     </Card>
   );
 };
+TravelInfoStep.propTypes = {
+  formData: PropTypes.shape({
+    travelInfo: PropTypes.shape({
+      entryDate: PropTypes.string,
+      entryPort: PropTypes.string,
+    }),
+  }).isRequired,
+  onUpdate: PropTypes.func.isRequired,
+  onNext: PropTypes.func.isRequired,
+  onPrevious: PropTypes.func.isRequired,
+};
+
+export default TravelInfoStep;
