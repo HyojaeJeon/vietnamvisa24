@@ -30,10 +30,18 @@ import {
 
 import { formatCurrency } from "./utils";
 
+const calculateTotalPrice = (formData) => {
+  let price = 25000;
+  if (formData.processingType === "fast") {
+    price += 10000;
+  }
+  return price;
+};
+
 const ConfirmationStep = ({ formData, applicationId }) => {
   const currentPrice = calculateTotalPrice(formData);
   const receiptRef = useRef(null);
-
+  const [isDownloading, setIsDownloading] =useState(false)
   const getEntryPortLabel = (portCode) => {
     const portMap = {
       DAD: "다낭",
@@ -50,14 +58,6 @@ const ConfirmationStep = ({ formData, applicationId }) => {
       code: "E-VISA",
       name: "E-VISA",
     };
-  };
-
-  const calculateTotalPrice = (formData) => {
-    let price = 25000;
-    if (formData.processingType === "fast") {
-      price += 10000;
-    }
-    return price;
   };
 
   // PDF 다운로드 함수 - 한글 폰트 지원
@@ -272,7 +272,8 @@ const ConfirmationStep = ({ formData, applicationId }) => {
           신청이 완료되었습니다!
         </h1>
         <p className="text-lg md:text-xl text-gray-600 mb-1 md:mb-2 px-4">
-          신청번호: <span className="font-bold text-blue-600">{applicationId}</span>
+          신청번호:{" "}
+          <span className="font-bold text-blue-600">{applicationId}</span>
         </p>
         <p className="text-base md:text-lg text-gray-500 px-4">
           확인 이메일이 발송되었습니다.
@@ -297,45 +298,68 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                     <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
                       <User className="w-4 h-4 md:w-5 md:h-5 text-blue-500 flex-shrink-0" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">신청자명</p>
+                        <p className="text-xs md:text-sm text-gray-500">
+                          신청자명
+                        </p>
                         <p className="font-semibold text-sm md:text-base truncate">
-                          {formData.personalInfo?.firstName} {formData.personalInfo?.lastName}
+                          {formData.personalInfo?.firstName}{" "}
+                          {formData.personalInfo?.lastName}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
                       <Mail className="w-4 h-4 md:w-5 md:h-5 text-green-500 flex-shrink-0" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">이메일</p>
-                        <p className="font-semibold text-sm md:text-base truncate">{formData.personalInfo?.email}</p>
+                        <p className="text-xs md:text-sm text-gray-500">
+                          이메일
+                        </p>
+                        <p className="font-semibold text-sm md:text-base truncate">
+                          {formData.personalInfo?.email}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
                       <Phone className="w-4 h-4 md:w-5 md:h-5 text-orange-500 flex-shrink-0" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">연락처</p>
-                        <p className="font-semibold text-sm md:text-base">{formData.personalInfo?.phone}</p>
+                        <p className="text-xs md:text-sm text-gray-500">
+                          연락처
+                        </p>
+                        <p className="font-semibold text-sm md:text-base">
+                          {formData.personalInfo?.phone}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
                       <Calendar className="w-4 h-4 md:w-5 md:h-5 text-purple-500 flex-shrink-0" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">입국 예정일</p>
-                        <p className="font-semibold text-sm md:text-base">{formData.travelInfo?.entryDate}</p>
+                        <p className="text-xs md:text-sm text-gray-500">
+                          입국 예정일
+                        </p>
+                        <p className="font-semibold text-sm md:text-base">
+                          {formData.travelInfo?.entryDate}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
                       <MapPin className="w-4 h-4 md:w-5 md:h-5 text-red-500 flex-shrink-0" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">입국 공항</p>
-                        <p className="font-semibold text-sm md:text-base">{getEntryPortLabel(formData.travelInfo?.entryPort)}</p>
+                        <p className="text-xs md:text-sm text-gray-500">
+                          입국 공항
+                        </p>
+                        <p className="font-semibold text-sm md:text-base">
+                          {getEntryPortLabel(formData.travelInfo?.entryPort)}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
                       <Globe className="w-4 h-4 md:w-5 md:h-5 text-indigo-500 flex-shrink-0" />
                       <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">비자 유형</p>
-                        <p className="font-semibold text-sm md:text-base">{getVisaTypeInfo().name}</p>
+                        <p className="text-xs md:text-sm text-gray-500">
+                          비자 유형
+                        </p>
+                        <p className="font-semibold text-sm md:text-base">
+                          {getVisaTypeInfo().name}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -358,7 +382,9 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 <div className="space-y-2">
                   <div className="flex justify-between items-center text-sm md:text-base">
                     <span className="text-gray-600">기본 서비스</span>
-                    <span className="font-semibold">{formatCurrency(25000)}</span>
+                    <span className="font-semibold">
+                      {formatCurrency(25000)}
+                    </span>
                   </div>
                   {formData.processingType === "fast" && (
                     <div className="flex justify-between items-center text-sm md:text-base">
@@ -371,7 +397,9 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 </div>
                 <div className="border-t pt-2 md:pt-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-base md:text-lg font-bold text-gray-900">총 결제금액</span>
+                    <span className="text-base md:text-lg font-bold text-gray-900">
+                      총 결제금액
+                    </span>
                     <span className="text-lg md:text-2xl font-bold text-green-600">
                       {formatCurrency(currentPrice)}
                     </span>
@@ -444,7 +472,9 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
                   <FileText className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
                 </div>
-                <h3 className="font-bold text-base md:text-lg mb-2">1. 서류 검토</h3>
+                <h3 className="font-bold text-base md:text-lg mb-2">
+                  1. 서류 검토
+                </h3>
                 <p className="text-gray-600 text-xs md:text-sm">
                   담당자가 제출된 서류를 검토합니다 (1-2시간 소요)
                 </p>
@@ -453,7 +483,9 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
                   <Globe className="w-6 h-6 md:w-8 md:h-8 text-green-600" />
                 </div>
-                <h3 className="font-bold text-base md:text-lg mb-2">2. 공식 신청</h3>
+                <h3 className="font-bold text-base md:text-lg mb-2">
+                  2. 공식 신청
+                </h3>
                 <p className="text-gray-600 text-xs md:text-sm">
                   베트남 출입국관리소에 공식 신청합니다
                 </p>
@@ -462,7 +494,9 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 <div className="w-12 h-12 md:w-16 md:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
                   <Mail className="w-6 h-6 md:w-8 md:h-8 text-purple-600" />
                 </div>
-                <h3 className="font-bold text-base md:text-lg mb-2">3. 비자 발급</h3>
+                <h3 className="font-bold text-base md:text-lg mb-2">
+                  3. 비자 발급
+                </h3>
                 <p className="text-gray-600 text-xs md:text-sm">
                   승인된 e-Visa를 이메일로 발송합니다
                 </p>

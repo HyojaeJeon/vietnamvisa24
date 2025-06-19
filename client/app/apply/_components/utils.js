@@ -2,12 +2,6 @@
 
 import { ADDITIONAL_SERVICES } from "./types.js";
 
-export const formatCurrency = (amount, currency = "KRW") => {
-  return new Intl.NumberFormat("ko-KR", {
-    style: "currency",
-    currency: currency,
-  }).format(amount);
-};
 
 export const formatDate = (date) => {
   return new Date(date).toLocaleDateString("ko-KR");
