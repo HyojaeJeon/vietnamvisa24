@@ -55,16 +55,6 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/apply/page.js"
-    ],
-    "/dashboard/applications/[id]/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/applications/[id]/page.js"
-    ],
-    "/dashboard/consultations/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/dashboard/consultations/page.js"
     ]
   }
 }

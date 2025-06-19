@@ -1,327 +1,490 @@
-
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { updateForm, nextStep, prevStep, setApplicationId } from "../src/store/applyFormSlice";
-import { generateApplicationId } from "./_components/utils";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useMutation } from "@apollo/client";
+import Header from "../src/components/header";
+import Footer from "../src/components/footer";
 
-// Import step components
+// Import GraphQL mutation
+import { CREATE_APPLICATION_MUTATION } from "../src/lib/graphql/mutation/applications";
+
+// Import utilities and types
+import { initialFormData } from "./_components/types";
+import {
+  validateStep,
+  safeLocalStorage,
+  generateApplicationId,
+  calculateTotalPrice,
+} from "./_components/utils";
+
+// Import token refresh test (development only)
+if (process.env.NODE_ENV === "development") {
+  import("../src/lib/tokenRefreshTest");
+  import("../src/lib/tokenDebugger");
+}
+
+// Import components
+import ProgressIndicator from "./_components/progressIndicator";
 import ServiceSelectionStep from "./_components/serviceSelectionStep";
 import PersonalInfoStep from "./_components/personalInfoStep";
-import ContactInfoStep from "./_components/contactInfoStep";
 import TravelInfoStep from "./_components/travelInfoStep";
 import DocumentUploadStep from "./_components/documentUploadStep";
 import ReviewStep from "./_components/reviewStep";
-import PaymentStep from "./_components/paymentStep";
 import ConfirmationStep from "./_components/confirmationStep";
-import ProgressIndicator from "./_components/progressIndicator";
-import { STEPS } from "./_components/types";
+
+const TOTAL_STEPS = 6;
+
+// OCR 데이터를 snake_case에서 camelCase로 변환하는 함수
+const convertOcrDataToCamelCase = (ocrData) => {
+  if (!ocrData) return null;
+
+  const camelCaseData = {};
+
+  // snake_case -> camelCase 매핑
+  const fieldMapping = {
+    type: "type",
+    issuing_country: "issuingCountry",
+    passport_no: "passportNo",
+    surname: "surname",
+    given_names: "givenNames",
+    date_of_birth: "dateOfBirth",
+    date_of_issue: "dateOfIssue",
+    date_of_expiry: "dateOfExpiry",
+    sex: "sex",
+    nationality: "nationality",
+    personal_no: "personalNo",
+    authority: "authority",
+    korean_name: "koreanName",
+  };
+
+  // 필드 변환
+  Object.entries(ocrData).forEach(([key, value]) => {
+    const camelCaseKey = fieldMapping[key] || key;
+    if (value !== null && value !== undefined) {
+      camelCaseData[camelCaseKey] = value;
+    }
+  });
+
+  return camelCaseData;
+};
+
+const STEP_NAMES = {
+  1: "서비스 선택",
+  2: "개인 정보",
+  3: "여행 정보",
+  4: "서류 업로드",
+  5: "정보 확인",
+  6: "신청 완료",
+};
 
 export default function ApplyPageContent() {
-  const dispatch = useDispatch();
-  const { currentStep, form, applicationId } = useSelector((state) => state.applyForm);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState({});
+  console.log("ApplyPageContent rendering...");
 
-  // Initialize application ID
+  // State management
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState(initialFormData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [applicationId, setApplicationId] = useState("");
+
+  console.log("Form data : ", formData);
+
+  // 개발 모드에서만 토큰 테스트 기능 추가
+  const [showTokenTest, setShowTokenTest] = useState(false);
+
   useEffect(() => {
-    if (!applicationId) {
-      const newApplicationId = generateApplicationId();
-      dispatch(setApplicationId(newApplicationId));
+    if (process.env.NODE_ENV === "development") {
+      setShowTokenTest(true);
     }
-  }, [applicationId, dispatch]);
+  }, []); // GraphQL mutation hook
+  const [createApplication] = useMutation(CREATE_APPLICATION_MUTATION, {
+    onCompleted: (data) => {
+      console.log("✅ Application created successfully:", data);
+      console.log("🔄 Starting navigation to confirmation step...");
 
-  // Auto-save to localStorage
+      // Update form data with submission info
+      updateFormData({
+        applicationId: data.createApplication.applicationId,
+        submittedAt: new Date().toISOString(),
+        status: "SUBMITTED",
+      });
+
+      setApplicationId(data.createApplication.applicationId);
+      console.log("🔄 Setting current step to 6...");
+      setCurrentStep(6); // Move to confirmation step
+      console.log("✅ Navigation to confirmation step completed");
+
+      // Clear saved form data after successful submission
+      safeLocalStorage.removeItem("visa-application-form");
+      setIsSubmitting(false);
+      console.log("✅ Form submission completed successfully");
+    },
+    onError: (error) => {
+      console.error("❌ Application submission error:", error);
+
+      // GraphQL 에러 메시지 파싱
+      let errorMessage = "신청서 제출 중 오류가 발생했습니다.";
+      if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+        errorMessage = error.graphQLErrors[0].message;
+      } else if (error.networkError) {
+        errorMessage =
+          "네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.";
+      }
+
+      alert(`${errorMessage} 다시 시도해주세요.`);
+      setIsSubmitting(false);
+    },
+  });
+
+  console.log("formData:", formData);
+  const searchParams = useSearchParams();
+
+  // Initialize step from URL parameter if present
   useEffect(() => {
-    if (Object.keys(form).length > 0) {
-      localStorage.setItem("visaApplicationForm", JSON.stringify(form));
-      localStorage.setItem("visaApplicationStep", currentStep.toString());
+    const stepParam = searchParams.get("step");
+    if (stepParam) {
+      const stepNumber = parseInt(stepParam);
+      if (stepNumber >= 1 && stepNumber <= TOTAL_STEPS) {
+        setCurrentStep(stepNumber);
+      }
     }
-  }, [form, currentStep]);
 
-  // Load from localStorage on mount
-  useEffect(() => {
-    const savedForm = localStorage.getItem("visaApplicationForm");
-    const savedStep = localStorage.getItem("visaApplicationStep");
-    
-    if (savedForm) {
+    // Load saved form data from localStorage
+    const savedData = safeLocalStorage.getItem("visa-application-form");
+    if (savedData) {
       try {
-        const parsedForm = JSON.parse(savedForm);
-        dispatch(updateForm(parsedForm));
+        const parsedData = JSON.parse(savedData);
+        setFormData((prev) => ({ ...prev, ...parsedData }));
       } catch (error) {
-        console.error("Error loading saved form:", error);
+        console.error("Error loading saved form data:", error);
       }
     }
-    
-    if (savedStep) {
-      const stepNumber = parseInt(savedStep, 10);
-      if (stepNumber >= 1 && stepNumber <= 8) {
-        // Note: We would need to dispatch to set current step if we had that action
-        // For now, we'll start from step 1
+  }, [searchParams]);
+
+  // Update form data
+  const updateFormData = (updates) => {
+    setFormData((prev) => {
+      const newData = { ...prev, ...updates };
+      // Auto-save to localStorage
+      if (currentStep < 6) {
+        safeLocalStorage.setItem(
+          "visa-application-form",
+          JSON.stringify(newData),
+        );
       }
+      return newData;
+    });
+  };
+
+  // Navigation handlers
+  const handleNext = () => {
+    if (currentStep < TOTAL_STEPS && validateStep(currentStep, formData)) {
+      setCurrentStep((prev) => prev + 1);
+      // Smooth scroll to top with better mobile handling
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }, 100);
+    } else {
+      // Show validation errors if step is not valid
+      const stepName = STEP_NAMES[currentStep];
+      console.log(`${stepName} 단계를 완료해주세요.`);
+      // You could show a toast notification here
     }
-  }, [dispatch]);
+  };
 
-  const handleNext = useCallback(async () => {
-    setIsLoading(true);
-    setErrors({});
+  const handlePrevious = () => {
+    if (currentStep > 1) {
+      setCurrentStep((prev) => prev - 1);
+      // Smooth scroll to top
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }, 100);
+    }
+  };
 
+  // Handle edit - go to specific step
+  const handleEdit = (step) => {
+    if (step >= 1 && step <= TOTAL_STEPS) {
+      setCurrentStep(step);
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }, 100);
+    }
+  };
+  // Handle application submission
+  const handleApplicationSubmit = async () => {
+    console.log("🚀 handleApplicationSubmit called");
+    setIsSubmitting(true);
     try {
-      // Validate current step
-      const isValid = await validateCurrentStep();
-      if (!isValid) {
-        setIsLoading(false);
-        return;
+      // Generate application ID if not exists
+      const newApplicationId = applicationId || generateApplicationId();
+      setApplicationId(newApplicationId); // Debug logging
+      console.log("🔍 Original formData:", formData);
+      console.log("🔍 travelInfo:", formData.travelInfo);
+      console.log("🔍 documents:", formData.documents); // Prepare documents data
+      const documentsData = {};
+      if (formData.documents) {
+        Object.entries(formData.documents).forEach(([docType, docData]) => {
+          if (docData && (docData.file || docData.fileName)) {
+            // OCR 결과 처리 - passport의 경우 변환된 camelCase 데이터 사용
+            let extractedInfo = null;
+            if (docType === "passport") {
+              // 이미 camelCase로 변환된 extractedInfo 사용 (우선순위)
+              if (docData.extractedInfo) {
+                extractedInfo = docData.extractedInfo;
+                console.log(
+                  `🔍 Using camelCase extractedInfo for ${docType}:`,
+                  extractedInfo,
+                );
+              } else if (docData.ocrResult && !docData.ocrResult.error) {
+                // fallback: ocrResult가 있지만 extractedInfo가 없는 경우 - snake_case를 camelCase로 변환
+                extractedInfo = convertOcrDataToCamelCase(docData.ocrResult);
+                console.log(
+                  `🔍 Fallback: converted snake_case OCR Result to camelCase for ${docType}:`,
+                  extractedInfo,
+                );
+              }
+            } else if (docData.extractedInfo) {
+              extractedInfo = docData.extractedInfo;
+            }
+
+            // 파일 데이터 처리 - Base64 문자열인지 확인
+            let fileDataToSend = docData.file;
+            if (
+              typeof docData.file === "string" &&
+              docData.file.startsWith("data:")
+            ) {
+              // 이미 Base64 형태인 경우 그대로 사용
+              fileDataToSend = docData.file;
+            } else if (docData.file && typeof docData.file === "object") {
+              // File 객체인 경우 - 실제로는 이미 Base64로 변환되어 저장되어야 함
+              console.warn(
+                `File object found for ${docType}, should be Base64 string`,
+              );
+              fileDataToSend = null;
+            }
+
+            documentsData[docType] = {
+              fileName:
+                docData.fileName || docData.file?.name || `${docType}.jpg`,
+              fileSize: docData.fileSize || docData.file?.size || 0,
+              fileType: docData.fileType || docData.file?.type || "image/jpeg",
+              fileData: fileDataToSend,
+              extractedInfo: extractedInfo,
+            };
+            console.log(`🔍 Processing ${docType}:`, {
+              fileName: documentsData[docType].fileName,
+              fileSize: documentsData[docType].fileSize,
+              fileType: documentsData[docType].fileType,
+              hasFileData: !!documentsData[docType].fileData,
+              fileDataType: typeof documentsData[docType].fileData,
+              hasExtractedInfo: !!documentsData[docType].extractedInfo,
+              extractedInfoKeys: extractedInfo
+                ? Object.keys(extractedInfo)
+                : [],
+              extractedInfoSample: extractedInfo
+                ? JSON.stringify(extractedInfo).substring(0, 200) + "..."
+                : "none",
+            });
+          }
+        });
       }
 
-      // Special handling for payment step
-      if (currentStep === STEPS.PAYMENT) {
-        // Here you would handle payment processing
-        // For now, we'll just proceed to confirmation
-      }
+      // Prepare simplified application data for GraphQL mutation
+      const applicationData = {
+        applicationId: newApplicationId,
+        processingType: formData.processingType,
+        totalPrice: calculateTotalPrice(formData),
+        personalInfo: {
+          firstName: formData.personalInfo?.firstName || "",
+          lastName: formData.personalInfo?.lastName || "",
+          email: formData.personalInfo?.email || "",
+          phone: formData.personalInfo?.phone || "",
+          address: formData.personalInfo?.address || "",
+          phoneOfFriend: formData.personalInfo?.phoneOfFriend || "",
+        },
+        travelInfo: {
+          entryDate: formData.travelInfo?.entryDate || "",
+          entryPort: formData.travelInfo?.entryPort || "",
+          visaType: formData.visaType || "",
+        },
+        additionalServiceIds: formData.additionalServices || [],
+        documents:
+          Object.keys(documentsData).length > 0 ? documentsData : undefined,
+      };
+      console.log(
+        "🔍 Simplified applicationData:",
+        JSON.stringify(applicationData, null, 2),
+      );
 
-      dispatch(nextStep());
+      // 🔍 Debug: Check documents data before GraphQL submission
+      if (applicationData.documents) {
+        Object.entries(applicationData.documents).forEach(
+          ([docType, docData]) => {
+            if (docData.extractedInfo) {
+              console.log(
+                `🔍 ${docType} extractedInfo being sent to GraphQL:`,
+                docData.extractedInfo,
+              );
+              console.log(
+                `🔍 ${docType} extractedInfo keys:`,
+                Object.keys(docData.extractedInfo),
+              );
+            }
+          },
+        );
+      } // Submit via Apollo Client mutation
+      console.log("🔄 Calling createApplication mutation...");
+      await createApplication({
+        variables: {
+          input: applicationData,
+        },
+      });
+      console.log("✅ createApplication mutation completed successfully");
     } catch (error) {
-      console.error("Error proceeding to next step:", error);
-      setErrors({ general: "오류가 발생했습니다. 다시 시도해주세요." });
+      console.error("❌ Application submission error:", error);
+      alert("신청서 제출 중 오류가 발생했습니다. 다시 시도해주세요.");
+      setIsSubmitting(false);
     } finally {
-      setIsLoading(false);
-    }
-  }, [currentStep, dispatch]);
-
-  const handlePrev = useCallback(() => {
-    dispatch(prevStep());
-  }, [dispatch]);
-
-  const handleFormUpdate = useCallback((stepData) => {
-    dispatch(updateForm(stepData));
-  }, [dispatch]);
-
-  const validateCurrentStep = async () => {
-    const currentStepData = form[`step${currentStep}`] || {};
-    
-    switch (currentStep) {
-      case STEPS.SERVICE_SELECTION:
-        return validateServiceSelection(currentStepData);
-      case STEPS.PERSONAL_INFO:
-        return validatePersonalInfo(currentStepData);
-      case STEPS.CONTACT_INFO:
-        return validateContactInfo(currentStepData);
-      case STEPS.TRAVEL_INFO:
-        return validateTravelInfo(currentStepData);
-      case STEPS.DOCUMENT_UPLOAD:
-        return validateDocuments(currentStepData);
-      case STEPS.REVIEW:
-        return true; // Review step doesn't need validation
-      case STEPS.PAYMENT:
-        return validatePayment(currentStepData);
-      default:
-        return true;
+      setIsSubmitting(false);
     }
   };
 
-  const validateServiceSelection = (data) => {
-    const newErrors = {};
-    
-    if (!data.serviceType) {
-      newErrors.serviceType = "서비스 유형을 선택해주세요.";
-    }
-    if (!data.visaType) {
-      newErrors.visaType = "비자 유형을 선택해주세요.";
-    }
-    if (!data.processingType) {
-      newErrors.processingType = "처리 속도를 선택해주세요.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validatePersonalInfo = (data) => {
-    const newErrors = {};
-    
-    if (!data.firstName) {
-      newErrors.firstName = "이름을 입력해주세요.";
-    }
-    if (!data.lastName) {
-      newErrors.lastName = "성을 입력해주세요.";
-    }
-    if (!data.passportNumber) {
-      newErrors.passportNumber = "여권번호를 입력해주세요.";
-    }
-    if (!data.dateOfBirth) {
-      newErrors.dateOfBirth = "생년월일을 입력해주세요.";
-    }
-    if (!data.nationality) {
-      newErrors.nationality = "국적을 선택해주세요.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateContactInfo = (data) => {
-    const newErrors = {};
-    
-    if (!data.email) {
-      newErrors.email = "이메일을 입력해주세요.";
-    } else if (!/\S+@\S+\.\S+/.test(data.email)) {
-      newErrors.email = "유효한 이메일 주소를 입력해주세요.";
-    }
-    
-    if (!data.phone) {
-      newErrors.phone = "전화번호를 입력해주세요.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateTravelInfo = (data) => {
-    const newErrors = {};
-    
-    if (!data.entryDate) {
-      newErrors.entryDate = "입국 예정일을 선택해주세요.";
-    }
-    if (!data.exitDate) {
-      newErrors.exitDate = "출국 예정일을 선택해주세요.";
-    }
-    
-    if (data.entryDate && data.exitDate) {
-      const entry = new Date(data.entryDate);
-      const exit = new Date(data.exitDate);
-      
-      if (entry >= exit) {
-        newErrors.exitDate = "출국일은 입국일보다 늦어야 합니다.";
+  // Prevent accidental page refresh/back button
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (currentStep > 1 && currentStep < 6) {
+        e.preventDefault();
+        e.returnValue =
+          "작성 중인 신청서가 있습니다. 정말 페이지를 나가시겠습니까?";
+        return e.returnValue;
       }
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateDocuments = (data) => {
-    const newErrors = {};
-    
-    if (!data.passportImage) {
-      newErrors.passportImage = "여권 사진을 업로드해주세요.";
-    }
-    if (!data.profileImage) {
-      newErrors.profileImage = "증명사진을 업로드해주세요.";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validatePayment = (data) => {
-    // Payment validation would be handled by payment provider
-    return true;
-  };
-
-  const renderStepComponent = () => {
-    const commonProps = {
-      formData: form,
-      onFormUpdate: handleFormUpdate,
-      errors: errors,
-      isLoading: isLoading
     };
 
-    switch (currentStep) {
-      case STEPS.SERVICE_SELECTION:
-        return <ServiceSelectionStep {...commonProps} />;
-      case STEPS.PERSONAL_INFO:
-        return <PersonalInfoStep {...commonProps} />;
-      case STEPS.CONTACT_INFO:
-        return <ContactInfoStep {...commonProps} />;
-      case STEPS.TRAVEL_INFO:
-        return <TravelInfoStep {...commonProps} />;
-      case STEPS.DOCUMENT_UPLOAD:
-        return <DocumentUploadStep {...commonProps} />;
-      case STEPS.REVIEW:
-        return <ReviewStep {...commonProps} />;
-      case STEPS.PAYMENT:
-        return <PaymentStep {...commonProps} />;
-      case STEPS.CONFIRMATION:
-        return <ConfirmationStep />;
+    const handlePopState = (e) => {
+      if (currentStep > 1 && currentStep < 6) {
+        const confirmLeave = window.confirm(
+          "작성 중인 신청서가 있습니다. 정말 페이지를 나가시겠습니까?",
+        );
+        if (!confirmLeave) {
+          window.history.pushState(null, "", window.location.href);
+        }
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    window.addEventListener("popstate", handlePopState);
+
+    // Push initial state to prevent accidental back navigation
+    if (currentStep > 1) {
+      window.history.pushState(null, "", window.location.href);
+    }
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [currentStep]);
+
+  // Clear saved data when application is completed
+  useEffect(() => {
+    if (currentStep === 6) {
+      safeLocalStorage.removeItem("visa-application-form");
+    }
+  }, [currentStep]);
+
+  // Render current step component
+  const renderStepComponent = () => {
+    // switch (currentStep) {
+    switch (6) {
+      case 1:
+        return (
+          <ServiceSelectionStep
+            formData={formData}
+            onUpdate={updateFormData}
+            onNext={handleNext}
+          />
+        );
+      case 2:
+        return (
+          <PersonalInfoStep
+            formData={formData}
+            onUpdate={updateFormData}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        );
+      case 3:
+        return (
+          <TravelInfoStep
+            formData={formData}
+            onUpdate={updateFormData}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        );
+      case 4:
+        return (
+          <DocumentUploadStep
+            formData={formData}
+            onUpdate={updateFormData}
+            onNext={handleNext}
+            onPrevious={handlePrevious}
+          />
+        );
+      case 5:
+        return (
+          <ReviewStep
+            formData={formData}
+            onNext={handleApplicationSubmit}
+            onPrevious={handlePrevious}
+            onEdit={handleEdit}
+            isSubmitting={isSubmitting}
+          />
+        );
+      case 6:
+        return (
+          <ConfirmationStep formData={formData} applicationId={applicationId} />
+        );
       default:
-        return <ServiceSelectionStep {...commonProps} />;
+        return (
+          <ServiceSelectionStep
+            formData={formData}
+            onUpdate={updateFormData}
+            onNext={handleNext}
+          />
+        );
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-              베트남 비자 신청
-            </h1>
-            <p className="text-gray-600 text-lg">
-              간편하고 빠른 온라인 비자 신청 서비스
-            </p>
-          </div>
+      <Header />
 
-          {/* Progress Indicator */}
-          <div className="mb-8">
-            <ProgressIndicator currentStep={currentStep} />
-          </div>
-
-          {/* Main Content */}
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div className="p-8">
-              {renderStepComponent()}
-            </div>
-
-            {/* Navigation Buttons */}
-            {currentStep !== STEPS.CONFIRMATION && (
-              <div className="bg-gray-50 px-8 py-6 flex justify-between">
-                <button
-                  onClick={handlePrev}
-                  disabled={currentStep === 1 || isLoading}
-                  className="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  이전
-                </button>
-                
-                <button
-                  onClick={handleNext}
-                  disabled={isLoading}
-                  className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                >
-                  {isLoading && (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  )}
-                  {currentStep === STEPS.PAYMENT ? "결제하기" : "다음"}
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Help Section */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-600 mb-4">
-              도움이 필요하신가요?
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <a
-                href="tel:1588-1234"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                📞 전화 상담: 1588-1234
-              </a>
-              <a
-                href="#"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400 text-black rounded-lg hover:bg-yellow-500 transition-colors"
-              >
-                💬 카카오톡 상담
-              </a>
-            </div>
-          </div>
+      <main className="container px-4 py-8 mx-auto">
+        {/* Progress Indicator */}
+        <div className="mb-8">
+          <ProgressIndicator
+            currentStep={currentStep}
+            totalSteps={TOTAL_STEPS}
+            stepNames={STEP_NAMES}
+          />
         </div>
-      </div>
+
+        {/* Step Content */}
+        <div className="max-w-4xl mx-auto">{renderStepComponent()}</div>
+      </main>
+
+      <Footer />
     </div>
   );
 }
