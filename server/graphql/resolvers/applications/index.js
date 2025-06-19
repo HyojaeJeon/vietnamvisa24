@@ -730,6 +730,96 @@ ${customMessage || "비자 발급이 완료되었습니다. 첨부된 비자를 
       }
     },
 
+    // 신청서 업데이트 뮤테이션
+    updateApplication: async (_, { id, input }, context) => {
+      try {
+        console.log("🔄 신청서 업데이트 요청:", { id, input });
+
+        // 관리자 권한 확인
+        const user = await requireAuth(context, [
+          "SUPER_ADMIN",
+          "ADMIN",
+          "MANAGER",
+          "STAFF",
+        ]);
+
+        const application = await VisaApplication.findByPk(id);
+        if (!application) {
+          throw new GraphQLError("신청서를 찾을 수 없습니다.", {
+            extensions: { code: "NOT_FOUND" },
+          });
+        }
+
+        // 업데이트 데이터 준비
+        const updateData = {};
+        
+        if (input.personalInfo) {
+          updateData.firstName = input.personalInfo.firstName;
+          updateData.lastName = input.personalInfo.lastName;
+          updateData.fullName = `${input.personalInfo.firstName} ${input.personalInfo.lastName}`;
+          updateData.email = input.personalInfo.email;
+          updateData.phone = input.personalInfo.phone;
+          updateData.address = input.personalInfo.address;
+          updateData.phoneOfFriend = input.personalInfo.phoneOfFriend;
+        }
+
+        if (input.travelInfo) {
+          updateData.visaType = input.travelInfo.visaType;
+          updateData.entryDate = input.travelInfo.entryDate;
+          updateData.arrivalDate = input.travelInfo.entryDate;
+          updateData.entryPort = input.travelInfo.entryPort;
+        }
+
+        if (input.processingType) {
+          updateData.processingType = input.processingType;
+        }
+
+        if (input.totalPrice !== undefined) {
+          updateData.totalPrice = input.totalPrice;
+        }
+
+        // 신청서 업데이트
+        await application.update(updateData);
+
+        console.log("✅ 신청서 업데이트 완료:", { id, updatedFields: Object.keys(updateData) });
+
+        // 업데이트된 데이터를 GraphQL 형식으로 반환
+        return {
+          id: application.id.toString(),
+          applicationId: application.applicationId || `APP-${application.id}`,
+          processingType: application.processingType || "STANDARD",
+          totalPrice: application.totalPrice || 0,
+          status: dbToGraphQLStatus(application.status),
+          createdAt: application.createdAt,
+          personalInfo: {
+            id: application.id.toString(),
+            firstName: application.firstName || application.fullName?.split(" ")[0] || "이름",
+            lastName: application.lastName || application.fullName?.split(" ")[1] || "성",
+            email: application.email || "email@example.com",
+            phone: application.phone || "010-0000-0000",
+            address: application.address || "주소 정보 없음",
+            phoneOfFriend: application.phoneOfFriend || null,
+          },
+          travelInfo: {
+            id: application.id.toString(),
+            entryDate: application.entryDate || application.arrivalDate,
+            entryPort: application.entryPort || "인천국제공항",
+            visaType: application.visaType || "E_VISA_GENERAL",
+          },
+          additionalServices: [],
+          documents: [],
+        };
+      } catch (error) {
+        console.error("❌ 신청서 업데이트 실패:", error);
+        throw new GraphQLError("신청서 업데이트에 실패했습니다.", {
+          extensions: {
+            code: "INTERNAL_SERVER_ERROR",
+            details: error.message,
+          },
+        });
+      }
+    },
+
     // PDF 생성 뮤테이션
     generateApplicationPDF: async (_, { applicationId }, context) => {
       try {

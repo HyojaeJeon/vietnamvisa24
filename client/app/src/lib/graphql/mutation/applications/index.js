@@ -147,8 +147,16 @@ export const UPDATE_STATUS_MUTATION = gql`
 
 // 새로운 이메일 발송 뮤테이션
 export const SEND_NOTIFICATION_EMAIL_MUTATION = gql`
-  mutation SendNotificationEmail($applicationId: ID!, $emailType: EmailType!, $customMessage: String) {
-    sendNotificationEmail(applicationId: $applicationId, emailType: $emailType, customMessage: $customMessage) {
+  mutation SendNotificationEmail(
+    $applicationId: ID!
+    $emailType: String!
+    $customMessage: String
+  ) {
+    sendNotificationEmail(
+      applicationId: $applicationId
+      emailType: $emailType
+      customMessage: $customMessage
+    ) {
       success
       message
       emailType
@@ -157,15 +165,57 @@ export const SEND_NOTIFICATION_EMAIL_MUTATION = gql`
   }
 `;
 
-// PDF 생성 뮤테이션
-export const GENERATE_APPLICATION_PDF_MUTATION = gql`
-  mutation GenerateApplicationPDF($applicationId: ID!) {
-    generateApplicationPDF(applicationId: $applicationId) {
-      success
-      message
-      downloadUrl
-      fileName
-      generatedAt
+export const UPDATE_APPLICATION_MUTATION = gql`
+  mutation UpdateApplication($id: ID!, $input: UpdateApplicationInput!) {
+    updateApplication(id: $id, input: $input) {
+      id
+      applicationId
+      processingType
+      totalPrice
+      status
+      createdAt
+      personalInfo {
+        id
+        firstName
+        lastName
+        email
+        phone
+        address
+        phoneOfFriend
+      }
+      travelInfo {
+        id
+        entryDate
+        entryPort
+        visaType
+      }
+      additionalServices {
+        id
+        name
+      }
+      documents {
+        id
+        type
+        fileName
+        fileSize
+        fileType
+        uploadedAt
+        extractedInfo {
+          type
+          issuingCountry
+          passportNo
+          surname
+          givenNames
+          dateOfBirth
+          dateOfIssue
+          dateOfExpiry
+          sex
+          nationality
+          personalNo
+          authority
+          koreanName
+        }
+      }
     }
   }
 `;
