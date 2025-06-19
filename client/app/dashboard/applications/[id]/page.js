@@ -35,11 +35,83 @@ import {
   Activity,
   FileCheck,
   Send,
-  ExternalLink
+  ExternalLink,
+  ZoomIn
 } from "lucide-react";
-import ImagePreviewModal from "../../../../src/components/ui/ImagePreviewModal";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+
+// 이미지 미리보기 모달 컴포넌트
+const ImagePreviewModal = ({ isOpen, onClose, imageSrc, fileName }) => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  if (!isOpen) return null;
+
+  const downloadImage = () => {
+    try {
+      const base64Data = imageSrc.split(",")[1];
+      const mimeType = imageSrc.split(";")[0].split(":")[1];
+
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: mimeType });
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName || "document.jpg";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("이미지 다운로드 실패:", error);
+      alert("이미지 다운로드에 실패했습니다.");
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" onClick={onClose}>
+      <div className="relative max-w-4xl max-h-[90vh] m-4" onClick={e => e.stopPropagation()}>
+        <div className="bg-white rounded-lg shadow-2xl overflow-hidden">
+          <div className="flex items-center justify-between p-4 border-b">
+            <h3 className="text-lg font-semibold text-gray-900 truncate">{fileName}</h3>
+            <div className="flex items-center space-x-2">
+              <Button variant="outline" size="sm" onClick={downloadImage}>
+                <Download className="w-4 h-4 mr-2" />
+                다운로드
+              </Button>
+              <Button variant="outline" size="sm" onClick={onClose}>
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="relative">
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                <div className="flex flex-col items-center space-y-2">
+                  <div className="w-8 h-8 border-b-2 border-blue-600 rounded-full animate-spin"></div>
+                  <p className="text-sm text-gray-600">이미지 로딩 중...</p>
+                </div>
+              </div>
+            )}
+            <img
+              src={imageSrc}
+              alt={fileName}
+              className="max-w-full max-h-[70vh] object-contain"
+              onLoad={() => setIsLoading(false)}
+              onError={() => setIsLoading(false)}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function ApplicationDetailPage() {
   const router = useRouter();
@@ -57,6 +129,50 @@ export default function ApplicationDetailPage() {
 
   // PDF 생성 상태
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  // 비자 종류 한글 매핑
+  const getVisaTypeLabel = (visaType) => {
+    const visaTypeMapping = {
+      'e-visa_general': 'E-VISA 일반',
+      'e-visa_urgent': 'E-VISA 긴급',
+      'e-visa_express': 'E-VISA 특급',
+      'tourist_visa': '관광 비자',
+      'business_visa': '상용 비자',
+      'transit_visa': '경유 비자'
+    };
+    return visaTypeMapping[visaType] || visaType;
+  };
+
+  // 입국공항 매핑
+  const getAirportLabel = (airportCode) => {
+    const airportMapping = {
+      'UIH': '푸꿕(UIH)',
+      'ICN': '인천(ICN)',
+      'SGN': '탄손냣(SGN)',
+      'HAN': '노이바이(HAN)',
+      'DAD': '다낭(DAD)',
+      'CXR': '캄란(CXR)',
+      'VCA': '껀터(VCA)',
+      'HPH': '깟비(HPH)',
+      'DLI': '달랏(DLI)',
+      'PQC': '푸꾸옥(PQC)'
+    };
+    return airportMapping[airportCode] || `${airportCode}`;
+  };
+
+  // 문서 타입 한글 매핑
+  const getDocumentTypeLabel = (type) => {
+    const typeMapping = {
+      'passport': '여권',
+      'photo': '증명사진',
+      'visa': '비자',
+      'ticket': '항공권',
+      'hotel': '숙박예약증',
+      'invitation': '초청장',
+      'insurance': '보험증서'
+    };
+    return typeMapping[type] || type;
+  };
 
   // GraphQL 뮤테이션
   const [updateStatus, { loading: updatingStatus }] = useMutation(UPDATE_STATUS_MUTATION, {
@@ -252,34 +368,6 @@ export default function ApplicationDetailPage() {
         {config.label}
       </Badge>
     );
-  };
-
-  // 이미지 다운로드 함수
-  const downloadImage = async (imageData, fileName) => {
-    try {
-      const base64Data = imageData.split(",")[1];
-      const mimeType = imageData.split(";")[0].split(":")[1];
-
-      const byteCharacters = atob(base64Data);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: mimeType });
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = fileName || "document.jpg";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("이미지 다운로드 실패:", error);
-      alert("이미지 다운로드에 실패했습니다.");
-    }
   };
 
   // 이미지 미리보기 열기
@@ -573,7 +661,7 @@ export default function ApplicationDetailPage() {
                   <div>
                     <label className="text-sm font-medium text-gray-500 block mb-1">비자 종류</label>
                     <p className="font-semibold text-gray-900 bg-gray-50 p-3 rounded-lg">
-                      {application.travelInfo?.visaType}
+                      {getVisaTypeLabel(application.travelInfo?.visaType)}
                     </p>
                   </div>
                   <div>
@@ -593,7 +681,7 @@ export default function ApplicationDetailPage() {
                     <label className="text-sm font-medium text-gray-500 block mb-1">입국공항</label>
                     <p className="flex items-center gap-2 text-gray-900">
                       <MapPin className="w-4 h-4 text-green-500" />
-                      {application.travelInfo?.entryPort}
+                      {getAirportLabel(application.travelInfo?.entryPort)}
                     </p>
                   </div>
                 </div>
@@ -634,14 +722,20 @@ export default function ApplicationDetailPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-6">
                     {application.documents.map((document, index) => (
-                      <div key={index} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                      <div key={index} className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow bg-gray-50">
+                        {/* 문서 헤더 */}
                         <div className="flex items-center justify-between mb-4">
                           <div>
-                            <h4 className="font-semibold text-gray-900 mb-1">{document.fileName}</h4>
+                            <h4 className="font-semibold text-gray-900 mb-1 text-lg">
+                              {getDocumentTypeLabel(document.type)} / {document.type.toUpperCase()}
+                            </h4>
                             <p className="text-sm text-gray-500">
-                              {document.type} • {(document.fileSize / 1024).toFixed(1)}KB • {document.fileType}
+                              {document.fileName} • {(document.fileSize / 1024).toFixed(1)}KB • {document.fileType}
+                            </p>
+                            <p className="text-xs text-gray-400 mt-1">
+                              업로드: {new Date(parseInt(document.uploadedAt)).toLocaleString('ko-KR')}
                             </p>
                           </div>
                           <div className="flex items-center space-x-2">
@@ -653,57 +747,81 @@ export default function ApplicationDetailPage() {
                                   onClick={() => openImagePreview(document.fileData, document.fileName)}
                                   className="hover:bg-blue-50"
                                 >
-                                  <Eye className="w-3 h-3 mr-1" />
+                                  <ZoomIn className="w-3 h-3 mr-1" />
                                   미리보기
-                                </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="outline" 
-                                  onClick={() => downloadImage(document.fileData, document.fileName)}
-                                  className="hover:bg-green-50"
-                                >
-                                  <Download className="w-3 h-3 mr-1" />
-                                  다운로드
                                 </Button>
                               </>
                             )}
                           </div>
                         </div>
 
-                        {/* 서류 미리보기 썸네일 */}
-                        {document.fileData && (
-                          <div className="mb-4">
-                            <img
-                              src={document.fileData}
-                              alt={document.fileName}
-                              className="w-full h-32 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition-opacity"
-                              onClick={() => openImagePreview(document.fileData, document.fileName)}
-                            />
-                          </div>
-                        )}
-
-                        {/* OCR 추출 정보 */}
-                        {document.extractedInfo && (
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <h5 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
-                              <Activity className="w-4 h-4" />
-                              추출된 정보
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                          {/* 이미지 섹션 */}
+                          <div>
+                            <h5 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
+                              <Eye className="w-4 h-4" />
+                              문서 이미지 / Document Image
                             </h5>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
-                              {Object.entries(document.extractedInfo).map(
-                                ([key, value]) =>
-                                  value && (
-                                    <div key={key} className="flex justify-between items-center py-1">
-                                      <span className="font-medium text-blue-700 capitalize">
-                                        {key.replace(/([A-Z])/g, ' $1').trim()}:
-                                      </span>
-                                      <span className="text-blue-800 truncate ml-2">{value}</span>
-                                    </div>
-                                  )
-                              )}
-                            </div>
+                            {document.fileData ? (
+                              <div className="space-y-3">
+                                <img
+                                  src={document.fileData}
+                                  alt={document.fileName}
+                                  className="w-full h-48 object-cover rounded-lg border cursor-pointer hover:opacity-80 transition-opacity shadow-sm"
+                                  onClick={() => openImagePreview(document.fileData, document.fileName)}
+                                />
+                                <div className="flex gap-2">
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline" 
+                                    onClick={() => openImagePreview(document.fileData, document.fileName)}
+                                    className="flex-1 hover:bg-blue-50"
+                                  >
+                                    <Eye className="w-3 h-3 mr-1" />
+                                    확대보기
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-full h-48 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
+                                <p className="text-gray-500">이미지 없음</p>
+                              </div>
+                            )}
                           </div>
-                        )}
+
+                          {/* 추출된 정보 섹션 */}
+                          <div>
+                            <h5 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
+                              <Activity className="w-4 h-4" />
+                              추출된 정보 / Extracted Information
+                            </h5>
+                            {document.extractedInfo ? (
+                              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
+                                <div className="grid grid-cols-1 gap-3 text-sm">
+                                  {Object.entries(document.extractedInfo).map(
+                                    ([key, value]) =>
+                                      value && key !== '__typename' && (
+                                        <div key={key} className="bg-white rounded p-2 border border-blue-100">
+                                          <div className="flex justify-between items-start">
+                                            <div className="flex-1">
+                                              <span className="font-medium text-blue-700 block text-xs mb-1">
+                                                {getKoreanFieldName(key)} / {key.replace(/([A-Z])/g, ' $1').trim()}
+                                              </span>
+                                              <span className="text-blue-900 font-medium">{value}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      )
+                                  )}
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                <p className="text-gray-500 text-sm">추출된 정보가 없습니다</p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -839,9 +957,9 @@ export default function ApplicationDetailPage() {
 
             <div style={{ marginBottom: '20px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '10px', borderBottom: '2px solid #333', paddingBottom: '5px' }}>여행정보</h2>
-              <p><strong>비자 종류:</strong> {application.travelInfo?.visaType}</p>
+              <p><strong>비자 종류:</strong> {getVisaTypeLabel(application.travelInfo?.visaType)}</p>
               <p><strong>입국일:</strong> {application.travelInfo?.entryDate}</p>
-              <p><strong>입국공항:</strong> {application.travelInfo?.entryPort}</p>
+              <p><strong>입국공항:</strong> {getAirportLabel(application.travelInfo?.entryPort)}</p>
               <p><strong>처리 방식:</strong> {application.processingType}</p>
             </div>
 
@@ -861,8 +979,27 @@ export default function ApplicationDetailPage() {
         onClose={() => setIsPreviewOpen(false)}
         imageSrc={previewImage?.src}
         fileName={previewImage?.title}
-        onDownload={() => previewImage && downloadImage(previewImage.src, previewImage.title)}
       />
     </div>
   );
+}
+
+// 필드명 한글 매핑 함수
+function getKoreanFieldName(fieldName) {
+  const fieldMapping = {
+    type: '여권종류',
+    issuingCountry: '발급국가',
+    passportNo: '여권번호',
+    surname: '성',
+    givenNames: '이름',
+    dateOfBirth: '생년월일',
+    dateOfIssue: '발급일',
+    dateOfExpiry: '만료일',
+    sex: '성별',
+    nationality: '국적',
+    personalNo: '개인번호',
+    authority: '발급기관',
+    koreanName: '한글명'
+  };
+  return fieldMapping[fieldName] || fieldName;
 }
