@@ -404,7 +404,8 @@ export default function ApplyPageContent() {
 
   // Render current step component
   const renderStepComponent = () => {
-    switch (currentStep) {
+    // switch (currentStep) {
+    switch (5) {
       case 1:
         return (
           <ServiceSelectionStep

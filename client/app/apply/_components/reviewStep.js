@@ -33,7 +33,14 @@ import {
 import { formatCurrency, calculateTotalPrice } from "./utils";
 import { VISA_TYPES, PROCESSING_TYPES } from "./types";
 
-const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, updateFormData }) => {
+const ReviewStep = ({
+  formData,
+  onNext,
+  onPrevious,
+  onEdit,
+  isSubmitting,
+  updateFormData,
+}) => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(null);
   const [isEditingPassport, setIsEditingPassport] = useState(false);
@@ -103,30 +110,67 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
   // 비자 타입 정보
   const getVisaTypeInfo = () => {
     const visaTypes = {
-      [VISA_TYPES.E_VISA_GENERAL]: { id: VISA_TYPES.E_VISA_GENERAL, name: "E-VISA (전자비자) / 일반 (3-4일 소요)" },
-      [VISA_TYPES.E_VISA_URGENT]: { id: VISA_TYPES.E_VISA_URGENT, name: "E-VISA (전자비자) / 긴급 (선택 옵션에 따라 1시간 ~ 2일 소요)" },
-      [VISA_TYPES.E_VISA_TRANSIT]: { id: VISA_TYPES.E_VISA_TRANSIT, name: "E-VISA (전자비자) / 목바이 경유 (당일 발급)" },
+      [VISA_TYPES.E_VISA_GENERAL]: {
+        id: VISA_TYPES.E_VISA_GENERAL,
+        name: "E-VISA (전자비자) / 일반 (3-4일 소요)",
+      },
+      [VISA_TYPES.E_VISA_URGENT]: {
+        id: VISA_TYPES.E_VISA_URGENT,
+        name: "E-VISA (전자비자) / 긴급 (선택 옵션에 따라 1시간 ~ 2일 소요)",
+      },
+      [VISA_TYPES.E_VISA_TRANSIT]: {
+        id: VISA_TYPES.E_VISA_TRANSIT,
+        name: "E-VISA (전자비자) / 목바이 경유 (당일 발급)",
+      },
     };
-    return visaTypes[formData.visaType] || { id: formData.visaType, name: formData.visaType };
+    return (
+      visaTypes[formData.visaType] || {
+        id: formData.visaType,
+        name: formData.visaType,
+      }
+    );
   };
 
   // 처리 속도 정보
   const getProcessingTypeInfo = () => {
     const processingTypes = {
-      [PROCESSING_TYPES.NORMAL]: { id: PROCESSING_TYPES.NORMAL, name: "일반 처리 (4-5일)" },
-      [PROCESSING_TYPES.URGENT_1HOUR]: { id: PROCESSING_TYPES.URGENT_1HOUR, name: "1시간" },
-      [PROCESSING_TYPES.URGENT_2HOUR]: { id: PROCESSING_TYPES.URGENT_2HOUR, name: "2시간" },
-      [PROCESSING_TYPES.URGENT_4HOUR]: { id: PROCESSING_TYPES.URGENT_4HOUR, name: "4시간" },
-      [PROCESSING_TYPES.URGENT_1DAY]: { id: PROCESSING_TYPES.URGENT_1DAY, name: "1일" },
-      [PROCESSING_TYPES.URGENT_2DAY]: { id: PROCESSING_TYPES.URGENT_2DAY, name: "2일" },
+      [PROCESSING_TYPES.NORMAL]: {
+        id: PROCESSING_TYPES.NORMAL,
+        name: "일반 처리 (4-5일)",
+      },
+      [PROCESSING_TYPES.URGENT_1HOUR]: {
+        id: PROCESSING_TYPES.URGENT_1HOUR,
+        name: "1시간",
+      },
+      [PROCESSING_TYPES.URGENT_2HOUR]: {
+        id: PROCESSING_TYPES.URGENT_2HOUR,
+        name: "2시간",
+      },
+      [PROCESSING_TYPES.URGENT_4HOUR]: {
+        id: PROCESSING_TYPES.URGENT_4HOUR,
+        name: "4시간",
+      },
+      [PROCESSING_TYPES.URGENT_1DAY]: {
+        id: PROCESSING_TYPES.URGENT_1DAY,
+        name: "1일",
+      },
+      [PROCESSING_TYPES.URGENT_2DAY]: {
+        id: PROCESSING_TYPES.URGENT_2DAY,
+        name: "2일",
+      },
     };
-    return processingTypes[formData.processingType] || { id: formData.processingType, name: formData.processingType };
+    return (
+      processingTypes[formData.processingType] || {
+        id: formData.processingType,
+        name: formData.processingType,
+      }
+    );
   };
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
   const getEntryPortLabel = (code) => {
@@ -184,7 +228,9 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 md:gap-3">
                   <User className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                  <CardTitle className="text-lg md:text-xl text-blue-700">개인 정보</CardTitle>
+                  <CardTitle className="text-lg md:text-xl text-blue-700">
+                    개인 정보
+                  </CardTitle>
                 </div>
                 <Button
                   variant="outline"
@@ -204,7 +250,8 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-gray-500">신청자명</p>
                     <p className="font-semibold text-gray-900 truncate">
-                      {formData.personalInfo?.firstName} {formData.personalInfo?.lastName}
+                      {formData.personalInfo?.firstName}{" "}
+                      {formData.personalInfo?.lastName}
                     </p>
                   </div>
                 </div>
@@ -244,7 +291,9 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 md:gap-3">
                   <User className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
-                  <CardTitle className="text-lg md:text-xl text-blue-700">여권 정보</CardTitle>
+                  <CardTitle className="text-lg md:text-xl text-blue-700">
+                    여권 정보
+                  </CardTitle>
                 </div>
                 {!isEditingPassport && (
                   <Button
@@ -494,7 +543,9 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                   <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
                     <Phone className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs text-gray-500">이름 (Given Names)</p>
+                      <p className="text-xs text-gray-500">
+                        이름 (Given Names)
+                      </p>
                       <p className="font-semibold text-gray-900">
                         {formData.personalInfo?.givenNames}
                       </p>
@@ -592,7 +643,9 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 md:gap-3">
                   <Plane className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                  <CardTitle className="text-lg md:text-xl text-green-700">여행 정보</CardTitle>
+                  <CardTitle className="text-lg md:text-xl text-green-700">
+                    여행 정보
+                  </CardTitle>
                 </div>
                 <Button
                   variant="outline"
@@ -635,7 +688,9 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 md:gap-3">
                   <Globe className="w-5 h-5 md:w-6 md:h-6 text-purple-600" />
-                  <CardTitle className="text-lg md:text-xl text-purple-700">비자 정보</CardTitle>
+                  <CardTitle className="text-lg md:text-xl text-purple-700">
+                    비자 정보
+                  </CardTitle>
                 </div>
                 <Button
                   variant="outline"
@@ -677,7 +732,9 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 md:gap-3">
                   <FileText className="w-5 h-5 md:w-6 md:h-6 text-orange-600" />
-                  <CardTitle className="text-lg md:text-xl text-orange-700">업로드된 서류</CardTitle>
+                  <CardTitle className="text-lg md:text-xl text-orange-700">
+                    업로드된 서류
+                  </CardTitle>
                 </div>
                 <Button
                   variant="outline"
@@ -692,32 +749,45 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
             </CardHeader>
             <CardContent className="pt-3 md:pt-4">
               <div className="space-y-2 md:space-y-3">
-                {formData.documents && Object.entries(formData.documents).map(([docType, docData]) => (
-                  <div
-                    key={docType}
-                    className="flex items-center justify-between p-2 md:p-3 bg-gray-50 rounded-lg"
-                  >
-                    <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
-                      <FileText className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-gray-900 text-xs md:text-sm">
-                          {docType === "passport" ? "여권 정보면" : "증명사진"}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {docData.fileName} ({(docData.fileSize / 1024 / 1024).toFixed(2)}MB)
-                        </p>
+                {formData.documents &&
+                  Object.entries(formData.documents).map(
+                    ([docType, docData]) => (
+                      <div
+                        key={docType}
+                        className="flex items-center justify-between p-2 md:p-3 bg-gray-50 rounded-lg"
+                      >
+                        <div className="flex items-center gap-2 md:gap-3 flex-1 min-w-0">
+                          <FileText className="w-4 h-4 md:w-5 md:h-5 text-gray-500 flex-shrink-0" />
+                          <div className="min-w-0 flex-1">
+                            <p className="font-semibold text-gray-900 text-xs md:text-sm">
+                              {docType === "passport"
+                                ? "여권 정보면"
+                                : "증명사진"}
+                            </p>
+                            <p className="text-xs text-gray-500 truncate">
+                              {docData.fileName} (
+                              {(docData.fileSize / 1024 / 1024).toFixed(2)}MB)
+                            </p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleImagePreview(
+                              docData.file,
+                              docType === "passport"
+                                ? "여권 정보면"
+                                : "증명사진",
+                            )
+                          }
+                          className="h-7 md:h-8 px-2 md:px-3 flex-shrink-0"
+                        >
+                          <Eye className="w-3 h-3 md:w-4 md:h-4" />
+                        </Button>
                       </div>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleImagePreview(docData.file, docType === "passport" ? "여권 정보면" : "증명사진")}
-                      className="h-7 md:h-8 px-2 md:px-3 flex-shrink-0"
-                    >
-                      <Eye className="w-3 h-3 md:w-4 md:h-4" />
-                    </Button>
-                  </div>
-                ))}
+                    ),
+                  )}
               </div>
             </CardContent>
           </Card>
@@ -730,7 +800,9 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
             <CardHeader className="pb-3 md:pb-4">
               <div className="flex items-center gap-2 md:gap-3">
                 <CreditCard className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
-                <CardTitle className="text-lg md:text-xl text-green-700">결제 정보</CardTitle>
+                <CardTitle className="text-lg md:text-xl text-green-700">
+                  결제 정보
+                </CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-3 md:space-y-4">
@@ -750,7 +822,9 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
               </div>
               <div className="border-t pt-2 md:pt-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-base md:text-lg font-bold text-gray-900">총 결제금액</span>
+                  <span className="text-base md:text-lg font-bold text-gray-900">
+                    총 결제금액
+                  </span>
                   <span className="text-xl md:text-2xl font-bold text-green-600">
                     {formatCurrency(currentPrice)}
                   </span>
@@ -764,7 +838,9 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
             <CardHeader className="pb-3 md:pb-4">
               <div className="flex items-center gap-2 md:gap-3">
                 <Shield className="w-5 h-5 md:w-6 md:h-6 text-gray-600" />
-                <CardTitle className="text-lg md:text-xl text-gray-700">약관 동의</CardTitle>
+                <CardTitle className="text-lg md:text-xl text-gray-700">
+                  약관 동의
+                </CardTitle>
               </div>
             </CardHeader>
             <CardContent className="space-y-3 md:space-y-4">
@@ -776,12 +852,17 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                     onCheckedChange={setAgreedToTerms}
                     className="mt-1"
                   />
-                  <label htmlFor="terms" className="text-xs md:text-sm text-gray-700 leading-relaxed cursor-pointer">
+                  <label
+                    htmlFor="terms"
+                    className="text-xs md:text-sm text-gray-700 leading-relaxed cursor-pointer"
+                  >
                     <span className="font-semibold">서비스 이용약관</span> 및{" "}
-                    <span className="font-semibold">개인정보처리방침</span>에 동의합니다.
+                    <span className="font-semibold">개인정보처리방침</span>에
+                    동의합니다.
                     <br />
                     <span className="text-xs text-gray-500 mt-1 block">
-                      비자 신청을 위해 필요한 개인정보 수집 및 이용에 동의합니다.
+                      비자 신청을 위해 필요한 개인정보 수집 및 이용에
+                      동의합니다.
                     </span>
                   </label>
                 </div>
@@ -832,7 +913,9 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
         <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
           <div className="relative max-w-4xl max-h-full bg-white rounded-lg overflow-hidden">
             <div className="flex items-center justify-between p-3 md:p-4 border-b">
-              <h3 className="text-base md:text-lg font-semibold">{showImagePreview.title}</h3>
+              <h3 className="text-base md:text-lg font-semibold">
+                {showImagePreview.title}
+              </h3>
               <Button
                 variant="outline"
                 size="sm"
