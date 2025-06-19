@@ -1,0 +1,1 @@
+Fixing syntax error in ApplyPageContent.js and creating a new confirmationStep.js component.
