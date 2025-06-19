@@ -4,5 +4,6 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/dashboard/applications/page": "app/dashboard/applications/page.js",
-  "/dashboard/applications/[id]/page": "app/dashboard/applications/[id]/page.js"
+  "/dashboard/applications/[id]/page": "app/dashboard/applications/[id]/page.js",
+  "/dashboard/consultations/page": "app/dashboard/consultations/page.js"
 }
