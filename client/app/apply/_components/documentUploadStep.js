@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import imageCompression from "browser-image-compression";
@@ -544,7 +546,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-8 space-y-8">
+      <CardContent className="p-4 md:p-8 space-y-6 md:space-y-8">
         {/* 업로드 안내 */}
         <Alert>
           <AlertCircle className="w-4 h-4" />
@@ -573,7 +575,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
               <Card
                 className={`border-2 transition-all duration-300 ${isUploaded ? "border-green-500 bg-green-50" : doc.required ? "border-orange-300 bg-orange-50" : "border-gray-200 bg-white"}`}
               >
-                <CardContent className="p-6">
+                <CardContent className="p-4 md:p-6">
                   <div className="flex items-start gap-4">
                     <div
                       className={`w-12 h-12 rounded-xl flex items-center justify-center ${
@@ -592,7 +594,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                     </div>
 
                     <div className="flex-1 space-y-3">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
                         <div>
                           <h3 className="flex items-center gap-2 text-lg font-bold text-gray-800">
                             {doc.title}
@@ -607,7 +609,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 mt-2 md:mt-0">
                           <span className="text-xs text-gray-500">
                             최대 {doc.maxSize} | {doc.formats.join(", ")}
                           </span>
@@ -640,7 +642,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                           />
                         </div>
                       ) : isUploaded ? (
-                        <div className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                        <div className="flex flex-col md:flex-row items-center justify-between p-3 bg-white border rounded-lg">
                           <div className="flex items-center gap-3">
                             <CheckCircle className="w-5 h-5 text-green-500" />
                             <div className="flex-1">
@@ -738,7 +740,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                                 )}
                             </div>
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 mt-3 md:mt-0">
                             <Button
                               variant="outline"
                               size="sm"
@@ -777,7 +779,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                           >
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                               <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                              <p className="mb-2 text-sm text-gray-500">
+                              <p className="mb-2 text-sm text-gray-500 text-center">
                                 <span className="font-semibold">
                                   클릭하여 업로드
                                 </span>{" "}
@@ -814,7 +816,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   </div>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-6">
+              <CardContent className="p-4 md:p-6">
                 {/* 안내 메시지 */}
                 <div className="p-4 mb-6 border border-blue-200 rounded-lg bg-blue-100/70">
                   <div className="flex items-start gap-3">
@@ -830,7 +832,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                     </div>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   {" "}
                   {/* 여권 타입 */}
                   <div className="space-y-2">
@@ -1211,7 +1213,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   </div> */}
                 </div>
                 {/* 저장 버튼 */}
-                <div className="flex items-center justify-between gap-4 pt-6 mt-6 border-t border-emerald-200">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-6 mt-6 border-t border-emerald-200">
                   <div className="text-sm text-gray-600">
                     <span className="font-medium">수정사항이 있나요?</span>{" "}
                     저장하시면 개인정보 입력 단계에 반영됩니다.
@@ -1262,7 +1264,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
               <Card
                 className={`border-2 transition-all duration-300 ${isUploaded ? "border-green-500 bg-green-50" : doc.required ? "border-orange-300 bg-orange-50" : "border-gray-200 bg-white"}`}
               >
-                <CardContent className="p-6">
+                <CardContent className="p-4 md:p-6">
                   <div className="flex items-start gap-4">
                     <div
                       className={`w-12 h-12 rounded-xl flex items-center justify-center ${
@@ -1281,7 +1283,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                     </div>
 
                     <div className="flex-1 space-y-3">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
                         <div>
                           <h3 className="flex items-center gap-2 text-lg font-bold text-gray-800">
                             {doc.title}
@@ -1296,7 +1298,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                           </p>
                         </div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 mt-2 md:mt-0">
                           <span className="text-xs text-gray-500">
                             최대 {doc.maxSize} | {doc.formats.join(", ")}
                           </span>
@@ -1379,7 +1381,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                             </div>
                           )}
 
-                          <div className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                          <div className="flex flex-col md:flex-row items-center justify-between p-3 bg-white border rounded-lg">
                             <div className="flex items-center gap-3">
                               <CheckCircle className="w-5 h-5 text-green-500" />
                               <div className="flex-1">
@@ -1430,7 +1432,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                                 </div>
                               </div>
                             </div>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 mt-3 md:mt-0">
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -1499,7 +1501,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                           >
                             <div className="flex flex-col items-center justify-center pt-5 pb-6">
                               <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                              <p className="mb-2 text-sm text-gray-500">
+                              <p className="mb-2 text-sm text-gray-500 text-center">
                                 <span className="font-semibold">
                                   클릭하여 업로드
                                 </span>{" "}
@@ -1522,7 +1524,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
         {/* OCR 진행 상태 표시 */}
         {ocrProcessing && (
           <Card className="border-2 border-amber-200 bg-amber-50/50">
-            <CardContent className="p-6">
+            <CardContent className="p-4 md:p-6">
               <div className="flex items-center gap-4">
                 <div className="flex items-center justify-center w-12 h-12 rounded-full bg-amber-100">
                   <Loader2 className="w-6 h-6 text-amber-600 animate-spin" />
@@ -1557,23 +1559,23 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           </Card>
         )}
         {/* 네비게이션 버튼 */}
-        <div className="flex justify-between pt-8 border-t border-gray-200">
+        <div className="flex justify-between pt-6 md:pt-8 border-t border-gray-200">
           <Button
             onClick={onPrevious}
             variant="outline"
-            className="px-8 py-4 text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-2xl"
+            className="px-6 py-3 md:px-8 md:py-4 text-base md:text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-xl md:rounded-2xl"
           >
-            <ArrowLeft className="w-6 h-6 mr-3" />
+            <ArrowLeft className="w-5 h-5 md:w-6 md:h-6 mr-2" />
             <span>이전</span>
           </Button>
 
           <Button
             onClick={onNext}
             disabled={!isValid}
-            className="px-12 py-4 text-lg font-bold text-white transition-all duration-300 transform shadow-2xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-700 hover:via-orange-700 hover:to-red-700 rounded-2xl hover:shadow-3xl disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
+            className="px-8 py-3 md:px-12 md:py-4 text-base md:text-lg font-bold text-white transition-all duration-300 transform shadow-2xl bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 hover:from-amber-700 hover:via-orange-700 hover:to-red-700 rounded-xl md:rounded-2xl hover:shadow-3xl disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
           >
-            <span className="mr-3">다음</span>
-            <ArrowRight className="w-6 h-6" />
+            <span className="mr-2">다음</span>
+            <ArrowRight className="w-5 h-5 md:w-6 md:h-6" />
           </Button>
         </div>
       </CardContent>
@@ -1653,23 +1655,23 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
           {/* 모달 컨텐츠 */}
-          <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4">
+          <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-4 md:p-8 max-w-md w-full mx-4">
             <div className="text-center">
               {/* 로딩 스피너 */}
-              <div className="flex justify-center mb-6">
+              <div className="flex justify-center mb-4 md:mb-6">
                 <div className="relative">
-                  <div className="w-16 h-16 border-4 border-blue-200 rounded-full animate-spin border-t-blue-600"></div>
+                  <div className="w-12 h-12 md:w-16 md:h-16 border-4 border-blue-200 rounded-full animate-spin border-t-blue-600"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-blue-600 animate-pulse" />
+                    <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-blue-600 animate-pulse" />
                   </div>
                 </div>
               </div>
 
               {/* 로딩 메시지 */}
-              <h3 className="text-xl font-bold text-gray-800 mb-2">
+              <h3 className="text-lg md:text-xl font-bold text-gray-800 mb-2">
                 처리 중입니다
               </h3>
-              <p className="text-gray-600 mb-6">{loadingMessage}</p>
+              <p className="text-gray-600 mb-4 md:mb-6">{loadingMessage}</p>
 
               {/* 프로그레스 바 (여권의 경우) */}
               {ocrProcessing && (
@@ -1684,7 +1686,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
               )}
 
               {/* 안내 메시지 */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <div className="mt-4 md:mt-6 p-3 md:p-4 bg-blue-50 rounded-lg">
                 <div className="flex items-center justify-center gap-2 text-sm text-blue-700">
                   <Info className="w-4 h-4" />
                   <span>
