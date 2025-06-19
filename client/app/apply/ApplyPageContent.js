@@ -404,8 +404,7 @@ export default function ApplyPageContent() {
 
   // Render current step component
   const renderStepComponent = () => {
-    // switch (currentStep) {
-    switch (6) {
+    switch (currentStep) {
       case 1:
         return (
           <ServiceSelectionStep
@@ -488,3 +487,6 @@ export default function ApplyPageContent() {
     </div>
   );
 }
+```
+
+The code was modified to correct the switch statement in the `renderStepComponent` function in `ApplyPageContent.js`.
