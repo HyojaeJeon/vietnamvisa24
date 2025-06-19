@@ -29,14 +29,16 @@ const ConfirmationStep = ({ formData, applicationId }) => {
 
   // 접수증 PDF 생성 함수
   const generateReceiptPDF = () => {
-    const doc = new jsPDF({
-      orientation: 'portrait',
-      unit: 'mm',
-      format: 'a4'
-    });
+    try {
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
 
-    // 한글 지원을 위한 폰트 설정
-    doc.setFont("helvetica");
+      // 한글 지원을 위한 폰트 설정
+      doc.setFont("helvetica", "normal");
     
     // 브랜드 색상 정의 (더 생동감 있는 색상)
     const primaryBlue = [67, 133, 245];
@@ -437,18 +439,59 @@ const ConfirmationStep = ({ formData, applicationId }) => {
     doc.text("이 문서는 자동으로 생성되었습니다. 향후 참조를 위해 안전하게 보관하세요.", pageWidth / 2, currentY + 10, { align: 'center' });
 
     return doc;
+    } catch (error) {
+      console.error('PDF 생성 중 오류 발생:', error);
+      throw new Error('PDF 생성에 실패했습니다. 다시 시도해주세요.');
+    }
+  };
+
+  // 한글 텍스트 처리를 위한 유틸리티 함수
+  const wrapKoreanText = (text, maxWidth) => {
+    if (!text) return [''];
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
+    
+    words.forEach(word => {
+      const testLine = currentLine + (currentLine ? ' ' : '') + word;
+      if (testLine.length * 2.5 > maxWidth && currentLine) {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    });
+    
+    if (currentLine) lines.push(currentLine);
+    return lines.length ? lines : [''];
   };
 
   // PDF 다운로드 핸들러
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
     try {
+      // 필수 데이터 검증
+      if (!applicationId) {
+        throw new Error('신청번호가 없습니다.');
+      }
+      
+      if (!formData || !formData.personalInfo) {
+        throw new Error('신청자 정보가 없습니다.');
+      }
+
       const pdf = generateReceiptPDF();
-      const fileName = `베트남비자_접수증_${applicationId}_${new Date().toLocaleDateString('ko-KR').replace(/\./g, '')}.pdf`;
+      const safeDate = new Date().toLocaleDateString('ko-KR').replace(/[.\s]/g, '');
+      const fileName = `베트남비자_접수증_${applicationId}_${safeDate}.pdf`;
+      
+      // PDF 저장
       pdf.save(fileName);
+      
+      // 성공 메시지
+      console.log('PDF 다운로드 완료:', fileName);
+      
     } catch (error) {
       console.error('PDF 생성 오류:', error);
-      alert('PDF 생성 중 오류가 발생했습니다.');
+      alert(`PDF 생성 중 오류가 발생했습니다: ${error.message || '알 수 없는 오류'}`);
     } finally {
       setIsDownloading(false);
     }
