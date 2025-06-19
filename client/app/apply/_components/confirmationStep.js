@@ -654,4 +654,30 @@ const ConfirmationStep = ({ formData, applicationId }) => {
               <Phone className="w-8 h-8 mx-auto mb-3 text-blue-600" />
               <h4 className="mb-2 font-bold text-gray-800">전화 문의</h4>
               <p className="text-lg font-bold text-blue-600">1588-1234</p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600">평일 09:00-18:00</p>
+            </div>
+            <div className="p-6 text-center bg-green-50 rounded-xl">
+              <MessageCircle className="w-8 h-8 mx-auto mb-3 text-green-600" />
+              <h4 className="mb-2 font-bold text-gray-800">카카오톡</h4>
+              <p className="text-lg font-bold text-green-600">@vietnamvisa24</p>
+              <p className="text-sm text-gray-600">24시간 상담</p>
+            </div>
+            <div className="p-6 text-center bg-purple-50 rounded-xl">
+              <Mail className="w-8 h-8 mx-auto mb-3 text-purple-600" />
+              <h4 className="mb-2 font-bold text-gray-800">이메일</h4>
+              <p className="text-lg font-bold text-purple-600">support@vietnamvisa24.com</p>
+              <p className="text-sm text-gray-600">24시간 접수</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+ConfirmationStep.propTypes = {
+  formData: PropTypes.object.isRequired,
+  applicationId: PropTypes.string.isRequired,
+};
+
+export default ConfirmationStep;
