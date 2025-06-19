@@ -46,7 +46,7 @@ const ReviewStep = ({
   // 여권 정보 수정 시작
   const startEditingPassport = () => {
     setEditedPassportInfo({
-      passportNo: formData.personalInfo?.passportNumber || "",
+      passportNo: formData.personalInfo?.passportNo || "",
       surname: formData.personalInfo?.lastName || "",
       givenNames: formData.personalInfo?.firstName || "",
       koreanName: formData.personalInfo?.koreanName || "",
@@ -68,7 +68,7 @@ const ReviewStep = ({
     updateFormData({
       personalInfo: {
         ...formData.personalInfo,
-        passportNo: editedPassportInfo.passportNumber,
+        passportNo: editedPassportInfo.passportNo,
         lastName: editedPassportInfo.surname,
         firstName: editedPassportInfo.givenNames,
         koreanName: editedPassportInfo.koreanName,
@@ -270,7 +270,7 @@ const ReviewStep = ({
                         </label>
                         <input
                           type="text"
-                          value={editedPassportInfo.passportNumber}
+                          value={editedPassportInfo.passportNo}
                           onChange={(e) =>
                             setEditedPassportInfo({
                               ...editedPassportInfo,
@@ -596,14 +596,14 @@ const ReviewStep = ({
                         {formData.personalInfo?.authority || "-"}
                       </p>
                     </div>
-                    <div className="bg-white p-4 rounded-lg shadow-sm">
+                    {/* <div className="bg-white p-4 rounded-lg shadow-sm">
                       <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
                         개인번호
                       </p>
                       <p className="text-lg font-bold text-gray-800">
                         {formData.personalInfo?.personalNo || "-"}
                       </p>
-                    </div>
+                    </div> */}
                     <div className="bg-white p-4 rounded-lg shadow-sm">
                       <p className="mb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
                         이메일

@@ -210,7 +210,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
     }
 
     if (ocrResult.passport_no)
-      info.passportNumber = ocrResult.passport_no.trim();
+      info.passportNo = ocrResult.passport_no.trim();
     if (ocrResult.issuing_country) {
       info.issuingCountry = ocrResult.issuing_country; // 영어 원본 그대로 저장
       info.issuingCountryCode = ocrResult.issuing_country; // 원본 코드도 저장
@@ -1067,7 +1067,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-semibold text-gray-700">
                       <span>여권번호 (Passport Number)</span>
-                      {extractedPassportInfo.mapped?.passportNumber && (
+                      {extractedPassportInfo.mapped?.passportNo && (
                         <span className="px-2 py-1 text-xs text-green-700 bg-green-100 rounded-full">
                           자동추출
                         </span>
@@ -1077,14 +1077,14 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                       type="text"
                       title="여권번호(Passport Number)"
                       value={
-                        editingPassportInfo?.passportNumber ??
-                        extractedPassportInfo.mapped?.passportNumber ??
+                        editingPassportInfo?.passportNo ??
+                        extractedPassportInfo.mapped?.passportNo ??
                         ""
                       }
                       onChange={(e) =>
                         setEditingPassportInfo((prev) => ({
                           ...(prev || extractedPassportInfo.mapped || {}),
-                          passportNumber: e.target.value,
+                          passportNo: e.target.value,
                         }))
                       }
                       className="w-full px-4 py-3 transition-all duration-200 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
