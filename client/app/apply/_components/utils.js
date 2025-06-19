@@ -23,7 +23,7 @@ export const validatePhone = (phone) => {
   // 국제 전화번호 형식 검증 (한국: +82, 베트남: +84 등)
   const phoneRegex = /^(\+\d{1,3}[-.\s]?)?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
   const cleanPhone = phone.replace(/[\s\-()]/g, '');
-  
+
   // 최소 8자리, 최대 15자리 (국제표준)
   return phoneRegex.test(phone) && cleanPhone.length >= 8 && cleanPhone.length <= 15;
 };
@@ -151,11 +151,23 @@ export const safeLocalStorage = {
   },
 };
 
-// Generate unique application ID
+// Generate random application ID with prefix
 export const generateApplicationId = () => {
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(2, 8);
-  return `VN${timestamp}${random.toUpperCase()}`;
+  const prefix = "VN";
+  const timestamp = Date.now().toString();
+  const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+  return `${prefix}${timestamp}${random}`;
+};
+
+// Format currency to Korean Won
+export const formatCurrency = (amount) => {
+  if (typeof amount !== 'number') {
+    return '₩0';
+  }
+  return new Intl.NumberFormat('ko-KR', {
+    style: 'currency',
+    currency: 'KRW'
+  }).format(amount);
 };
 
 // Calculate total price including base price and additional services

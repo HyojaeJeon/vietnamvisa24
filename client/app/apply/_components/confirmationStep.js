@@ -28,7 +28,7 @@ import {
   Copy,
 } from "lucide-react";
 
-import { formatCurrency } from "../../lib/utils";
+import { formatCurrency } from "./utils";
 
 const ConfirmationStep = ({ formData, applicationId }) => {
   const currentPrice = calculateTotalPrice(formData);
