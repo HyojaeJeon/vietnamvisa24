@@ -1,0 +1,62 @@
+Executing (default): DROP TABLE `visa_applications`;
+❌ Database Connection Error: Error
+    at Database.<anonymous> (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:185:27)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:50
+    at new Promise (<anonymous>)
+    at Query.run (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:12)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at async SQLiteQueryInterface.changeColumn (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query-interface.js:43:7)
+    at async VisaApplication.sync (/home/runner/workspace/server/node_modules/sequelize/lib/model.js:984:11)
+    at async Sequelize.sync (/home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:377:9)
+    at async connectDB (/home/runner/workspace/server/database.js:56:5)
+    at async startServer (/home/runner/workspace/server/index.js:47:3) {
+  name: 'SequelizeForeignKeyConstraintError',
+  parent: [Error: SQLITE_CONSTRAINT: FOREIGN KEY constraint failed] {
+    errno: 19,
+    code: 'SQLITE_CONSTRAINT',
+    sql: 'DROP TABLE `visa_applications`;'
+  },
+  original: [Error: SQLITE_CONSTRAINT: FOREIGN KEY constraint failed] {
+    errno: 19,
+    code: 'SQLITE_CONSTRAINT',
+    sql: 'DROP TABLE `visa_applications`;'
+  },
+  sql: 'DROP TABLE `visa_applications`;',
+  parameters: {},
+  table: undefined,
+  fields: undefined,
+  value: undefined,
+  index: undefined,
+  reltype: undefined
+}
+❌ Failed to start server: Error
+    at Database.<anonymous> (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:185:27)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:50
+    at new Promise (<anonymous>)
+    at Query.run (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query.js:183:12)
+    at /home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:315:28
+    at async SQLiteQueryInterface.changeColumn (/home/runner/workspace/server/node_modules/sequelize/lib/dialects/sqlite/query-interface.js:43:7)
+    at async VisaApplication.sync (/home/runner/workspace/server/node_modules/sequelize/lib/model.js:984:11)
+    at async Sequelize.sync (/home/runner/workspace/server/node_modules/sequelize/lib/sequelize.js:377:9)
+    at async connectDB (/home/runner/workspace/server/database.js:56:5)
+    at async startServer (/home/runner/workspace/server/index.js:47:3) {
+  name: 'SequelizeForeignKeyConstraintError',
+  parent: [Error: SQLITE_CONSTRAINT: FOREIGN KEY constraint failed] {
+    errno: 19,
+    code: 'SQLITE_CONSTRAINT',
+    sql: 'DROP TABLE `visa_applications`;'
+  },
+  original: [Error: SQLITE_CONSTRAINT: FOREIGN KEY constraint failed] {
+    errno: 19,
+    code: 'SQLITE_CONSTRAINT',
+    sql: 'DROP TABLE `visa_applications`;'
+  },
+  sql: 'DROP TABLE `visa_applications`;',
+  parameters: {},
+  table: undefined,
+  fields: undefined,
+  value: undefined,
+  index: undefined,
+  reltype: undefined
+}
+[nodemon] app crashed - waiting for file changes before starting...
