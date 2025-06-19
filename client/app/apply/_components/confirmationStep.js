@@ -37,408 +37,423 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         compress: true
       });
 
-      // 한글 지원을 위한 폰트 설정
-      doc.setFont("helvetica", "normal");
-    
-    // 브랜드 색상 정의 (더 생동감 있는 색상)
-    const primaryBlue = [67, 133, 245];
-    const accentOrange = [255, 99, 99];
-    const successGreen = [34, 197, 94];
-    const warningPurple = [168, 85, 247];
-    const darkText = [31, 41, 55];
-    const lightText = [107, 114, 128];
-    const bgLight = [249, 250, 251];
+      // 브랜드 색상 정의
+      const brandBlue = [67, 133, 245];      // 메인 블루
+      const lightBlue = [219, 234, 254];     // 연한 블루
+      const coral = [255, 127, 80];          // 코랄 (여행정보)
+      const purple = [147, 51, 234];         // 보라 (처리정보)
+      const teal = [20, 184, 166];           // 틸 (결제정보)
+      const slate = [71, 85, 105];           // 슬레이트 (고객지원)
+      const darkText = [31, 41, 55];
+      const lightText = [107, 114, 128];
+      const whiteText = [255, 255, 255];
 
-    // 페이지 설정
-    const margin = 12;
-    const pageWidth = 210;
-    const pageHeight = 297;
-    const contentWidth = pageWidth - (margin * 2);
-    let currentY = margin;
+      // 페이지 설정
+      const margin = 15;
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const contentWidth = pageWidth - (margin * 2);
+      let currentY = 0;
 
-    // === 모던 헤더 디자인 ===
-    // 메인 헤더 배경 (그라데이션 효과)
-    doc.setFillColor(...primaryBlue);
-    doc.rect(0, 0, pageWidth, 50, 'F');
-    
-    // 헤더 장식 요소
-    doc.setFillColor(255, 255, 255);
-    doc.setGlobalAlpha(0.1);
-    doc.circle(pageWidth - 20, 15, 25, 'F');
-    doc.circle(25, 35, 15, 'F');
-    doc.setGlobalAlpha(1);
-    
-    // 회사명 및 로고 영역
-    doc.setTextColor(255, 255, 255);
-    doc.setFontSize(28);
-    doc.setFont("helvetica", "bold");
-    doc.text("VIETNAM VISA 24", pageWidth / 2, 22, { align: 'center' });
-    
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "normal");
-    doc.text("Professional Visa Service", pageWidth / 2, 30, { align: 'center' });
-    
-    // 장식 라인
-    doc.setDrawColor(255, 255, 255);
-    doc.setLineWidth(1);
-    doc.line(pageWidth / 2 - 40, 35, pageWidth / 2 + 40, 35);
-    
-    doc.setFontSize(10);
-    doc.text("www.vietnamvisa24.com", pageWidth / 2, 42, { align: 'center' });
-    
-    currentY = 60;
-
-    // === 접수증 타이틀 ===
-    doc.setTextColor(...darkText);
-    doc.setFontSize(24);
-    doc.setFont("helvetica", "bold");
-    doc.text("비자 신청 접수증", pageWidth / 2, currentY, { align: 'center' });
-    
-    doc.setFontSize(14);
-    doc.setTextColor(...lightText);
-    doc.text("VISA APPLICATION RECEIPT", pageWidth / 2, currentY + 7, { align: 'center' });
-    
-    currentY += 20;
-
-    // === 접수 정보 박스 (고급스러운 디자인) ===
-    // 그림자 효과
-    doc.setFillColor(200, 200, 200);
-    doc.rect(margin + 1, currentY + 1, contentWidth, 20, 'F');
-    
-    // 메인 박스
-    doc.setFillColor(...bgLight);
-    doc.rect(margin, currentY, contentWidth, 20, 'F');
-    doc.setDrawColor(...primaryBlue);
-    doc.setLineWidth(2);
-    doc.rect(margin, currentY, contentWidth, 20, 'S');
-    
-    // 접수 정보 내용
-    doc.setTextColor(...darkText);
-    doc.setFontSize(11);
-    doc.setFont("helvetica", "bold");
-    doc.text(`접수일시: ${new Date().toLocaleDateString('ko-KR')} ${new Date().toLocaleTimeString('ko-KR')}`, margin + 8, currentY + 8);
-    
-    doc.setTextColor(...primaryBlue);
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text(`신청번호: ${applicationId}`, pageWidth - margin - 8, currentY + 8, { align: 'right' });
-    
-    doc.setTextColor(...lightText);
-    doc.setFontSize(9);
-    doc.text("Receipt Date & Time", margin + 8, currentY + 14);
-    doc.text("Application Number", pageWidth - margin - 8, currentY + 14, { align: 'right' });
-    
-    currentY += 30;
-
-    // === 섹션 그리기 함수 (한글 중심) ===
-    const drawKoreanSection = (koreanTitle, englishTitle, bgColor, data, startY) => {
-      let y = startY;
+      // === 메인 헤더 (그라데이션 배경) ===
+      // 블루 그라데이션 배경
+      doc.setFillColor(67, 133, 245);
+      doc.rect(0, 0, pageWidth, 55, 'F');
       
-      // 섹션 헤더 (라운드 코너 효과)
-      doc.setFillColor(...bgColor);
-      doc.roundedRect(margin, y, contentWidth, 14, 3, 3, 'F');
+      // 그라데이션 효과 시뮬레이션 (여러 레이어)
+      doc.setFillColor(59, 130, 246);
+      doc.rect(0, 0, pageWidth, 45, 'F');
       
-      // 헤더 텍스트
-      doc.setTextColor(255, 255, 255);
-      doc.setFontSize(13);
+      doc.setFillColor(79, 143, 255);
+      doc.rect(0, 0, pageWidth, 35, 'F');
+
+      // 헤더 장식 요소 (원형)
+      doc.setFillColor(255, 255, 255);
+      doc.setGlobalAlpha(0.1);
+      doc.circle(pageWidth - 15, 12, 20, 'F');
+      doc.circle(20, 40, 12, 'F');
+      doc.setGlobalAlpha(1);
+
+      // 회사 로고 및 브랜드명
+      doc.setTextColor(...whiteText);
+      doc.setFontSize(32);
       doc.setFont("helvetica", "bold");
-      doc.text(koreanTitle, margin + 8, y + 7);
+      doc.text("VIETNAM VISA 24", pageWidth / 2, 20, { align: 'center' });
       
-      doc.setFontSize(9);
+      doc.setFontSize(14);
       doc.setFont("helvetica", "normal");
-      doc.text(englishTitle, margin + 8, y + 11);
+      doc.text("Professional Visa Service", pageWidth / 2, 28, { align: 'center' });
       
-      y += 18;
+      // 장식 라인
+      doc.setDrawColor(...whiteText);
+      doc.setLineWidth(0.8);
+      doc.line(pageWidth / 2 - 45, 33, pageWidth / 2 + 45, 33);
       
-      // 데이터 영역 (카드 스타일)
-      const dataHeight = Math.ceil(data.length / 2) * 14 + 12;
-      
-      // 그림자
-      doc.setFillColor(230, 230, 230);
-      doc.roundedRect(margin + 1, y + 1, contentWidth, dataHeight, 2, 2, 'F');
-      
-      // 메인 카드
-      doc.setFillColor(255, 255, 255);
-      doc.roundedRect(margin, y, contentWidth, dataHeight, 2, 2, 'F');
-      doc.setDrawColor(220, 220, 220);
-      doc.setLineWidth(0.5);
-      doc.roundedRect(margin, y, contentWidth, dataHeight, 2, 2, 'S');
-      
-      // 데이터 내용 배치
-      const colWidth = contentWidth / 2;
-      let row = 0;
-      
-      data.forEach((item, index) => {
-        const col = index % 2;
-        if (col === 0 && index > 0) row++;
-        
-        const x = margin + 8 + (col * colWidth);
-        const yPos = y + 8 + (row * 14);
-        
-        // 한글 레이블 (강조)
-        doc.setTextColor(...darkText);
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "bold");
-        doc.text(item.korean, x, yPos);
-        
-        // 영문 레이블 (보조)
-        doc.setTextColor(...lightText);
-        doc.setFontSize(8);
-        doc.setFont("helvetica", "normal");
-        doc.text(item.english, x, yPos + 4);
-        
-        // 값
-        doc.setTextColor(...darkText);
-        doc.setFontSize(10);
-        doc.setFont("helvetica", "normal");
-        const valueX = x + 50;
-        doc.text(item.value, valueX, yPos + 2);
-      });
-      
-      return y + dataHeight + 8;
-    };
+      doc.setFontSize(11);
+      doc.text("www.vietnamvisa24.com", pageWidth / 2, 40, { align: 'center' });
+      doc.text("전문 베트남 비자 서비스 | Professional Vietnam Visa Solution", pageWidth / 2, 47, { align: 'center' });
 
-    // === 신청자 정보 ===
-    const applicantData = [
-      {
-        korean: "신청번호",
-        english: "Application No",
-        value: applicationId
-      },
-      {
-        korean: "비자유형",
-        english: "Visa Type",
-        value: formData.visaType || "E-VISA"
-      },
-      {
-        korean: "처리속도",
-        english: "Processing Speed",
-        value: formData.processingType === "fast" ? "긴급처리 (24시간)" : "일반처리 (2-3일)"
-      },
-      {
-        korean: "신청자명",
-        english: "Applicant Name",
-        value: `${formData.personalInfo?.firstName || ""} ${formData.personalInfo?.lastName || ""}`.trim()
-      },
-      {
-        korean: "국적",
-        english: "Nationality",
-        value: "대한민국 (Republic of Korea)"
-      },
-      {
-        korean: "이메일",
-        english: "Email Address",
-        value: formData.personalInfo?.email || ""
-      },
-      {
-        korean: "연락처",
-        english: "Phone Number",
-        value: formData.personalInfo?.phone || ""
-      },
-      {
-        korean: "비상연락처",
-        english: "Emergency Contact",
-        value: formData.personalInfo?.phoneOfFriend || "N/A"
-      }
-    ];
+      currentY = 65;
 
-    currentY = drawKoreanSection("신청자 정보", "APPLICANT INFORMATION", primaryBlue, applicantData, currentY);
-
-    // === 여행 정보 ===
-    const travelData = [
-      {
-        korean: "입국예정일",
-        english: "Entry Date",
-        value: formData.travelInfo?.entryDate || "미정"
-      },
-      {
-        korean: "입국항구",
-        english: "Entry Port",
-        value: formData.travelInfo?.entryPort || "다낭공항"
-      },
-      {
-        korean: "여행목적",
-        english: "Purpose of Visit",
-        value: "관광 (Tourism)"
-      },
-      {
-        korean: "체류기간",
-        english: "Duration of Stay",
-        value: "30일 (30 Days)"
-      }
-    ];
-
-    currentY = drawKoreanSection("여행 정보", "TRAVEL INFORMATION", accentOrange, travelData, currentY);
-
-    // === 처리 정보 ===
-    const processingData = [
-      {
-        korean: "처리유형",
-        english: "Processing Type",
-        value: formData.processingType === "fast" ? "긴급 서비스" : "일반 서비스"
-      },
-      {
-        korean: "완료예정시간",
-        english: "Expected Completion",
-        value: formData.processingType === "fast" ? "24시간 이내" : "2-3 영업일"
-      },
-      {
-        korean: "처리상태",
-        english: "Processing Status",
-        value: "접수완료 (Received)"
-      },
-      {
-        korean: "결제상태",
-        english: "Payment Status",
-        value: "결제대기 (Pending Payment)"
-      }
-    ];
-
-    currentY = drawKoreanSection("처리 정보", "PROCESSING INFORMATION", warningPurple, processingData, currentY);
-
-    // === 결제 정보 (특별 강조) ===
-    // 그림자
-    doc.setFillColor(200, 200, 200);
-    doc.roundedRect(margin + 2, currentY + 2, contentWidth, 25, 5, 5, 'F');
-    
-    // 메인 박스
-    doc.setFillColor(240, 253, 244);
-    doc.roundedRect(margin, currentY, contentWidth, 25, 5, 5, 'F');
-    doc.setDrawColor(...successGreen);
-    doc.setLineWidth(2);
-    doc.roundedRect(margin, currentY, contentWidth, 25, 5, 5, 'S');
-    
-    // 제목
-    doc.setTextColor(...successGreen);
-    doc.setFontSize(12);
-    doc.setFont("helvetica", "bold");
-    doc.text("결제 정보", margin + 8, currentY + 8);
-    doc.setFontSize(9);
-    doc.text("PAYMENT INFORMATION", margin + 8, currentY + 13);
-    
-    // 금액 (중앙 강조)
-    doc.setTextColor(...successGreen);
-    doc.setFontSize(18);
-    doc.setFont("helvetica", "bold");
-    doc.text("총 결제금액: ₩25,000", pageWidth / 2, currentY + 17, { align: 'center' });
-    
-    currentY += 35;
-
-    // === 고객지원 정보 (카드 스타일) ===
-    doc.setTextColor(...darkText);
-    doc.setFontSize(14);
-    doc.setFont("helvetica", "bold");
-    doc.text("고객 지원", margin, currentY);
-    doc.setFontSize(10);
-    doc.setTextColor(...lightText);
-    doc.text("CUSTOMER SUPPORT", margin, currentY + 6);
-    
-    currentY += 15;
-    
-    // 연락처 카드들
-    const contactWidth = (contentWidth - 8) / 3;
-    const contacts = [
-      {
-        korean: "전화 문의",
-        english: "Phone Support",
-        value: "1588-1234",
-        hours: "평일 09:00-18:00",
-        color: [59, 130, 246]
-      },
-      {
-        korean: "카카오톡",
-        english: "KakaoTalk",
-        value: "@vietnamvisa24",
-        hours: "24시간 상담",
-        color: [34, 197, 94]
-      },
-      {
-        korean: "이메일",
-        english: "Email Support",
-        value: "support@vietnamvisa24.com",
-        hours: "24시간 접수",
-        color: [168, 85, 247]
-      }
-    ];
-    
-    contacts.forEach((contact, index) => {
-      const x = margin + (index * (contactWidth + 4));
-      
-      // 카드 그림자
-      doc.setFillColor(230, 230, 230);
-      doc.roundedRect(x + 1, currentY + 1, contactWidth, 28, 3, 3, 'F');
-      
-      // 카드 배경
-      doc.setFillColor(255, 255, 255);
-      doc.roundedRect(x, currentY, contactWidth, 28, 3, 3, 'F');
-      doc.setDrawColor(...contact.color);
-      doc.setLineWidth(1.5);
-      doc.roundedRect(x, currentY, contactWidth, 28, 3, 3, 'S');
-      
-      // 아이콘 영역
-      doc.setFillColor(...contact.color);
-      doc.circle(x + contactWidth/2, currentY + 8, 3, 'F');
-      
-      // 텍스트
+      // === 메인 타이틀 ===
       doc.setTextColor(...darkText);
-      doc.setFontSize(9);
+      doc.setFontSize(26);
       doc.setFont("helvetica", "bold");
-      doc.text(contact.korean, x + contactWidth/2, currentY + 15, { align: 'center' });
+      doc.text("비자 신청 접수증", pageWidth / 2, currentY, { align: 'center' });
       
-      doc.setTextColor(...contact.color);
-      doc.setFontSize(8);
+      doc.setFontSize(16);
+      doc.setTextColor(...lightText);
+      doc.text("VISA APPLICATION RECEIPT", pageWidth / 2, currentY + 8, { align: 'center' });
+      
+      // 한글 부제목
+      doc.setFontSize(12);
+      doc.text("비자 신청이 정상 접수되었습니다", pageWidth / 2, currentY + 16, { align: 'center' });
+      
+      currentY += 28;
+
+      // === 접수 정보 박스 ===
+      // 그림자 효과
+      doc.setFillColor(220, 220, 220);
+      doc.roundedRect(margin + 1, currentY + 1, contentWidth, 18, 3, 3, 'F');
+      
+      // 메인 박스 (그라데이션 배경)
+      doc.setFillColor(249, 250, 251);
+      doc.roundedRect(margin, currentY, contentWidth, 18, 3, 3, 'F');
+      doc.setDrawColor(...brandBlue);
+      doc.setLineWidth(1.5);
+      doc.roundedRect(margin, currentY, contentWidth, 18, 3, 3, 'S');
+      
+      // 접수 정보
+      doc.setTextColor(...darkText);
+      doc.setFontSize(12);
       doc.setFont("helvetica", "bold");
-      doc.text(contact.value, x + contactWidth/2, currentY + 19, { align: 'center' });
+      const receiptDate = new Date().toLocaleDateString('ko-KR');
+      const receiptTime = new Date().toLocaleTimeString('ko-KR');
+      doc.text(`접수일시: ${receiptDate} ${receiptTime}`, margin + 8, currentY + 8);
+      
+      doc.setTextColor(...brandBlue);
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text(`신청번호: ${applicationId}`, pageWidth - margin - 8, currentY + 8, { align: 'right' });
       
       doc.setTextColor(...lightText);
-      doc.setFontSize(7);
+      doc.setFontSize(9);
+      doc.text("Receipt Date & Time", margin + 8, currentY + 13);
+      doc.text("Application Number", pageWidth - margin - 8, currentY + 13, { align: 'right' });
+      
+      currentY += 30;
+
+      // === 섹션 그리기 함수 ===
+      const drawSection = (koreanTitle, englishTitle, bgColor, data, startY) => {
+        let y = startY;
+        
+        // 섹션 헤더
+        doc.setFillColor(...bgColor);
+        doc.roundedRect(margin, y, contentWidth, 16, 4, 4, 'F');
+        
+        // 헤더 텍스트
+        doc.setTextColor(...whiteText);
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text(koreanTitle, margin + 10, y + 7);
+        
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.text(englishTitle, margin + 10, y + 12);
+        
+        y += 20;
+        
+        // 데이터 영역 계산
+        const rowHeight = 12;
+        const dataHeight = Math.ceil(data.length / 2) * rowHeight + 16;
+        
+        // 데이터 박스 그림자
+        doc.setFillColor(235, 235, 235);
+        doc.roundedRect(margin + 1, y + 1, contentWidth, dataHeight, 3, 3, 'F');
+        
+        // 메인 데이터 박스
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(margin, y, contentWidth, dataHeight, 3, 3, 'F');
+        doc.setDrawColor(230, 230, 230);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(margin, y, contentWidth, dataHeight, 3, 3, 'S');
+        
+        // 데이터 내용 배치 (2열)
+        const colWidth = contentWidth / 2;
+        let row = 0;
+        
+        data.forEach((item, index) => {
+          const col = index % 2;
+          if (col === 0 && index > 0) row++;
+          
+          const x = margin + 12 + (col * colWidth);
+          const yPos = y + 10 + (row * rowHeight);
+          
+          // 한글 레이블
+          doc.setTextColor(...darkText);
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "bold");
+          doc.text(item.korean, x, yPos);
+          
+          // 영문 레이블
+          doc.setTextColor(...lightText);
+          doc.setFontSize(8);
+          doc.setFont("helvetica", "normal");
+          doc.text(item.english, x, yPos + 4);
+          
+          // 값
+          doc.setTextColor(...darkText);
+          doc.setFontSize(10);
+          doc.setFont("helvetica", "normal");
+          const valueX = x + 55;
+          const displayValue = item.value || "정보 없음";
+          doc.text(displayValue, valueX, yPos + 2);
+        });
+        
+        return y + dataHeight + 12;
+      };
+
+      // === 신청자 정보 섹션 ===
+      const applicantData = [
+        {
+          korean: "신청번호",
+          english: "Application No.",
+          value: applicationId
+        },
+        {
+          korean: "비자유형",
+          english: "Visa Type",
+          value: formData.visaType || "E-VISA"
+        },
+        {
+          korean: "신청자명",
+          english: "Applicant Name",
+          value: `${formData.personalInfo?.firstName || ""} ${formData.personalInfo?.lastName || ""}`.trim()
+        },
+        {
+          korean: "여권번호",
+          english: "Passport Number",
+          value: formData.personalInfo?.passportNumber || "정보 없음"
+        },
+        {
+          korean: "국적",
+          english: "Nationality",
+          value: "대한민국 (Republic of Korea)"
+        },
+        {
+          korean: "생년월일",
+          english: "Date of Birth",
+          value: formData.personalInfo?.dateOfBirth || "정보 없음"
+        },
+        {
+          korean: "이메일",
+          english: "Email Address",
+          value: formData.personalInfo?.email || "정보 없음"
+        },
+        {
+          korean: "연락처",
+          english: "Phone Number",
+          value: formData.personalInfo?.phone || "정보 없음"
+        }
+      ];
+
+      currentY = drawSection("신청자 정보", "APPLICANT INFORMATION", brandBlue, applicantData, currentY);
+
+      // === 여행 정보 섹션 ===
+      const travelData = [
+        {
+          korean: "입국예정일",
+          english: "Entry Date",
+          value: formData.travelInfo?.entryDate || "미정"
+        },
+        {
+          korean: "입국항구",
+          english: "Entry Port",
+          value: formData.travelInfo?.entryPort || "하노이공항"
+        },
+        {
+          korean: "여행목적",
+          english: "Purpose of Visit",
+          value: "관광 (Tourism)"
+        },
+        {
+          korean: "체류기간",
+          english: "Duration of Stay",
+          value: "30일 (30 Days)"
+        }
+      ];
+
+      currentY = drawSection("여행 정보", "TRAVEL INFORMATION", coral, travelData, currentY);
+
+      // === 처리 정보 섹션 ===
+      const processingData = [
+        {
+          korean: "처리유형",
+          english: "Processing Type",
+          value: formData.processingType === "fast" ? "긴급 서비스 (Fast Service)" : "일반 서비스 (Standard)"
+        },
+        {
+          korean: "완료예정",
+          english: "Expected Completion",
+          value: formData.processingType === "fast" ? "24시간 이내" : "2-3 영업일"
+        },
+        {
+          korean: "처리상태",
+          english: "Processing Status",
+          value: "접수완료 (Received)"
+        },
+        {
+          korean: "결제상태",
+          english: "Payment Status",
+          value: "결제대기 (Pending Payment)"
+        }
+      ];
+
+      currentY = drawSection("처리 정보", "PROCESSING INFORMATION", purple, processingData, currentY);
+
+      // === 결제 정보 (특별 강조) ===
+      // 그림자
+      doc.setFillColor(210, 210, 210);
+      doc.roundedRect(margin + 2, currentY + 2, contentWidth, 28, 6, 6, 'F');
+      
+      // 메인 박스 (그라데이션 배경)
+      doc.setFillColor(240, 253, 250);
+      doc.roundedRect(margin, currentY, contentWidth, 28, 6, 6, 'F');
+      doc.setDrawColor(...teal);
+      doc.setLineWidth(2);
+      doc.roundedRect(margin, currentY, contentWidth, 28, 6, 6, 'S');
+      
+      // 제목
+      doc.setTextColor(...teal);
+      doc.setFontSize(14);
+      doc.setFont("helvetica", "bold");
+      doc.text("결제 정보", margin + 12, currentY + 10);
+      doc.setFontSize(10);
+      doc.text("PAYMENT INFORMATION", margin + 12, currentY + 16);
+      
+      // 금액 (중앙 강조)
+      doc.setTextColor(...teal);
+      doc.setFontSize(20);
+      doc.setFont("helvetica", "bold");
+      doc.text("총 결제금액: ₩25,000", pageWidth / 2, currentY + 20, { align: 'center' });
+      
+      currentY += 38;
+
+      // === 고객지원 정보 ===
+      doc.setTextColor(...darkText);
+      doc.setFontSize(16);
+      doc.setFont("helvetica", "bold");
+      doc.text("고객 지원", margin, currentY);
+      doc.setFontSize(11);
+      doc.setTextColor(...lightText);
+      doc.text("CUSTOMER SUPPORT", margin, currentY + 6);
+      
+      currentY += 18;
+      
+      // 연락처 카드들
+      const contactWidth = (contentWidth - 8) / 3;
+      const contacts = [
+        {
+          korean: "전화 문의",
+          english: "Phone",
+          value: "1588-1234",
+          hours: "평일 09:00-18:00",
+          color: [59, 130, 246]
+        },
+        {
+          korean: "카카오톡",
+          english: "KakaoTalk",
+          value: "@vietnamvisa24",
+          hours: "24시간 상담",
+          color: [34, 197, 94]
+        },
+        {
+          korean: "이메일",
+          english: "Email",
+          value: "support@vietnamvisa24.com",
+          hours: "24시간 접수",
+          color: [168, 85, 247]
+        }
+      ];
+      
+      contacts.forEach((contact, index) => {
+        const x = margin + (index * (contactWidth + 4));
+        
+        // 카드 그림자
+        doc.setFillColor(240, 240, 240);
+        doc.roundedRect(x + 1, currentY + 1, contactWidth, 32, 4, 4, 'F');
+        
+        // 카드 배경
+        doc.setFillColor(255, 255, 255);
+        doc.roundedRect(x, currentY, contactWidth, 32, 4, 4, 'F');
+        doc.setDrawColor(...contact.color);
+        doc.setLineWidth(1.2);
+        doc.roundedRect(x, currentY, contactWidth, 32, 4, 4, 'S');
+        
+        // 아이콘 영역
+        doc.setFillColor(...contact.color);
+        doc.circle(x + contactWidth/2, currentY + 10, 4, 'F');
+        
+        // 텍스트
+        doc.setTextColor(...darkText);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text(contact.korean, x + contactWidth/2, currentY + 18, { align: 'center' });
+        
+        doc.setTextColor(...contact.color);
+        doc.setFontSize(8);
+        doc.setFont("helvetica", "bold");
+        doc.text(contact.value, x + contactWidth/2, currentY + 22, { align: 'center' });
+        
+        doc.setTextColor(...lightText);
+        doc.setFontSize(7);
+        doc.setFont("helvetica", "normal");
+        doc.text(contact.hours, x + contactWidth/2, currentY + 27, { align: 'center' });
+      });
+      
+      currentY += 42;
+
+      // === 중요 안내사항 ===
+      doc.setFillColor(254, 242, 242);
+      doc.roundedRect(margin, currentY, contentWidth, 25, 4, 4, 'F');
+      doc.setDrawColor(248, 113, 113);
+      doc.setLineWidth(1);
+      doc.roundedRect(margin, currentY, contentWidth, 25, 4, 4, 'S');
+      
+      doc.setTextColor(185, 28, 28);
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("중요 안내사항", margin + 10, currentY + 8);
+      
+      doc.setTextColor(107, 114, 128);
+      doc.setFontSize(9);
       doc.setFont("helvetica", "normal");
-      doc.text(contact.hours, x + contactWidth/2, currentY + 23, { align: 'center' });
-    });
-    
-    currentY += 38;
+      const notices = [
+        "• 본 접수증은 공식 비자 승인서가 아닙니다. 승인서는 별도 발송됩니다.",
+        "• 처리 상황은 실시간으로 이메일과 SMS로 안내드립니다.",
+        "• 추가 서류 요청 시 지연 방지를 위해 즉시 제출해주세요."
+      ];
+      
+      notices.forEach((notice, index) => {
+        doc.text(notice, margin + 10, currentY + 14 + (index * 4));
+      });
+      
+      currentY += 35;
 
-    // === 중요 안내사항 ===
-    doc.setFillColor(254, 242, 242);
-    doc.roundedRect(margin, currentY, contentWidth, 20, 3, 3, 'F');
-    doc.setDrawColor(248, 113, 113);
-    doc.setLineWidth(1);
-    doc.roundedRect(margin, currentY, contentWidth, 20, 3, 3, 'S');
-    
-    doc.setTextColor(185, 28, 28);
-    doc.setFontSize(10);
-    doc.setFont("helvetica", "bold");
-    doc.text("중요 안내사항", margin + 8, currentY + 7);
-    
-    doc.setTextColor(107, 114, 128);
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    const notices = [
-      "• 본 접수증은 공식 비자 승인서가 아닙니다. 승인서는 별도 발송됩니다.",
-      "• 처리 상황은 실시간으로 이메일과 SMS로 안내드립니다.",
-      "• 추가 서류 요청 시 지연 방지를 위해 즉시 제출해주세요."
-    ];
-    
-    notices.forEach((notice, index) => {
-      doc.text(notice, margin + 8, currentY + 12 + (index * 3));
-    });
-    
-    currentY += 30;
+      // === 푸터 ===
+      doc.setDrawColor(229, 231, 235);
+      doc.setLineWidth(0.5);
+      doc.line(margin, currentY, pageWidth - margin, currentY);
+      
+      currentY += 10;
+      doc.setTextColor(...lightText);
+      doc.setFontSize(9);
+      doc.setFont("helvetica", "normal");
+      doc.text("Vietnam Visa 24 - 전문 베트남 비자 서비스", pageWidth / 2, currentY, { align: 'center' });
+      doc.text(`발급일시: ${new Date().toLocaleString('ko-KR')}`, pageWidth / 2, currentY + 5, { align: 'center' });
+      doc.text("이 문서는 자동으로 생성되었습니다. 향후 참조를 위해 안전하게 보관하세요.", pageWidth / 2, currentY + 10, { align: 'center' });
 
-    // === 푸터 ===
-    doc.setDrawColor(229, 231, 235);
-    doc.setLineWidth(0.5);
-    doc.line(margin, currentY, pageWidth - margin, currentY);
-    
-    currentY += 8;
-    doc.setTextColor(...lightText);
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "normal");
-    doc.text("Vietnam Visa 24 - 전문 비자 서비스", pageWidth / 2, currentY, { align: 'center' });
-    doc.text(`발급일시: ${new Date().toLocaleString('ko-KR')}`, pageWidth / 2, currentY + 5, { align: 'center' });
-    doc.text("이 문서는 자동으로 생성되었습니다. 향후 참조를 위해 안전하게 보관하세요.", pageWidth / 2, currentY + 10, { align: 'center' });
-
-    return doc;
+      return doc;
     } catch (error) {
       console.error('PDF 생성 중 오류 발생:', error);
       throw new Error('PDF 생성에 실패했습니다. 다시 시도해주세요.');
