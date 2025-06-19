@@ -404,8 +404,7 @@ export default function ApplyPageContent() {
 
   // Render current step component
   const renderStepComponent = () => {
-    // switch (currentStep) {
-    switch (5) {
+    switch (currentStep) {
       case 1:
         return (
           <ServiceSelectionStep
@@ -449,6 +448,7 @@ export default function ApplyPageContent() {
             onPrevious={handlePrevious}
             onEdit={handleEdit}
             isSubmitting={isSubmitting}
+            updateFormData={updateFormData}
           />
         );
       case 6:
