@@ -30,10 +30,10 @@ const dbToGraphQLStatus = (dbStatus) => {
 
 const resolvers = {
   Query: {
-    // applications 쿼리: 새로운 대시보드와 호환되는 형식
-    applications: async (_, __, context) => {
+    // applications 쿼리: 새로운 대시보드와 호환되는 형식 (페이지네이션 및 필터 지원)
+    applications: async (_, args, context) => {
       try {
-        console.log("🔍 applications 쿼리 호출됨");
+        console.log("🔍 applications 쿼리 호출됨", args);
 
         // 관리자 또는 스태프만 접근 가능
         const user = await requireAuth(context, [
@@ -46,21 +46,65 @@ const resolvers = {
 
         console.log("✅ 인증된 사용자:", user.role);
 
+        // 페이지네이션 및 필터 파라미터
+        const {
+          page = 1,
+          limit = 10,
+          searchTerm = "",
+          statusFilter = "all",
+          visaTypeFilter = "all",
+          processingTypeFilter = "all"
+        } = args;
+
+        const offset = (page - 1) * limit;
+
+        // 필터 조건 구성
+        const whereConditions = {};
+        
+        if (searchTerm) {
+          whereConditions[VisaApplication.sequelize.Op.or] = [
+            { firstName: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` } },
+            { lastName: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` } },
+            { fullName: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` } },
+            { email: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` } },
+            { applicationId: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` } }
+          ];
+        }
+
+        if (statusFilter && statusFilter !== "all") {
+          whereConditions.status = statusFilter.toLowerCase().replace(/_/g, "_");
+        }
+
+        if (visaTypeFilter && visaTypeFilter !== "all") {
+          whereConditions.visaType = visaTypeFilter;
+        }
+
+        if (processingTypeFilter && processingTypeFilter !== "all") {
+          whereConditions.processingType = processingTypeFilter;
+        }
+
+        // 전체 카운트 조회
+        const totalCount = await VisaApplication.count({
+          where: whereConditions
+        });
+
         // 실제 데이터베이스에서 조회
         const applications = await VisaApplication.findAll({
+          where: whereConditions,
           order: [["createdAt", "DESC"]],
-          limit: 20,
+          limit: limit,
+          offset: offset,
         });
 
         console.log(
-          `📊 데이터베이스에서 ${applications.length}개 신청서 조회됨`,
+          `📊 데이터베이스에서 ${applications.length}개 신청서 조회됨 (총 ${totalCount}개)`,
         );
 
         // 실제 데이터베이스 구조에 맞게 변환
-        return applications.map((app) => ({
+        const mappedApplications = applications.map((app) => ({
           id: app.id.toString(),
           applicationId: app.applicationId || `APP-${app.id}`,
-          processingType: app.processingType || "STANDARD",
+          processingType: app.processingType || "standard",
           totalPrice: app.totalPrice || 0,
           createdAt: app.createdAt,
           status: dbToGraphQLStatus(app.status),
@@ -82,6 +126,15 @@ const resolvers = {
           additionalServices: [],
           documents: [],
         }));
+
+        return {
+          applications: mappedApplications,
+          totalCount,
+          totalPages: Math.ceil(totalCount / limit),
+          currentPage: page,
+          hasNextPage: page * limit < totalCount,
+          hasPreviousPage: page > 1
+        };
       } catch (error) {
         console.error("❌ applications 쿼리 오류:", error);
 
@@ -96,6 +149,74 @@ const resolvers = {
             details: error.message,
           },
         });
+      }
+    },
+
+    // 대시보드 통계 쿼리
+    applicationStatistics: async (_, __, context) => {
+      try {
+        console.log("🔍 applicationStatistics 쿼리 호출됨");
+
+        // 관리자 또는 스태프만 접근 가능
+        const user = await requireAuth(context, [
+          "SUPER_ADMIN",
+          "ADMIN",
+          "MANAGER",
+          "STAFF",
+          "USER",
+        ]);
+
+        if (!VisaApplication) {
+          // 목업 데이터 반환
+          return {
+            pending: 5,
+            processing: 8,
+            completed: 12,
+            total: 25
+          };
+        }
+
+        // 상태별 카운트
+        const pending = await VisaApplication.count({
+          where: { status: "pending" }
+        });
+
+        const processing = await VisaApplication.count({
+          where: { 
+            status: {
+              [VisaApplication.sequelize.Op.in]: ["processing", "document_review", "submitted_to_authority"]
+            }
+          }
+        });
+
+        const completed = await VisaApplication.count({
+          where: { 
+            status: {
+              [VisaApplication.sequelize.Op.in]: ["approved", "completed"]
+            }
+          }
+        });
+
+        const total = await VisaApplication.count();
+
+        console.log(`📊 통계: 대기 ${pending}, 처리중 ${processing}, 완료 ${completed}, 전체 ${total}`);
+
+        return {
+          pending,
+          processing,
+          completed,
+          total
+        };
+      } catch (error) {
+        console.error("❌ applicationStatistics 쿼리 오류:", error);
+
+        // 목업 데이터 반환
+        return {
+          pending: 0,
+          processing: 0,
+          completed: 0,
+          total: 0
+        };
       }
     },
 

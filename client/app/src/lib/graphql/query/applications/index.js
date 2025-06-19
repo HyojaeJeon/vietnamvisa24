@@ -9,6 +9,7 @@ export const GET_APPLICATION = gql`
       processingType
       totalPrice
       createdAt
+      status
       personalInfo {
         id
         firstName
@@ -35,81 +36,81 @@ export const GET_APPLICATION = gql`
         fileSize
         fileType
         uploadedAt
-        extractedInfo {
-          type
-          issuingCountry
-          passportNo
-          surname
-          givenNames
-          dateOfBirth
-          dateOfIssue
-          dateOfExpiry
-          sex
-          nationality
-          personalNo
-          authority
-          koreanName
-          passportNo
-          givenNames
-          dateOfBirth
-          dateOfIssue
-          dateOfExpiry
-          personalNo
-          koreanName
-        }
+        extractedInfo
       }
     }
   }
 `;
 
-// 신청서 전체 목록 조회
 export const GET_APPLICATIONS = gql`
-  query GetApplications {
-    applications {
-      id
-      applicationId
-      processingType
-      totalPrice
-      createdAt
-      personalInfo {
+  query GetApplications(
+    $page: Int
+    $limit: Int
+    $searchTerm: String
+    $statusFilter: String
+    $visaTypeFilter: String
+    $processingTypeFilter: String
+  ) {
+    applications(
+      page: $page
+      limit: $limit
+      searchTerm: $searchTerm
+      statusFilter: $statusFilter
+      visaTypeFilter: $visaTypeFilter
+      processingTypeFilter: $processingTypeFilter
+    ) {
+      applications {
         id
-        firstName
-        lastName
-        email
-        phone
-        address
-        phoneOfFriend
-      }
-      travelInfo {
-        id
-        entryDate
-        entryPort
-        visaType
-      }
-      additionalServices {
-        id
-        name
-      }
-      documents {
-        id
-        type
-        fileName
-        fileSize
-        fileType
-        uploadedAt
-        extractedInfo {
-          passportNo
-          surname
-          givenNames
-          dateOfBirth
-          nationality
-          koreanName
-          passportNo
-          givenNames
-          dateOfBirth
-          koreanName
+        applicationId
+        processingType
+        totalPrice
+        createdAt
+        status
+        personalInfo {
+          id
+          firstName
+          lastName
+          email
+          phone
+          address
+          phoneOfFriend
+        }
+        travelInfo {
+          id
+          entryDate
+          entryPort
+          visaType
+        }
+        additionalServices {
+          id
+          name
+        }
+        documents {
+          id
+          type
+          fileName
+          fileSize
+          fileType
+          uploadedAt
+          extractedInfo
         }
       }
+      totalCount
+      totalPages
+      currentPage
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+`;
+
+export const GET_APPLICATION_STATISTICS = gql`
+  query GetApplicationStatistics {
+    applicationStatistics {
+      pending
+      processing
+      completed
+      total
     }
   }
 `;

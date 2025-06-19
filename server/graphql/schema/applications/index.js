@@ -66,9 +66,33 @@ const typeDefs = gql`
     name: String
   }
 
+  type ApplicationsResponse {
+    applications: [Application]!
+    totalCount: Int!
+    totalPages: Int!
+    currentPage: Int!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+  }
+
+  type ApplicationStatistics {
+    pending: Int!
+    processing: Int!
+    completed: Int!
+    total: Int!
+  }
+
   type Query {
     application(id: ID): Application
-    applications: [Application]
+    applications(
+      page: Int
+      limit: Int
+      searchTerm: String
+      statusFilter: String
+      visaTypeFilter: String
+      processingTypeFilter: String
+    ): ApplicationsResponse
+    applicationStatistics: ApplicationStatistics
     documents(applicationId: ID): [Document]
     services: [AdditionalService]
   }
