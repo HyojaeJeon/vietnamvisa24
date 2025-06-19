@@ -487,6 +487,3 @@ export default function ApplyPageContent() {
     </div>
   );
 }
-```
-
-The code was modified to correct the switch statement in the `renderStepComponent` function in `ApplyPageContent.js`.
