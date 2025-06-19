@@ -29,6 +29,7 @@ import {
   Plane,
   Clock,
   Shield,
+  X,
 } from "lucide-react";
 import { formatCurrency, calculateTotalPrice } from "./utils";
 import { VISA_TYPES, PROCESSING_TYPES } from "./types";

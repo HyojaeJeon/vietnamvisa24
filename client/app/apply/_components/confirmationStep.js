@@ -347,7 +347,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                           입국 공항
                         </p>
                         <p className="font-semibold text-sm md:text-base">
-                          {getEntryPortLabel(formData.travelInfo?.entryPort)}
+                          {getEntryPortLabel(formData.travelInfo?.entryPort)} ({formData.travelInfo?.entryPort})
                         </p>
                       </div>
                     </div>
@@ -355,10 +355,15 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                       <Globe className="w-4 h-4 md:w-5 md:h-5 text-indigo-500 flex-shrink-0" />
                       <div className="min-w-0 flex-1">
                         <p className="text-xs md:text-sm text-gray-500">
-                          비자 유형
+                          비자 유형 및 처리 속도
                         </p>
                         <p className="font-semibold text-sm md:text-base">
                           {getVisaTypeInfo().name}
+                        </p>
+                        <p className="text-xs text-gray-600">
+                          {formData.processingType === "fast" 
+                            ? "긴급 처리 (24시간 이내)" 
+                            : "일반 처리 (2-3 영업일)"}
                         </p>
                       </div>
                     </div>
@@ -368,8 +373,39 @@ const ConfirmationStep = ({ formData, applicationId }) => {
             </Card>
           </div>
 
-          {/* 사이드바 - 결제 정보 및 다운로드 */}
+          {/* 사이드바 - 추가 서비스, 결제 정보 및 다운로드 */}
           <div className="space-y-4 md:space-y-6">
+            {/* 추가 부가서비스 카드 */}
+            <Card className="shadow-lg border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50">
+              <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
+                <CardTitle className="flex items-center gap-2 md:gap-3 text-lg md:text-xl text-orange-700">
+                  <Building className="w-5 h-5 md:w-6 md:h-6" />
+                  추가 부가서비스
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2 md:space-y-3 p-4 md:p-6 pt-0">
+                {formData.additionalServices && formData.additionalServices.length > 0 ? (
+                  formData.additionalServices.map((serviceId, index) => (
+                    <div key={index} className="flex items-center gap-2 p-2 bg-white rounded-lg border">
+                      <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0"></div>
+                      <span className="text-sm font-medium text-gray-700">
+                        {serviceId === 'airport_pickup' && '공항 픽업 서비스'}
+                        {serviceId === 'fast_track' && '공항 패스트트랙'}
+                        {serviceId === 'car_rental' && '렌터카 서비스'}
+                        {serviceId === 'hotel_booking' && '호텔 예약'}
+                        {serviceId === 'tour_guide' && '관광 가이드'}
+                        {serviceId === 'translation' && '번역 서비스'}
+                      </span>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-3">
+                    <p className="text-sm text-gray-500">선택 안함</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             {/* 결제 정보 카드 */}
             <Card className="shadow-lg border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
               <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
@@ -430,36 +466,12 @@ const ConfirmationStep = ({ formData, applicationId }) => {
               </CardContent>
             </Card>
 
-            {/* 공유 및 추가 액션 */}
-            <Card className="shadow-lg border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50">
-              <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
-                <CardTitle className="flex items-center gap-2 md:gap-3 text-lg md:text-xl text-purple-700">
-                  <Share2 className="w-5 h-5 md:w-6 md:h-6" />
-                  공유 및 지원
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 p-4 md:p-6 pt-0">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-gray-700 border-gray-300 hover:bg-gray-50 py-2 text-sm md:text-base"
-                >
-                  <Copy className="w-4 h-4 mr-2" />
-                  신청번호 복사
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-gray-700 border-gray-300 hover:bg-gray-50 py-2 text-sm md:text-base"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2" />
-                  고객지원 문의
-                </Button>
-              </CardContent>
-            </Card>
+            
           </div>
         </div>
 
         {/* 다음 단계 안내 */}
-        <Card className="mt-4 md:mt-8 shadow-lg border-2 border-gray-200 bg-white/90 backdrop-blur-sm">
+        <Card className="mt-4 md:mt-8 mb-4 md:mb-8 shadow-lg border-2 border-gray-200 bg-white/90 backdrop-blur-sm">
           <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-t-lg p-4 md:p-6">
             <CardTitle className="flex items-center gap-2 md:gap-3 text-lg md:text-2xl text-gray-700">
               <Clock className="w-6 h-6 md:w-8 md:h-8" />
