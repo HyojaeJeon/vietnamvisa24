@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useRef } from "react";
@@ -233,7 +234,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="space-y-8">
       {/* 숨겨진 접수증 컴포넌트 */}
       <div
         ref={receiptRef}
@@ -926,135 +927,155 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         </div>
       </div>
 
-      {/* 성공 메시지 */}
-      <Card className="border-green-200 bg-green-50">
+      {/* 메인 컨텐츠 */}
+      <Card className="border-0 bg-gradient-to-r from-green-50 to-blue-50 shadow-lg">
         <CardContent className="p-8 text-center">
           <div className="flex justify-center mb-6">
-            <CheckCircle className="w-20 h-20 text-green-600" />
+            <div className="relative">
+              <CheckCircle className="w-24 h-24 text-green-600" />
+              <div className="absolute -top-2 -right-2 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-white" />
+              </div>
+            </div>
           </div>
-          <h1 className="mb-4 text-3xl font-bold text-green-800">
+          <h1 className="mb-4 text-4xl font-bold bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
             신청이 완료되었습니다!
           </h1>
-          <p className="mb-6 text-lg text-green-700">
+          <p className="mb-6 text-xl text-gray-700">
             베트남 비자 신청이 성공적으로 접수되었습니다.
           </p>
-          <div className="p-4 bg-white rounded-lg shadow-sm">
-            <p className="text-sm text-gray-600">신청번호</p>
-            <p className="text-2xl font-bold text-blue-600">{applicationId}</p>
+          <div className="bg-white p-6 rounded-xl shadow-sm border-2 border-blue-100">
+            <p className="text-sm text-gray-600 mb-2">신청번호</p>
+            <p className="text-3xl font-bold text-blue-600 tracking-wider">
+              {applicationId}
+            </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* 신청 정보 요약 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="w-5 h-5" />
-            신청 정보 요약
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* 개인 정보 */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                <User className="w-5 h-5" />
-                개인 정보
-              </h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">신청자:</span>
-                  <span className="font-medium">
-                    {formData.personalInfo?.firstName}{" "}
-                    {formData.personalInfo?.lastName}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">이메일:</span>
-                  <span className="font-medium">
-                    {formData.personalInfo?.email}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">연락처:</span>
-                  <span className="font-medium">
-                    {formData.personalInfo?.phone}
-                  </span>
-                </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* 신청 정보 요약 */}
+        <Card className="border-2 border-blue-100 hover:border-blue-200 transition-colors">
+          <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50">
+            <CardTitle className="flex items-center gap-3 text-blue-700">
+              <User className="w-6 h-6" />
+              신청자 정보
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 space-y-4">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-600 font-medium">신청자명</span>
+                <span className="font-semibold text-gray-900">
+                  {formData.personalInfo?.firstName}{" "}
+                  {formData.personalInfo?.lastName}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-600 font-medium">이메일</span>
+                <span className="font-semibold text-gray-900">
+                  {formData.personalInfo?.email}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-600 font-medium">연락처</span>
+                <span className="font-semibold text-gray-900">
+                  {formData.personalInfo?.phone}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="text-gray-600 font-medium">주소</span>
+                <span className="font-semibold text-gray-900 text-right">
+                  {formData.personalInfo?.address || "정보 없음"}
+                </span>
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            {/* 비자 정보 */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                <Globe className="w-5 h-5" />
-                비자 정보
-              </h3>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">비자 유형:</span>
-                  <span className="font-medium">{formData.visaType}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">처리 속도:</span>
-                  <span className="font-medium">
-                    {formData.processingType === "fast"
-                      ? "긴급 처리"
-                      : "일반 처리"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">입국 예정일:</span>
-                  <span className="font-medium">
-                    {formData.travelInfo?.entryDate}
-                  </span>
-                </div>
+        {/* 비자 정보 */}
+        <Card className="border-2 border-green-100 hover:border-green-200 transition-colors">
+          <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50">
+            <CardTitle className="flex items-center gap-3 text-green-700">
+              <Globe className="w-6 h-6" />
+              비자 정보
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-6 space-y-4">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-600 font-medium">비자 유형</span>
+                <span className="font-semibold text-gray-900">
+                  {formData.visaType}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-600 font-medium">처리 속도</span>
+                <span className="font-semibold text-gray-900">
+                  {formData.processingType === "fast"
+                    ? "긴급 처리"
+                    : "일반 처리"}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-600 font-medium">입국 예정일</span>
+                <span className="font-semibold text-gray-900">
+                  {formData.travelInfo?.entryDate}
+                </span>
+              </div>
+              <div className="flex justify-between items-center py-2">
+                <span className="text-gray-600 font-medium">완료 예정</span>
+                <span className="font-semibold text-green-600">
+                  {formData.processingType === "fast"
+                    ? "24시간 이내"
+                    : "2-3 영업일"}
+                </span>
               </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* 다음 단계 안내 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            다음 단계
+      <Card className="border-2 border-purple-100 hover:border-purple-200 transition-colors">
+        <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+          <CardTitle className="flex items-center gap-3 text-purple-700">
+            <Clock className="w-6 h-6" />
+            다음 단계 안내
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        <CardContent className="p-6">
+          <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-blue-600 font-bold">1</span>
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                <span className="text-white font-bold text-lg">1</span>
               </div>
-              <div>
-                <h4 className="font-semibold">서류 검토 (1-2시간 내)</h4>
-                <p className="text-gray-600">
+              <div className="flex-1">
+                <h4 className="font-bold text-gray-900 mb-2">서류 검토 (1-2시간 내)</h4>
+                <p className="text-gray-600 leading-relaxed">
                   제출해주신 서류를 검토하고 추가 서류가 필요한 경우
                   연락드립니다.
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-blue-600 font-bold">2</span>
+              <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                <span className="text-white font-bold text-lg">2</span>
               </div>
-              <div>
-                <h4 className="font-semibold">비자 신청 제출</h4>
-                <p className="text-gray-600">
+              <div className="flex-1">
+                <h4 className="font-bold text-gray-900 mb-2">비자 신청 제출</h4>
+                <p className="text-gray-600 leading-relaxed">
                   베트남 이민청에 정식으로 비자 신청을 제출합니다.
                 </p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-green-600 font-bold">3</span>
+              <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg">
+                <span className="text-white font-bold text-lg">3</span>
               </div>
-              <div>
-                <h4 className="font-semibold">비자 승인 및 발급</h4>
-                <p className="text-gray-600">
+              <div className="flex-1">
+                <h4 className="font-bold text-gray-900 mb-2">비자 승인 및 발급</h4>
+                <p className="text-gray-600 leading-relaxed">
                   {formData.processingType === "fast"
                     ? "24시간 내에 승인 결과를 받아 즉시 전달드립니다."
                     : "2-3일 내에 승인 결과를 받아 즉시 전달드립니다."}
@@ -1066,62 +1087,69 @@ const ConfirmationStep = ({ formData, applicationId }) => {
       </Card>
 
       {/* 접수증 다운로드 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Download className="w-5 h-5" />
+      <Card className="border-2 border-orange-100 hover:border-orange-200 transition-colors">
+        <CardHeader className="bg-gradient-to-r from-orange-50 to-red-50">
+          <CardTitle className="flex items-center gap-3 text-orange-700">
+            <Download className="w-6 h-6" />
             접수증 다운로드
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <Button
               onClick={handleDownloadPDF}
               disabled={isDownloading}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg"
+              size="lg"
             >
-              <Download className="w-4 h-4" />
+              <Download className="w-5 h-5" />
               {isDownloading ? "생성 중..." : "PDF 다운로드"}
             </Button>
             <Button
               onClick={handleSendEmail}
               disabled={isSendingEmail || !formData.personalInfo?.email}
               variant="outline"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 border-2 border-blue-200 hover:border-blue-300 text-blue-700 hover:text-blue-800"
+              size="lg"
             >
-              <Mail className="w-4 h-4" />
+              <Mail className="w-5 h-5" />
               {isSendingEmail ? "발송 중..." : "이메일로 발송"}
             </Button>
           </div>
-          <p className="mt-2 text-sm text-gray-600">
-            접수증을 안전한 곳에 보관해주세요. 문의 시 신청번호가 필요합니다.
-          </p>
+          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-700 font-medium">
+              💡 접수증을 안전한 곳에 보관해주세요. 문의 시 신청번호가 필요합니다.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
       {/* 고객 지원 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>고객 지원</CardTitle>
+      <Card className="border-2 border-indigo-100 hover:border-indigo-200 transition-colors">
+        <CardHeader className="bg-gradient-to-r from-indigo-50 to-blue-50">
+          <CardTitle className="flex items-center gap-3 text-indigo-700">
+            <MessageCircle className="w-6 h-6" />
+            고객 지원 센터
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 text-center bg-blue-50 rounded-xl">
-              <Phone className="w-8 h-8 mx-auto mb-3 text-blue-600" />
-              <h4 className="mb-2 font-bold text-gray-800">전화 문의</h4>
-              <p className="text-lg font-bold text-blue-600">1588-1234</p>
+            <div className="p-6 text-center bg-gradient-to-br from-red-50 to-pink-50 rounded-xl border-2 border-red-100 hover:border-red-200 transition-colors">
+              <Phone className="w-10 h-10 mx-auto mb-4 text-red-600" />
+              <h4 className="mb-3 font-bold text-gray-900 text-lg">전화 문의</h4>
+              <p className="text-2xl font-bold text-red-600 mb-2">1588-1234</p>
               <p className="text-sm text-gray-600">평일 09:00-18:00</p>
             </div>
-            <div className="p-6 text-center bg-green-50 rounded-xl">
-              <MessageCircle className="w-8 h-8 mx-auto mb-3 text-green-600" />
-              <h4 className="mb-2 font-bold text-gray-800">카카오톡</h4>
-              <p className="text-lg font-bold text-green-600">@vietnamvisa24</p>
+            <div className="p-6 text-center bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-100 hover:border-green-200 transition-colors">
+              <MessageCircle className="w-10 h-10 mx-auto mb-4 text-green-600" />
+              <h4 className="mb-3 font-bold text-gray-900 text-lg">카카오톡</h4>
+              <p className="text-xl font-bold text-green-600 mb-2">@vietnamvisa24</p>
               <p className="text-sm text-gray-600">24시간 상담</p>
             </div>
-            <div className="p-6 text-center bg-purple-50 rounded-xl">
-              <Mail className="w-8 h-8 mx-auto mb-3 text-purple-600" />
-              <h4 className="mb-2 font-bold text-gray-800">이메일</h4>
-              <p className="text-lg font-bold text-purple-600">
+            <div className="p-6 text-center bg-gradient-to-br from-purple-50 to-indigo-50 rounded-xl border-2 border-purple-100 hover:border-purple-200 transition-colors">
+              <Mail className="w-10 h-10 mx-auto mb-4 text-purple-600" />
+              <h4 className="mb-3 font-bold text-gray-900 text-lg">이메일</h4>
+              <p className="text-lg font-bold text-purple-600 mb-2">
                 support@vietnamvisa24.com
               </p>
               <p className="text-sm text-gray-600">24시간 접수</p>
