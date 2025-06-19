@@ -170,7 +170,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
             <RadioGroup
               value={formData.visaType || ""}
               onValueChange={handleVisaTypeChange}
-              className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3"
+              className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4"
             >
               {visaTypeOptions.map((visa) => {
                 const IconComponent = visa.icon;
@@ -186,7 +186,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
                     <Label
                       htmlFor={visa.id}
                       className={`
-                        relative block p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl border-2 cursor-pointer transition-all duration-300 
+                        relative block p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-300 
                         ${
                           isSelected
                             ? "border-blue-500 bg-blue-50 shadow-lg ring-2 ring-blue-200"
@@ -195,42 +195,42 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
                       `}
                     >
                       {visa.recommended && (
-                        <div className="absolute -top-1 sm:-top-2 left-2 sm:left-4">
-                          <span className="inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 text-xs font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-full">
-                            <Star className="w-2 h-2 sm:w-3 sm:h-3 mr-1" />
+                        <div className="absolute -top-1 left-1 sm:left-2">
+                          <span className="inline-flex items-center px-1 sm:px-2 py-0.5 text-xs font-semibold text-white bg-gradient-to-r from-orange-500 to-red-500 rounded-full">
+                            <Star className="w-2 h-2 mr-0.5" />
                             추천
                           </span>
                         </div>
                       )}
 
-                      <div className="flex flex-col items-center text-center space-y-2 sm:space-y-3">
+                      <div className="flex flex-col items-center text-center space-y-1 sm:space-y-2">
                         <div
                           className={`
-                          flex items-center justify-center w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-xl sm:rounded-2xl transition-colors
+                          flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl transition-colors
                           ${isSelected ? `bg-gradient-to-r ${visa.gradient} text-white` : "bg-gray-100 text-gray-600"}
                         `}
                         >
-                          <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8" />
+                          <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                         </div>
 
                         <div>
-                          <h5 className="text-sm sm:text-base md:text-lg font-bold text-gray-800 mb-0.5 sm:mb-1">
+                          <h5 className="text-xs sm:text-sm md:text-base font-bold text-gray-800 mb-0.5">
                             {visa.title}
                           </h5>
-                          <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-semibold text-blue-600">
+                          <p className="mb-1 text-xs sm:text-sm font-semibold text-blue-600">
                             {visa.subtitle}
                           </p>
-                          <p className="mb-2 sm:mb-3 text-xs sm:text-sm text-gray-600">
+                          <p className="mb-1 text-xs text-gray-600 hidden sm:block">
                             {visa.description}
                           </p>
 
-                          <div className="space-y-0.5 sm:space-y-1">
+                          <div className="space-y-0.5 hidden md:block">
                             {visa.features.map((feature, index) => (
                               <div
                                 key={index}
                                 className="flex items-center justify-center gap-1 text-xs text-gray-500"
                               >
-                                <CheckCircle className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-green-500" />
+                                <CheckCircle className="w-2 h-2 text-green-500" />
                                 <span className="text-xs">{feature}</span>
                               </div>
                             ))}
@@ -259,7 +259,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
               <RadioGroup
                 value={formData.visaDurationType || ""}
                 onValueChange={handleVisaDurationChange}
-                className="grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2"
+                className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4"
               >
                 <div className="relative">
                   <RadioGroupItem
@@ -270,7 +270,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
                   <Label
                     htmlFor="single_90"
                     className={`
-                      relative block p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl border-2 cursor-pointer transition-all duration-300
+                      relative block p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-300
                       ${
                         formData.visaDurationType === "single_90"
                           ? "border-green-500 bg-green-50 shadow-lg ring-2 ring-green-200"
@@ -311,7 +311,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
                   <Label
                     htmlFor="multiple_90"
                     className={`
-                      relative block p-3 sm:p-4 md:p-6 rounded-xl sm:rounded-2xl border-2 cursor-pointer transition-all duration-300
+                      relative block p-2 sm:p-3 md:p-4 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-300
                       ${
                         formData.visaDurationType === "multiple_90"
                           ? "border-blue-500 bg-blue-50 shadow-lg ring-2 ring-blue-200"
@@ -367,7 +367,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
               <RadioGroup
                 value={formData.processingType || ""}
                 onValueChange={handleProcessingTypeChange}
-                className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 sm:grid-cols-3 lg:grid-cols-3"
+                className="grid grid-cols-3 gap-2 sm:gap-3 md:gap-4"
               >
                 {urgentProcessingOptions.map((processing) => {
                   const IconComponent = processing.icon;
@@ -383,7 +383,7 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
                       <Label
                         htmlFor={processing.id}
                         className={`
-                          relative block p-2 sm:p-3 md:p-4 lg:p-6 rounded-lg sm:rounded-xl md:rounded-2xl border-2 cursor-pointer transition-all duration-300
+                          relative block p-1 sm:p-2 md:p-3 rounded-lg sm:rounded-xl border-2 cursor-pointer transition-all duration-300
                           ${
                             isSelected
                               ? "border-purple-500 bg-purple-50 shadow-lg ring-2 ring-purple-200"
@@ -391,24 +391,24 @@ const ServiceSelectionStep = ({ formData, onUpdate, onNext }) => {
                           }
                         `}
                       >
-                        <div className="flex flex-col items-center text-center space-y-1 sm:space-y-2 md:space-y-3">
+                        <div className="flex flex-col items-center text-center space-y-1 sm:space-y-2">
                           <div
                             className={`
-                            flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-lg sm:rounded-xl transition-colors
+                            flex items-center justify-center w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 rounded-lg transition-colors
                             ${isSelected ? `bg-gradient-to-r ${processing.gradient} text-white` : "bg-gray-100 text-gray-600"}
                           `}
                           >
-                            <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                            <IconComponent className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5" />
                           </div>
 
                           <div>
-                            <h5 className="mb-0.5 sm:mb-1 text-xs sm:text-sm md:text-base lg:text-lg font-bold text-gray-800">
+                            <h5 className="mb-0.5 text-xs sm:text-sm md:text-base font-bold text-gray-800">
                               {processing.title}
                             </h5>
-                            <p className="mb-1 sm:mb-2 text-xs sm:text-sm font-semibold text-purple-600">
+                            <p className="mb-1 text-xs sm:text-sm font-semibold text-purple-600">
                               {processing.subtitle}
                             </p>
-                            <p className="mb-1 sm:mb-2 text-xs sm:text-sm text-gray-600">
+                            <p className="mb-1 text-xs text-gray-600 hidden sm:block">
                               {processing.description}
                             </p>
                             <p className="text-xs font-semibold text-gray-500">
