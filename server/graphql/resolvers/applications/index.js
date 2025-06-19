@@ -35,16 +35,16 @@ const resolvers = {
       try {
         console.log("🔍 applications 쿼리 호출됨", args);
 
-        // 관리자 또는 스태프만 접근 가능
-        const user = await requireAuth(context, [
-          "SUPER_ADMIN",
-          "ADMIN",
-          "MANAGER",
-          "STAFF",
-          "USER",
-        ]);
+        // // 관리자 또는 스태프만 접근 가능
+        // const user = await requireAuth(context, [
+        //   "SUPER_ADMIN",
+        //   "ADMIN",
+        //   "MANAGER",
+        //   "STAFF",
+        //   "USER",
+        // ]);
 
-        console.log("✅ 인증된 사용자:", user.role);
+        // console.log("✅ 인증된 사용자:", user.role);
 
         // 페이지네이션 및 필터 파라미터
         const {
@@ -53,26 +53,46 @@ const resolvers = {
           searchTerm = "",
           statusFilter = "all",
           visaTypeFilter = "all",
-          processingTypeFilter = "all"
+          processingTypeFilter = "all",
         } = args;
 
         const offset = (page - 1) * limit;
 
         // 필터 조건 구성
         const whereConditions = {};
-        
+
         if (searchTerm) {
           whereConditions[VisaApplication.sequelize.Op.or] = [
-            { firstName: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` } },
-            { lastName: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` } },
-            { fullName: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` } },
-            { email: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` } },
-            { applicationId: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` } }
+            {
+              firstName: {
+                [VisaApplication.sequelize.Op.like]: `%${searchTerm}%`,
+              },
+            },
+            {
+              lastName: {
+                [VisaApplication.sequelize.Op.like]: `%${searchTerm}%`,
+              },
+            },
+            {
+              fullName: {
+                [VisaApplication.sequelize.Op.like]: `%${searchTerm}%`,
+              },
+            },
+            {
+              email: { [VisaApplication.sequelize.Op.like]: `%${searchTerm}%` },
+            },
+            {
+              applicationId: {
+                [VisaApplication.sequelize.Op.like]: `%${searchTerm}%`,
+              },
+            },
           ];
         }
 
         if (statusFilter && statusFilter !== "all") {
-          whereConditions.status = statusFilter.toLowerCase().replace(/_/g, "_");
+          whereConditions.status = statusFilter
+            .toLowerCase()
+            .replace(/_/g, "_");
         }
 
         if (visaTypeFilter && visaTypeFilter !== "all") {
@@ -85,7 +105,7 @@ const resolvers = {
 
         // 전체 카운트 조회
         const totalCount = await VisaApplication.count({
-          where: whereConditions
+          where: whereConditions,
         });
 
         // 실제 데이터베이스에서 조회
@@ -134,7 +154,7 @@ const resolvers = {
           totalPages: Math.ceil(totalCount / limit),
           currentPage: page,
           hasNextPage: page * limit < totalCount,
-          hasPreviousPage: page > 1
+          hasPreviousPage: page > 1,
         };
       } catch (error) {
         console.error("❌ applications 쿼리 오류:", error);
@@ -159,13 +179,13 @@ const resolvers = {
         console.log("🔍 applicationStatistics 쿼리 호출됨");
 
         // 관리자 또는 스태프만 접근 가능
-        const user = await requireAuth(context, [
-          "SUPER_ADMIN",
-          "ADMIN",
-          "MANAGER",
-          "STAFF",
-          "USER",
-        ]);
+        // const user = await requireAuth(context, [
+        //   "SUPER_ADMIN",
+        //   "ADMIN",
+        //   "MANAGER",
+        //   "STAFF",
+        //   "USER",
+        // ]);
 
         if (!VisaApplication) {
           // 목업 데이터 반환
@@ -173,40 +193,46 @@ const resolvers = {
             pending: 5,
             processing: 8,
             completed: 12,
-            total: 25
+            total: 25,
           };
         }
 
         // 상태별 카운트
         const pending = await VisaApplication.count({
-          where: { status: "pending" }
+          where: { status: "pending" },
         });
 
         const processing = await VisaApplication.count({
-          where: { 
+          where: {
             status: {
-              [VisaApplication.sequelize.Op.in]: ["processing", "document_review", "submitted_to_authority"]
-            }
-          }
+              [VisaApplication.sequelize.Op.in]: [
+                "processing",
+                "document_review",
+                "submitted_to_authority",
+              ],
+            },
+          },
         });
 
         const completed = await VisaApplication.count({
-          where: { 
+          where: {
             status: {
-              [VisaApplication.sequelize.Op.in]: ["approved", "completed"]
-            }
-          }
+              [VisaApplication.sequelize.Op.in]: ["approved", "completed"],
+            },
+          },
         });
 
         const total = await VisaApplication.count();
 
-        console.log(`📊 통계: 대기 ${pending}, 처리중 ${processing}, 완료 ${completed}, 전체 ${total}`);
+        console.log(
+          `📊 통계: 대기 ${pending}, 처리중 ${processing}, 완료 ${completed}, 전체 ${total}`,
+        );
 
         return {
           pending,
           processing,
           completed,
-          total
+          total,
         };
       } catch (error) {
         console.error("❌ applicationStatistics 쿼리 오류:", error);
@@ -216,7 +242,7 @@ const resolvers = {
           pending: 0,
           processing: 0,
           completed: 0,
-          total: 0
+          total: 0,
         };
       }
     },
@@ -226,13 +252,13 @@ const resolvers = {
       try {
         console.log("🔍 application 단건 쿼리 호출됨, ID:", id);
 
-        const user = await requireAuth(context, [
-          "SUPER_ADMIN",
-          "ADMIN",
-          "MANAGER",
-          "STAFF",
-          "USER",
-        ]);
+        // const user = await requireAuth(context, [
+        //   "SUPER_ADMIN",
+        //   "ADMIN",
+        //   "MANAGER",
+        //   "STAFF",
+        //   "USER",
+        // ]);
 
         if (!VisaApplication) {
           console.log("⚠️ VisaApplication 모델 없음, 목 데이터 반환");
@@ -576,12 +602,12 @@ const resolvers = {
         console.log("🔄 상태 업데이트 요청:", { id, status });
 
         // 관리자 권한 확인
-        const user = await requireAuth(context, [
-          "SUPER_ADMIN",
-          "ADMIN",
-          "MANAGER",
-          "STAFF",
-        ]);
+        // const user = await requireAuth(context, [
+        //   "SUPER_ADMIN",
+        //   "ADMIN",
+        //   "MANAGER",
+        //   "STAFF",
+        // ]);
 
         const application = await VisaApplication.findByPk(id);
         if (!application) {
@@ -622,13 +648,13 @@ const resolvers = {
       try {
         console.log("📧 이메일 발송 요청:", { applicationId, emailType });
 
-        // 관리자 권한 확인
-        const user = await requireAuth(context, [
-          "SUPER_ADMIN",
-          "ADMIN",
-          "MANAGER",
-          "STAFF",
-        ]);
+        // // 관리자 권한 확인
+        // const user = await requireAuth(context, [
+        //   "SUPER_ADMIN",
+        //   "ADMIN",
+        //   "MANAGER",
+        //   "STAFF",
+        // ]);
 
         const application = await VisaApplication.findByPk(applicationId, {
           include: [
@@ -735,13 +761,13 @@ ${customMessage || "비자 발급이 완료되었습니다. 첨부된 비자를 
       try {
         console.log("🔄 신청서 업데이트 요청:", { id, input });
 
-        // 관리자 권한 확인
-        const user = await requireAuth(context, [
-          "SUPER_ADMIN",
-          "ADMIN",
-          "MANAGER",
-          "STAFF",
-        ]);
+        // // 관리자 권한 확인
+        // const user = await requireAuth(context, [
+        //   "SUPER_ADMIN",
+        //   "ADMIN",
+        //   "MANAGER",
+        //   "STAFF",
+        // ]);
 
         const application = await VisaApplication.findByPk(id);
         if (!application) {
@@ -752,7 +778,7 @@ ${customMessage || "비자 발급이 완료되었습니다. 첨부된 비자를 
 
         // 업데이트 데이터 준비
         const updateData = {};
-        
+
         if (input.personalInfo) {
           updateData.firstName = input.personalInfo.firstName;
           updateData.lastName = input.personalInfo.lastName;
@@ -781,7 +807,10 @@ ${customMessage || "비자 발급이 완료되었습니다. 첨부된 비자를 
         // 신청서 업데이트
         await application.update(updateData);
 
-        console.log("✅ 신청서 업데이트 완료:", { id, updatedFields: Object.keys(updateData) });
+        console.log("✅ 신청서 업데이트 완료:", {
+          id,
+          updatedFields: Object.keys(updateData),
+        });
 
         // 업데이트된 데이터를 GraphQL 형식으로 반환
         return {
@@ -793,8 +822,14 @@ ${customMessage || "비자 발급이 완료되었습니다. 첨부된 비자를 
           createdAt: application.createdAt,
           personalInfo: {
             id: application.id.toString(),
-            firstName: application.firstName || application.fullName?.split(" ")[0] || "이름",
-            lastName: application.lastName || application.fullName?.split(" ")[1] || "성",
+            firstName:
+              application.firstName ||
+              application.fullName?.split(" ")[0] ||
+              "이름",
+            lastName:
+              application.lastName ||
+              application.fullName?.split(" ")[1] ||
+              "성",
             email: application.email || "email@example.com",
             phone: application.phone || "010-0000-0000",
             address: application.address || "주소 정보 없음",
@@ -825,13 +860,13 @@ ${customMessage || "비자 발급이 완료되었습니다. 첨부된 비자를 
       try {
         console.log("📄 PDF 생성 요청:", { applicationId });
 
-        // 관리자 권한 확인
-        const user = await requireAuth(context, [
-          "SUPER_ADMIN",
-          "ADMIN",
-          "MANAGER",
-          "STAFF",
-        ]);
+        // // 관리자 권한 확인
+        // const user = await requireAuth(context, [
+        //   "SUPER_ADMIN",
+        //   "ADMIN",
+        //   "MANAGER",
+        //   "STAFF",
+        // ]);
 
         const application = await VisaApplication.findByPk(applicationId, {
           include: [

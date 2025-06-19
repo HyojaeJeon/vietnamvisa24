@@ -51,7 +51,11 @@ async function refreshTokensAsync() {
     console.log("🔍 Refresh response status:", response.status);
 
     if (!response.ok) {
-      console.log("❌ Refresh response not ok:", response.status, response.statusText);
+      console.log(
+        "❌ Refresh response not ok:",
+        response.status,
+        response.statusText,
+      );
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
 
@@ -95,7 +99,7 @@ async function refreshTokensAsync() {
     if (typeof window !== "undefined") {
       localStorage.removeItem("accessToken");
       // 로그인 페이지로 리다이렉트
-      window.location.replace("/login");
+      // window.location.replace("/login");
     }
 
     throw err;
@@ -104,13 +108,22 @@ async function refreshTokensAsync() {
 
 // Authorization 헤더 설정 (accessToken + admin-token)
 const authLink = setContext((_, { headers }) => {
-  const accessToken = store.getState().auth.accessToken || (typeof window !== "undefined" ? localStorage.getItem("accessToken") : null);
-  const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminAccessToken") : null;
+  const accessToken =
+    store.getState().auth.accessToken ||
+    (typeof window !== "undefined"
+      ? localStorage.getItem("accessToken")
+      : null);
+  const adminToken =
+    typeof window !== "undefined"
+      ? localStorage.getItem("adminAccessToken")
+      : null;
 
   console.log("🔐 Setting Authorization header with tokens:", {
     accessToken: accessToken ? "✅ Found" : "❌ Missing",
     adminToken: adminToken ? "✅ Found" : "❌ Missing",
-    accessTokenPrefix: accessToken ? accessToken.substring(0, 20) + "..." : "none",
+    accessTokenPrefix: accessToken
+      ? accessToken.substring(0, 20) + "..."
+      : "none",
   });
 
   return {
@@ -123,112 +136,130 @@ const authLink = setContext((_, { headers }) => {
 });
 
 // 에러 처리 링크: 토큰 만료 시 refresh -> 재시도, 실패 시 로그아웃
-const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
-  console.log("🔍 Apollo Error Link triggered");
-  console.log("🔍 GraphQL Errors:", graphQLErrors);
-  console.log("🔍 Network Error:", networkError);
-  // 토큰 만료 또는 인증 오류 확인
-  const isTokenError = graphQLErrors?.some((error) => {
-    const errorCode = error.extensions?.code;
-    const errorMessage = error.message?.toLowerCase() || "";
+const errorLink = onError(
+  ({ graphQLErrors, networkError, operation, forward }) => {
+    console.log("🔍 Apollo Error Link triggered");
+    console.log("🔍 GraphQL Errors:", graphQLErrors);
+    console.log("🔍 Network Error:", networkError);
+    // 토큰 만료 또는 인증 오류 확인
+    // const isTokenError = graphQLErrors?.some((error) => {
+    //   const errorCode = error.extensions?.code;
+    //   const errorMessage = error.message?.toLowerCase() || "";
 
-    console.log("🔍 Checking error:", {
-      errorCode,
-      errorMessage: error.message,
-      extensions: error.extensions,
-    });
+    //   console.log("🔍 Checking error:", {
+    //     errorCode,
+    //     errorMessage: error.message,
+    //     extensions: error.extensions,
+    //   });
 
-    // 다양한 토큰 관련 에러 조건들
-    const tokenErrorCodes = ["TOKEN_EXPIRED", "UNAUTHENTICATED", "UNAUTHORIZED"];
+    //   // 다양한 토큰 관련 에러 조건들
+    //   const tokenErrorCodes = [
+    //     "TOKEN_EXPIRED",
+    //     "UNAUTHENTICATED",
+    //     "UNAUTHORIZED",
+    //   ];
 
-    const tokenErrorMessages = ["token has expired", "토큰이 만료되었습니다", "token expired", "unauthorized", "인증이 필요합니다", "invalid token", "jwt expired", "authentication required"];
+    //   const tokenErrorMessages = [
+    //     "token has expired",
+    //     "토큰이 만료되었습니다",
+    //     "token expired",
+    //     "unauthorized",
+    //     "인증이 필요합니다",
+    //     "invalid token",
+    //     "jwt expired",
+    //     "authentication required",
+    //   ];
 
-    const hasTokenErrorCode = tokenErrorCodes.includes(errorCode);
-    const hasTokenErrorMessage = tokenErrorMessages.some((msg) => errorMessage.includes(msg.toLowerCase()));
+    //   const hasTokenErrorCode = tokenErrorCodes.includes(errorCode);
+    //   const hasTokenErrorMessage = tokenErrorMessages.some((msg) =>
+    //     errorMessage.includes(msg.toLowerCase()),
+    //   );
 
-    const isTokenRelatedError = hasTokenErrorCode || hasTokenErrorMessage;
+    //   const isTokenRelatedError = hasTokenErrorCode || hasTokenErrorMessage;
 
-    console.log("🔍 Token error analysis:", {
-      hasTokenErrorCode,
-      hasTokenErrorMessage,
-      isTokenRelatedError,
-      matchedMessage: tokenErrorMessages.find((msg) => errorMessage.includes(msg.toLowerCase())),
-    });
+    //   console.log("🔍 Token error analysis:", {
+    //     hasTokenErrorCode,
+    //     hasTokenErrorMessage,
+    //     isTokenRelatedError,
+    //     matchedMessage: tokenErrorMessages.find((msg) =>
+    //       errorMessage.includes(msg.toLowerCase()),
+    //     ),
+    //   });
 
-    return isTokenRelatedError;
-  });
-  if (isTokenError) {
-    console.log("🔄 Token error detected, attempting refresh...");
+    //   return isTokenRelatedError;
+    // });
+    // if (isTokenError) {
+    //   console.log("🔄 Token error detected, attempting refresh...");
 
-    return new Observable((observer) => {
-      // 토큰 갱신 시도
-      refreshTokensAsync()
-        .then((newAccessToken) => {
-          console.log("✅ Token refreshed successfully, retrying operation...");
+    //   return new Observable((observer) => {
+    //     토큰 갱신 시도
+    //     refreshTokensAsync()
+    //       .then((newAccessToken) => {
+    //         console.log(
+    //           "✅ Token refreshed successfully, retrying operation...",
+    //         );
+    //         // 새 토큰으로 헤더 업데이트 후 요청 재전송
+    //         operation.setContext(({ headers = {} }) => ({
+    //           headers: {
+    //             ...headers,
+    //             Authorization: `Bearer ${newAccessToken}`,
+    //           },
+    //         }));
+    //         // 재시도
+    //         const subscription = forward(operation).subscribe({
+    //           next: (result) => {
+    //             console.log("✅ Retry operation successful");
+    //             observer.next(result);
+    //           },
+    //           error: (error) => {
+    //             console.log("❌ Retry operation failed:", error);
+    //             // 재시도 후에도 토큰 에러가 발생하면 로그아웃 처리
+    //             const retryIsTokenError = error.graphQLErrors?.some((err) => {
+    //               const code = err.extensions?.code;
+    //               return code === "TOKEN_EXPIRED" || code === "UNAUTHENTICATED";
+    //             });
+    //             if (retryIsTokenError) {
+    //               console.log(
+    //                 "❌ Token error persists after refresh, forcing logout",
+    //               );
+    //               store.dispatch(logout());
+    //               if (typeof window !== "undefined") {
+    //                 localStorage.removeItem("accessToken");
+    //                 // window.location.replace("/login");
+    //               }
+    //             }
+    //             observer.error(error);
+    //           },
+    //           complete: observer.complete.bind(observer),
+    //         });
+    //         return () => subscription.unsubscribe();
+    //       })
+    //       .catch((refreshError) => {
+    //         console.error(
+    //           "❌ Token refresh failed, redirecting to login:",
+    //           refreshError,
+    //         );
+    //         // 토큰 재발급 실패 시 로그아웃 처리
+    //         store.dispatch(logout());
+    //         if (typeof window !== "undefined") {
+    //           localStorage.removeItem("accessToken");
+    //           // 사용자에게 알림 후 로그인 페이지로 이동
+    //           setTimeout(() => {
+    //             // alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
+    //             // window.location.replace("/login");
+    //           }, 100);
+    //         }
+    //         observer.error(refreshError);
+    //       });
+    //   });
+    // }
 
-          // 새 토큰으로 헤더 업데이트 후 요청 재전송
-          operation.setContext(({ headers = {} }) => ({
-            headers: {
-              ...headers,
-              Authorization: `Bearer ${newAccessToken}`,
-            },
-          }));
-
-          // 재시도
-          const subscription = forward(operation).subscribe({
-            next: (result) => {
-              console.log("✅ Retry operation successful");
-              observer.next(result);
-            },
-            error: (error) => {
-              console.log("❌ Retry operation failed:", error);
-
-              // 재시도 후에도 토큰 에러가 발생하면 로그아웃 처리
-              const retryIsTokenError = error.graphQLErrors?.some((err) => {
-                const code = err.extensions?.code;
-                return code === "TOKEN_EXPIRED" || code === "UNAUTHENTICATED";
-              });
-
-              if (retryIsTokenError) {
-                console.log("❌ Token error persists after refresh, forcing logout");
-                store.dispatch(logout());
-                if (typeof window !== "undefined") {
-                  localStorage.removeItem("accessToken");
-                  window.location.replace("/login");
-                }
-              }
-
-              observer.error(error);
-            },
-            complete: observer.complete.bind(observer),
-          });
-
-          return () => subscription.unsubscribe();
-        })
-        .catch((refreshError) => {
-          console.error("❌ Token refresh failed, redirecting to login:", refreshError);
-
-          // 토큰 재발급 실패 시 로그아웃 처리
-          store.dispatch(logout());
-          if (typeof window !== "undefined") {
-            localStorage.removeItem("accessToken");
-            // 사용자에게 알림 후 로그인 페이지로 이동
-            setTimeout(() => {
-              alert("로그인이 만료되었습니다. 다시 로그인해주세요.");
-              window.location.replace("/login");
-            }, 100);
-          }
-
-          observer.error(refreshError);
-        });
-    });
-  }
-
-  // 네트워크 오류 로깅
-  if (networkError) {
-    console.error("🌐 Network error:", networkError);
-  }
-});
+    // 네트워크 오류 로깅
+    if (networkError) {
+      console.error("🌐 Network error:", networkError);
+    }
+  },
+);
 
 // 재시도 링크 (네트워크 오류 등)
 const retryLink = new RetryLink({
@@ -257,7 +288,10 @@ if (typeof window !== "undefined") {
       console.log("🔄 Testing token refresh manually...");
       try {
         const newToken = await refreshTokensAsync();
-        console.log("✅ Manual token refresh successful:", newToken.substring(0, 20) + "...");
+        console.log(
+          "✅ Manual token refresh successful:",
+          newToken.substring(0, 20) + "...",
+        );
         return newToken;
       } catch (error) {
         console.error("❌ Manual token refresh failed:", error);
@@ -267,15 +301,22 @@ if (typeof window !== "undefined") {
 
     window.__SIMULATE_TOKEN_EXPIRY__ = () => {
       console.log("🔄 Simulating token expiry...");
-      const expiredToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYwMDAwMDAwMCwiZXhwIjoxNjAwMDAwMDAwfQ.expired";
+      const expiredToken =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTYwMDAwMDAwMCwiZXhwIjoxNjAwMDAwMDAwfQ.expired";
       store.dispatch(updateTokens({ accessToken: expiredToken }));
       localStorage.setItem("accessToken", expiredToken);
-      console.log("✅ Token set to expired. Next GraphQL request should trigger auto-refresh.");
+      console.log(
+        "✅ Token set to expired. Next GraphQL request should trigger auto-refresh.",
+      );
     };
 
     console.log("🔧 Token refresh test functions available:");
-    console.log("  - window.__TEST_TOKEN_REFRESH__() - manually test token refresh");
-    console.log("  - window.__SIMULATE_TOKEN_EXPIRY__() - set expired token to trigger auto-refresh");
+    console.log(
+      "  - window.__TEST_TOKEN_REFRESH__() - manually test token refresh",
+    );
+    console.log(
+      "  - window.__SIMULATE_TOKEN_EXPIRY__() - set expired token to trigger auto-refresh",
+    );
   }
 }
 

@@ -188,6 +188,7 @@ export default function ApplyPageContent() {
         });
       }, 100);
     } else {
+      //
       // Show validation errors if step is not valid
       const stepName = STEP_NAMES[currentStep];
       console.log(`${stepName} 단계를 완료해주세요.`);

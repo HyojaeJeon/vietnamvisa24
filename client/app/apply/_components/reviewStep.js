@@ -887,7 +887,8 @@ const ReviewStep = ({
               disabled={!agreedToTerms || isSubmitting}
               className="w-full py-3 md:py-4 text-sm md:text-lg font-bold text-white transition-all duration-300 transform shadow-2xl bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 hover:from-purple-700 hover:via-pink-700 hover:to-red-700 rounded-xl md:rounded-2xl hover:shadow-3xl disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105"
             >
-              {isSubmitting ? (
+              {/* {isSubmitting ? ( */}
+              {false ? (
                 <div className="flex items-center justify-center gap-2">
                   <div className="w-4 h-4 md:w-5 md:h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   <span>제출 중...</span>
