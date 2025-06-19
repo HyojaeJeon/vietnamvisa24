@@ -1,47 +1,5 @@
 import { gql } from "@apollo/client";
 
-// 신청서 단건 조회
-export const GET_APPLICATION = gql`
-  query GetApplication($id: ID!) {
-    application(id: $id) {
-      id
-      applicationId
-      processingType
-      totalPrice
-      createdAt
-      status
-      personalInfo {
-        id
-        firstName
-        lastName
-        email
-        phone
-        address
-        phoneOfFriend
-      }
-      travelInfo {
-        id
-        entryDate
-        entryPort
-        visaType
-      }
-      additionalServices {
-        id
-        name
-      }
-      documents {
-        id
-        type
-        fileName
-        fileSize
-        fileType
-        uploadedAt
-        extractedInfo
-      }
-    }
-  }
-`;
-
 export const GET_APPLICATIONS = gql`
   query GetApplications(
     $page: Int
@@ -64,8 +22,8 @@ export const GET_APPLICATIONS = gql`
         applicationId
         processingType
         totalPrice
-        createdAt
         status
+        createdAt
         personalInfo {
           id
           firstName
@@ -92,7 +50,21 @@ export const GET_APPLICATIONS = gql`
           fileSize
           fileType
           uploadedAt
-          extractedInfo
+          extractedInfo {
+            type
+            issuingCountry
+            passportNo
+            surname
+            givenNames
+            dateOfBirth
+            dateOfIssue
+            dateOfExpiry
+            sex
+            nationality
+            personalNo
+            authority
+            koreanName
+          }
         }
       }
       totalCount
@@ -111,6 +83,61 @@ export const GET_APPLICATION_STATISTICS = gql`
       processing
       completed
       total
+    }
+  }
+`;
+
+export const GET_APPLICATION = gql`
+  query GetApplication($id: ID!) {
+    application(id: $id) {
+      id
+      applicationId
+      processingType
+      totalPrice
+      status
+      createdAt
+      personalInfo {
+        id
+        firstName
+        lastName
+        email
+        phone
+        address
+        phoneOfFriend
+      }
+      travelInfo {
+        id
+        entryDate
+        entryPort
+        visaType
+      }
+      additionalServices {
+        id
+        name
+      }
+      documents {
+        id
+        type
+        fileName
+        fileSize
+        fileType
+        uploadedAt
+        extractedInfo {
+          type
+          issuingCountry
+          passportNo
+          surname
+          givenNames
+          dateOfBirth
+          dateOfIssue
+          dateOfExpiry
+          sex
+          nationality
+          personalNo
+          authority
+          koreanName
+        }
+      }
     }
   }
 `;

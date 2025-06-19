@@ -106,6 +106,7 @@ const resolvers = {
           applicationId: app.applicationId || `APP-${app.id}`,
           processingType: app.processingType || "standard",
           totalPrice: app.totalPrice || 0,
+          status: dbToGraphQLStatus(app.status || "pending"),
           createdAt: app.createdAt,
           status: dbToGraphQLStatus(app.status),
           personalInfo: {

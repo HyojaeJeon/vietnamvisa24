@@ -4,11 +4,22 @@ const typeDefs = gql`
   scalar Date
   scalar DateTime
 
+  enum ApplicationStatus {
+    PENDING
+    PROCESSING
+    DOCUMENT_REVIEW
+    SUBMITTED_TO_AUTHORITY
+    APPROVED
+    REJECTED
+    COMPLETED
+  }
+
   type Application {
     id: ID
     applicationId: String
     processingType: String
     totalPrice: Float
+    status: ApplicationStatus
     createdAt: DateTime
     documents: [Document]
     personalInfo: PersonalInfo
