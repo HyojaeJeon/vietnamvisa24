@@ -807,6 +807,30 @@ ${customMessage || "비자 발급이 완료되었습니다. 첨부된 비자를 
         // 신청서 업데이트
         await application.update(updateData);
 
+        // 추출된 정보 업데이트 (여권 문서의 extractedInfo)
+        if (input.extractedInfo) {
+          console.log("🔄 추출된 정보 업데이트 요청:", input.extractedInfo);
+          
+          // 해당 신청서의 여권 문서 찾기
+          const Document = require("../../models/document");
+          const passportDocument = await Document.findOne({
+            where: {
+              applicationId: application.id,
+              type: 'passport'
+            }
+          });
+
+          if (passportDocument) {
+            const updatedExtractedInfo = JSON.stringify(input.extractedInfo);
+            await passportDocument.update({
+              extractedInfo: updatedExtractedInfo
+            });
+            console.log("✅ 여권 추출 정보 업데이트 완료");
+          } else {
+            console.warn("⚠️ 여권 문서를 찾을 수 없어 추출된 정보를 업데이트할 수 없습니다.");
+          }
+        }
+
         console.log("✅ 신청서 업데이트 완료:", {
           id,
           updatedFields: Object.keys(updateData),

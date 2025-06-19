@@ -212,11 +212,46 @@ export default function ApplicationDetailPage() {
     errorPolicy: "all",
     onCompleted: (data) => {
       if (data?.application) {
+        // __typename과 id 필드를 제거한 깨끗한 데이터 설정
+        const cleanPersonalInfo = {
+          firstName: data.application.personalInfo?.firstName || '',
+          lastName: data.application.personalInfo?.lastName || '',
+          email: data.application.personalInfo?.email || '',
+          phone: data.application.personalInfo?.phone || '',
+          address: data.application.personalInfo?.address || '',
+          phoneOfFriend: data.application.personalInfo?.phoneOfFriend || ''
+        };
+
+        const cleanTravelInfo = {
+          entryDate: data.application.travelInfo?.entryDate || '',
+          entryPort: data.application.travelInfo?.entryPort || '',
+          visaType: data.application.travelInfo?.visaType || ''
+        };
+
+        // 여권 추출 정보 초기화
+        const passportDocument = data.application.documents?.find(doc => doc.type === 'passport');
+        const cleanExtractedInfo = passportDocument?.extractedInfo ? {
+          type: passportDocument.extractedInfo.type || '',
+          issuingCountry: passportDocument.extractedInfo.issuingCountry || '',
+          passportNo: passportDocument.extractedInfo.passportNo || '',
+          surname: passportDocument.extractedInfo.surname || '',
+          givenNames: passportDocument.extractedInfo.givenNames || '',
+          dateOfBirth: passportDocument.extractedInfo.dateOfBirth || '',
+          dateOfIssue: passportDocument.extractedInfo.dateOfIssue || '',
+          dateOfExpiry: passportDocument.extractedInfo.dateOfExpiry || '',
+          sex: passportDocument.extractedInfo.sex || '',
+          nationality: passportDocument.extractedInfo.nationality || '',
+          personalNo: passportDocument.extractedInfo.personalNo || '',
+          authority: passportDocument.extractedInfo.authority || '',
+          koreanName: passportDocument.extractedInfo.koreanName || ''
+        } : {};
+
         setEditableData({
-          personalInfo: { ...data.application.personalInfo },
-          travelInfo: { ...data.application.travelInfo },
+          personalInfo: cleanPersonalInfo,
+          travelInfo: cleanTravelInfo,
           processingType: data.application.processingType,
           totalPrice: data.application.totalPrice,
+          extractedInfo: cleanExtractedInfo
         });
       }
     },
@@ -404,15 +439,34 @@ export default function ApplicationDetailPage() {
   // 편집 저장 핸들러
   const handleSaveEdit = () => {
     if (confirm("변경사항을 저장하시겠습니까?")) {
+      // 깨끗한 데이터만 전송 (__typename, id 제거)
+      const cleanInput = {
+        personalInfo: {
+          firstName: editableData.personalInfo?.firstName || '',
+          lastName: editableData.personalInfo?.lastName || '',
+          email: editableData.personalInfo?.email || '',
+          phone: editableData.personalInfo?.phone || '',
+          address: editableData.personalInfo?.address || '',
+          phoneOfFriend: editableData.personalInfo?.phoneOfFriend || ''
+        },
+        travelInfo: {
+          entryDate: editableData.travelInfo?.entryDate || '',
+          entryPort: editableData.travelInfo?.entryPort || '',
+          visaType: editableData.travelInfo?.visaType || ''
+        },
+        processingType: editableData.processingType,
+        totalPrice: editableData.totalPrice
+      };
+
+      // 추출된 정보가 있으면 포함
+      if (editableData.extractedInfo && Object.keys(editableData.extractedInfo).length > 0) {
+        cleanInput.extractedInfo = editableData.extractedInfo;
+      }
+
       updateApplication({
         variables: {
           id: applicationId,
-          input: {
-            personalInfo: editableData.personalInfo,
-            travelInfo: editableData.travelInfo,
-            processingType: editableData.processingType,
-            totalPrice: editableData.totalPrice,
-          },
+          input: cleanInput,
         },
       });
     }
@@ -422,41 +476,73 @@ export default function ApplicationDetailPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <div className="max-w-7xl mx-auto p-6 space-y-6">
         {/* 헤더 섹션 */}
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-100">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-4">
+        <div className="bg-gradient-to-r from-white via-blue-50 to-indigo-50 rounded-2xl shadow-xl p-8 border border-blue-100 backdrop-blur-sm">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center space-x-6">
               <Button 
                 variant="outline" 
                 onClick={() => router.back()} 
-                className="flex items-center gap-2 shadow-sm hover:shadow-md transition-shadow"
+                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm shadow-lg hover:shadow-xl transition-all duration-300 border-blue-200 hover:border-blue-300 hover:bg-blue-50/50"
               >
-                <ArrowLeft className="w-4 h-4" />
-                목록으로
+                <ArrowLeft className="w-4 h-4 text-blue-600" />
+                <span className="text-blue-600 font-medium">목록으로</span>
               </Button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 mb-1">신청서 상세관리</h1>
-                <p className="text-gray-600 flex items-center gap-2">
-                  <FileText className="w-4 h-4" />
-                  신청서 ID: <span className="font-medium text-blue-600">{application.applicationId}</span>
-                </p>
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <FileText className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-800 bg-clip-text text-transparent mb-2">
+                    신청서 상세관리
+                  </h1>
+                  <div className="flex items-center gap-3">
+                    <div className="bg-white/70 backdrop-blur-sm rounded-lg px-3 py-1 border border-blue-200">
+                      <p className="text-gray-700 flex items-center gap-2 text-sm">
+                        <span className="text-gray-500">신청서 ID:</span>
+                        <span className="font-bold text-blue-700">{application.applicationId}</span>
+                      </p>
+                    </div>
+                    <div className="bg-white/70 backdrop-blur-sm rounded-lg px-3 py-1 border border-blue-200">
+                      <p className="text-gray-700 flex items-center gap-2 text-sm">
+                        <Clock className="w-3 h-3 text-gray-500" />
+                        <span className="text-gray-500">신청일:</span>
+                        <span className="font-medium text-gray-800">
+                          {new Date(application.createdAt).toLocaleDateString("ko-KR")}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              {getStatusBadge(application.status)}
-              <Button
-                variant={isEditing ? "destructive" : "outline"}
-                onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
-                className="shadow-sm"
-              >
-                {isEditing ? <X className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
-                {isEditing ? "취소" : "편집"}
-              </Button>
-              {isEditing && (
-                <Button onClick={handleSaveEdit} className="shadow-sm" disabled={updatingApplication}>
-                  {updatingApplication ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                  {updatingApplication ? "저장중..." : "저장"}
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/80 backdrop-blur-sm rounded-xl p-1 shadow-lg border border-blue-200">
+                {getStatusBadge(application.status)}
+              </div>
+              <div className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-xl p-2 shadow-lg border border-blue-200">
+                <Button
+                  variant={isEditing ? "destructive" : "default"}
+                  onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
+                  className={`shadow-sm transition-all duration-300 ${
+                    isEditing 
+                      ? "bg-red-500 hover:bg-red-600 text-white" 
+                      : "bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white"
+                  }`}
+                >
+                  {isEditing ? <X className="w-4 h-4 mr-2" /> : <Edit className="w-4 h-4 mr-2" />}
+                  {isEditing ? "편집 취소" : "정보 편집"}
                 </Button>
-              )}
+                {isEditing && (
+                  <Button 
+                    onClick={handleSaveEdit} 
+                    className="shadow-sm bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white transition-all duration-300" 
+                    disabled={updatingApplication}
+                  >
+                    {updatingApplication ? <RefreshCw className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                    {updatingApplication ? "저장중..." : "변경사항 저장"}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
 
@@ -543,95 +629,132 @@ export default function ApplicationDetailPage() {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div>
-                      <label className="text-sm font-medium text-gray-500 block mb-1">성명</label>
+                      <label className="text-sm font-medium text-gray-600 block mb-2 flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        성명
+                      </label>
                       {isEditing ? (
-                        <div className="flex space-x-2">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={editableData.personalInfo?.firstName || ''}
+                              onChange={(e) => setEditableData({
+                                ...editableData,
+                                personalInfo: { ...editableData.personalInfo, firstName: e.target.value }
+                              })}
+                              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md text-gray-900 placeholder-gray-400"
+                              placeholder="이름 (First Name)"
+                            />
+                          </div>
+                          <div className="relative">
+                            <input
+                              type="text"
+                              value={editableData.personalInfo?.lastName || ''}
+                              onChange={(e) => setEditableData({
+                                ...editableData,
+                                personalInfo: { ...editableData.personalInfo, lastName: e.target.value }
+                              })}
+                              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md text-gray-900 placeholder-gray-400"
+                              placeholder="성 (Last Name)"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                          <p className="font-semibold text-gray-900 text-lg flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                            {application.personalInfo?.firstName} {application.personalInfo?.lastName}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600 block mb-2 flex items-center gap-2">
+                        <Mail className="w-4 h-4" />
+                        이메일
+                      </label>
+                      {isEditing ? (
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                           <input
-                            type="text"
-                            value={editableData.personalInfo?.firstName || ''}
+                            type="email"
+                            value={editableData.personalInfo?.email || ''}
                             onChange={(e) => setEditableData({
                               ...editableData,
-                              personalInfo: { ...editableData.personalInfo, firstName: e.target.value }
+                              personalInfo: { ...editableData.personalInfo, email: e.target.value }
                             })}
-                            className="flex-1 p-2 border border-gray-300 rounded-md"
-                            placeholder="이름"
-                          />
-                          <input
-                            type="text"
-                            value={editableData.personalInfo?.lastName || ''}
-                            onChange={(e) => setEditableData({
-                              ...editableData,
-                              personalInfo: { ...editableData.personalInfo, lastName: e.target.value }
-                            })}
-                            className="flex-1 p-2 border border-gray-300 rounded-md"
-                            placeholder="성"
+                            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md text-gray-900 placeholder-gray-400"
+                            placeholder="이메일 주소를 입력하세요"
                           />
                         </div>
                       ) : (
-                        <p className="font-semibold text-gray-900 text-lg">
-                          {application.personalInfo?.firstName} {application.personalInfo?.lastName}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium text-gray-500 block mb-1">이메일</label>
-                      {isEditing ? (
-                        <input
-                          type="email"
-                          value={editableData.personalInfo?.email || ''}
-                          onChange={(e) => setEditableData({
-                            ...editableData,
-                            personalInfo: { ...editableData.personalInfo, email: e.target.value }
-                          })}
-                          className="w-full p-2 border border-gray-300 rounded-md"
-                        />
-                      ) : (
-                        <p className="flex items-center gap-2 text-gray-900">
-                          <Mail className="w-4 h-4 text-blue-500" />
-                          {application.personalInfo?.email}
-                        </p>
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                          <p className="flex items-center gap-2 text-gray-900">
+                            <Mail className="w-4 h-4 text-blue-500" />
+                            {application.personalInfo?.email}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div>
-                      <label className="text-sm font-medium text-gray-500 block mb-1">전화번호</label>
+                      <label className="text-sm font-medium text-gray-600 block mb-2 flex items-center gap-2">
+                        <Phone className="w-4 h-4" />
+                        전화번호
+                      </label>
                       {isEditing ? (
-                        <input
-                          type="tel"
-                          value={editableData.personalInfo?.phone || ''}
-                          onChange={(e) => setEditableData({
-                            ...editableData,
-                            personalInfo: { ...editableData.personalInfo, phone: e.target.value }
-                          })}
-                          className="w-full p-2 border border-gray-300 rounded-md"
-                        />
+                        <div className="relative">
+                          <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                          <input
+                            type="tel"
+                            value={editableData.personalInfo?.phone || ''}
+                            onChange={(e) => setEditableData({
+                              ...editableData,
+                              personalInfo: { ...editableData.personalInfo, phone: e.target.value }
+                            })}
+                            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md text-gray-900 placeholder-gray-400"
+                            placeholder="전화번호를 입력하세요"
+                          />
+                        </div>
                       ) : (
-                        <p className="flex items-center gap-2 text-gray-900">
-                          <Phone className="w-4 h-4 text-green-500" />
-                          {application.personalInfo?.phone}
-                        </p>
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                          <p className="flex items-center gap-2 text-gray-900">
+                            <Phone className="w-4 h-4 text-green-500" />
+                            {application.personalInfo?.phone}
+                          </p>
+                        </div>
                       )}
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-500 block mb-1">주소</label>
+                      <label className="text-sm font-medium text-gray-600 block mb-2 flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        주소
+                      </label>
                       {isEditing ? (
-                        <textarea
-                          value={editableData.personalInfo?.address || ''}
-                          onChange={(e) => setEditableData({
-                            ...editableData,
-                            personalInfo: { ...editableData.personalInfo, address: e.target.value }
-                          })}
-                          className="w-full p-2 border border-gray-300 rounded-md"
-                          rows="2"
-                        />
+                        <div className="relative">
+                          <MapPin className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+                          <textarea
+                            value={editableData.personalInfo?.address || ''}
+                            onChange={(e) => setEditableData({
+                              ...editableData,
+                              personalInfo: { ...editableData.personalInfo, address: e.target.value }
+                            })}
+                            className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md text-gray-900 placeholder-gray-400 resize-none"
+                            rows="3"
+                            placeholder="주소를 입력하세요"
+                          />
+                        </div>
                       ) : (
-                        <p className="flex items-start gap-2 text-gray-900">
-                          <MapPin className="w-4 h-4 text-red-500 mt-0.5" />
-                          {application.personalInfo?.address}
-                        </p>
+                        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                          <p className="flex items-start gap-2 text-gray-900">
+                            <MapPin className="w-4 h-4 text-red-500 mt-0.5" />
+                            {application.personalInfo?.address}
+                          </p>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -659,30 +782,123 @@ export default function ApplicationDetailPage() {
               <CardContent className="p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="text-sm font-medium text-gray-500 block mb-1">비자 종류</label>
-                    <p className="font-semibold text-gray-900 bg-gray-50 p-3 rounded-lg">
-                      {getVisaTypeLabel(application.travelInfo?.visaType)}
-                    </p>
+                    <label className="text-sm font-medium text-gray-600 block mb-2 flex items-center gap-2">
+                      <Globe className="w-4 h-4" />
+                      비자 종류
+                    </label>
+                    {isEditing ? (
+                      <select
+                        value={editableData.travelInfo?.visaType || ''}
+                        onChange={(e) => setEditableData({
+                          ...editableData,
+                          travelInfo: { ...editableData.travelInfo, visaType: e.target.value }
+                        })}
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md text-gray-900"
+                      >
+                        <option value="e-visa_general">E-VISA 일반</option>
+                        <option value="e-visa_urgent">E-VISA 긴급</option>
+                        <option value="e-visa_express">E-VISA 특급</option>
+                        <option value="tourist_visa">관광 비자</option>
+                        <option value="business_visa">상용 비자</option>
+                        <option value="transit_visa">경유 비자</option>
+                      </select>
+                    ) : (
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                        <p className="font-semibold text-gray-900 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          {getVisaTypeLabel(application.travelInfo?.visaType)}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500 block mb-1">처리 방식</label>
-                    <p className="font-semibold text-gray-900 bg-gray-50 p-3 rounded-lg">
-                      {application.processingType}
-                    </p>
+                    <label className="text-sm font-medium text-gray-600 block mb-2 flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      처리 방식
+                    </label>
+                    {isEditing ? (
+                      <select
+                        value={editableData.processingType || ''}
+                        onChange={(e) => setEditableData({
+                          ...editableData,
+                          processingType: e.target.value
+                        })}
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md text-gray-900"
+                      >
+                        <option value="일반">일반</option>
+                        <option value="2시간">2시간</option>
+                        <option value="4시간">4시간</option>
+                        <option value="익일">익일</option>
+                      </select>
+                    ) : (
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                        <p className="font-semibold text-gray-900 flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          {application.processingType}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500 block mb-1">입국일</label>
-                    <p className="flex items-center gap-2 text-gray-900">
-                      <Calendar className="w-4 h-4 text-blue-500" />
-                      {application.travelInfo?.entryDate}
-                    </p>
+                    <label className="text-sm font-medium text-gray-600 block mb-2 flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      입국일
+                    </label>
+                    {isEditing ? (
+                      <div className="relative">
+                        <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                          type="date"
+                          value={editableData.travelInfo?.entryDate || ''}
+                          onChange={(e) => setEditableData({
+                            ...editableData,
+                            travelInfo: { ...editableData.travelInfo, entryDate: e.target.value }
+                          })}
+                          className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md text-gray-900"
+                        />
+                      </div>
+                    ) : (
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                        <p className="flex items-center gap-2 text-gray-900">
+                          <Calendar className="w-4 h-4 text-blue-500" />
+                          {application.travelInfo?.entryDate}
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <label className="text-sm font-medium text-gray-500 block mb-1">입국공항</label>
-                    <p className="flex items-center gap-2 text-gray-900">
-                      <MapPin className="w-4 h-4 text-green-500" />
-                      {getAirportLabel(application.travelInfo?.entryPort)}
-                    </p>
+                    <label className="text-sm font-medium text-gray-600 block mb-2 flex items-center gap-2">
+                      <Plane className="w-4 h-4" />
+                      입국공항
+                    </label>
+                    {isEditing ? (
+                      <select
+                        value={editableData.travelInfo?.entryPort || ''}
+                        onChange={(e) => setEditableData({
+                          ...editableData,
+                          travelInfo: { ...editableData.travelInfo, entryPort: e.target.value }
+                        })}
+                        className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 shadow-sm hover:shadow-md text-gray-900"
+                      >
+                        <option value="UIH">푸꿕(UIH)</option>
+                        <option value="ICN">인천(ICN)</option>
+                        <option value="SGN">탄손냣(SGN)</option>
+                        <option value="HAN">노이바이(HAN)</option>
+                        <option value="DAD">다낭(DAD)</option>
+                        <option value="CXR">캄란(CXR)</option>
+                        <option value="VCA">껀터(VCA)</option>
+                        <option value="HPH">깟비(HPH)</option>
+                        <option value="DLI">달랏(DLI)</option>
+                        <option value="PQC">푸꾸옥(PQC)</option>
+                      </select>
+                    ) : (
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                        <p className="flex items-center gap-2 text-gray-900">
+                          <Plane className="w-4 h-4 text-green-500" />
+                          {getAirportLabel(application.travelInfo?.entryPort)}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
@@ -794,6 +1010,9 @@ export default function ApplicationDetailPage() {
                             <h5 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
                               <Activity className="w-4 h-4" />
                               추출된 정보 / Extracted Information
+                              {isEditing && document.extractedInfo && (
+                                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">편집 가능</span>
+                              )}
                             </h5>
                             {document.extractedInfo ? (
                               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
@@ -801,13 +1020,28 @@ export default function ApplicationDetailPage() {
                                   {Object.entries(document.extractedInfo).map(
                                     ([key, value]) =>
                                       value && key !== '__typename' && (
-                                        <div key={key} className="bg-white rounded p-2 border border-blue-100">
+                                        <div key={key} className="bg-white rounded-lg p-3 border border-blue-100 hover:border-blue-200 transition-colors">
                                           <div className="flex justify-between items-start">
                                             <div className="flex-1">
-                                              <span className="font-medium text-blue-700 block text-xs mb-1">
+                                              <span className="font-medium text-blue-700 block text-xs mb-2">
                                                 {getKoreanFieldName(key)} / {key.replace(/([A-Z])/g, ' $1').trim()}
                                               </span>
-                                              <span className="text-blue-900 font-medium">{value}</span>
+                                              {isEditing && document.type === 'passport' ? (
+                                                <input
+                                                  type="text"
+                                                  value={editableData.extractedInfo?.[key] || value}
+                                                  onChange={(e) => setEditableData({
+                                                    ...editableData,
+                                                    extractedInfo: {
+                                                      ...editableData.extractedInfo,
+                                                      [key]: e.target.value
+                                                    }
+                                                  })}
+                                                  className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-blue-900 font-medium text-sm"
+                                                />
+                                              ) : (
+                                                <span className="text-blue-900 font-medium">{value}</span>
+                                              )}
                                             </div>
                                           </div>
                                         </div>

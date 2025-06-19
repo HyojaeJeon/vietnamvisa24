@@ -123,12 +123,27 @@ const typeDefs = gql`
   }
 
   input UpdateApplicationInput {
-    processingType: String
-    totalPrice: Float
     personalInfo: PersonalInfoInput
     travelInfo: TravelInfoInput
-    additionalServiceIds: [ID]
-    documents: DocumentsInput
+    processingType: String
+    totalPrice: Float
+    extractedInfo: ExtractedInfoInput
+  }
+
+  input ExtractedInfoInput {
+    type: String
+    issuingCountry: String
+    passportNo: String
+    surname: String
+    givenNames: String
+    dateOfBirth: String
+    dateOfIssue: String
+    dateOfExpiry: String
+    sex: String
+    nationality: String
+    personalNo: String
+    authority: String
+    koreanName: String
   }
 
   input DocumentsInput {
