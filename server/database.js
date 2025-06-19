@@ -53,8 +53,28 @@ const connectDB = async () => {
     }
 
     // 데이터베이스 동기화 (테이블 생성/업데이트)
-    await models.sequelize.sync(syncOptions);
-    console.log("✅ Database tables synchronized successfully");
+    try {
+      console.log("🔄 Starting database synchronization...");
+      // Use force: true for clean setup, but only in development
+      const syncOptions = process.env.NODE_ENV === 'development' 
+        ? { force: true } // Clean slate for development
+        : { alter: false, force: false }; // Safe for production
+
+      await models.sequelize.sync(syncOptions);
+      console.log("✅ Database synchronized successfully");
+    } catch (syncError) {
+      console.error("❌ Database sync error:", syncError);
+      console.log("⚠️ Attempting to continue without sync...");
+
+      // Try basic connection test
+      try {
+        await models.sequelize.authenticate();
+        console.log("✅ Database connection is working");
+      } catch (authError) {
+        console.error("❌ Database authentication failed:", authError);
+        throw authError;
+      }
+    }
 
     // 테이블 생성이 완료될 때까지 잠시 대기
     await new Promise((resolve) => setTimeout(resolve, 1000));
