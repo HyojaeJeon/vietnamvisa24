@@ -67,12 +67,10 @@ const ConfirmationStep = ({ formData, applicationId }) => {
       doc.setFillColor(79, 143, 255);
       doc.rect(0, 0, pageWidth, 35, 'F');
 
-      // 헤더 장식 요소 (원형)
-      doc.setFillColor(255, 255, 255);
-      doc.setGlobalAlpha(0.1);
+      // 헤더 장식 요소 (원형) - 연한 색상으로 투명 효과 대체
+      doc.setFillColor(245, 245, 245);
       doc.circle(pageWidth - 15, 12, 20, 'F');
       doc.circle(20, 40, 12, 'F');
-      doc.setGlobalAlpha(1);
 
       // 회사 로고 및 브랜드명
       doc.setTextColor(...whiteText);
