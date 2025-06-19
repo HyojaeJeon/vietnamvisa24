@@ -1,0 +1,159 @@
+  const currentPrice = calculateTotalPrice(formData);
+  const receiptRef = useRef(null);
+
+  // PDF 다운로드 함수 - 한글 폰트 지원
+  const downloadReceipt = async () => {
+    try {
+      const jsPDF = (await import("jspdf")).default;
+      const html2canvas = (await import("html2canvas")).default;
+
+      const element = receiptRef.current;
+      if (!element) {
+        alert("영수증 요소를 찾을 수 없습니다.");
+        return;
+      }
+
+      // 접수증 요소를 일시적으로 표시
+      const originalDisplay = element.style.display;
+      element.style.display = "block";
+      element.style.fontFamily = "'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif";
+      element.style.backgroundColor = "#ffffff";
+
+      // HTML 요소를 캔버스로 변환 (한글 폰트 개선)
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        imageTimeout: 30000,
+        removeContainer: true,
+        foreignObjectRendering: false,
+        letterRendering: true,
+        onclone: function (clonedDoc) {
+          // 한글 폰트 스타일 추가
+          const style = clonedDoc.createElement("style");
+          style.textContent = `
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
+            * {
+              font-family: 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif !important;
+              -webkit-font-smoothing: antialiased;
+              -moz-osx-font-smoothing: grayscale;
+            }
+          `;
+          clonedDoc.head.appendChild(style);
+        },
+      });
+
+      // 원래 스타일 복원
+      element.style.display = originalDisplay;
+
+      if (!canvas || canvas.width === 0 || canvas.height === 0) {
+        throw new Error("캔버스 생성에 실패했습니다.");
+      }
+
+      // PDF 생성
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const pdf = new jsPDF("p", "mm", "a4");
+      let position = 0;
+
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+      if (!imgData || imgData === "data:,") {
+        throw new Error("이미지 데이터 생성에 실패했습니다.");
+      }
+
+      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      pdf.save(`베트남_비자_접수증_${applicationId || "TEMP"}.pdf`);
+    } catch (error) {
+      console.error("PDF 생성 오류:", error);
+      // 대체 방법: 텍스트 기반 PDF
+      try {
+        await generateTextBasedPDF();
+      } catch (fallbackError) {
+        console.error("대체 PDF 생성도 실패:", fallbackError);
+        alert("PDF 생성 중 오류가 발생했습니다. 브라우저 인쇄 기능을 사용해주세요.");
+      }
+    }
+  };
+
+  // 텍스트 기반 PDF 생성 (대체 방법)
+  const generateTextBasedPDF = async () => {
+    const jsPDF = (await import("jspdf")).default;
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    pdf.setFont("helvetica", "normal");
+    let y = 20;
+    const lineHeight = 8;
+    const leftMargin = 20;
+
+    // 제목
+    pdf.setFontSize(18);
+    pdf.text("Vietnam Visa Application Receipt", 105, y, { align: "center" });
+    y += lineHeight * 2;
+
+    // 신청번호
+    pdf.setFontSize(14);
+    pdf.text(`Application ID: ${applicationId || "N/A"}`, leftMargin, y);
+    y += lineHeight * 2;
+
+    // 개인정보
+    pdf.setFontSize(12);
+    pdf.text("=== Personal Information ===", leftMargin, y);
+    y += lineHeight;
+
+    const personalInfo = formData.personalInfo || {};
+    pdf.text(`Name: ${personalInfo.lastName || ""} ${personalInfo.firstName || ""}`, leftMargin, y);
+    y += lineHeight;
+    pdf.text(`Email: ${personalInfo.email || "N/A"}`, leftMargin, y);
+    y += lineHeight;
+    pdf.text(`Phone: ${personalInfo.phone || "N/A"}`, leftMargin, y);
+    y += lineHeight * 2;
+
+    // 여행정보
+    pdf.text("=== Travel Information ===", leftMargin, y);
+    y += lineHeight;
+
+    const travelInfo = formData.travelInfo || {};
+    pdf.text(`Entry Date: ${travelInfo.entryDate || "N/A"}`, leftMargin, y);
+    y += lineHeight;
+    pdf.text(`Entry Port: ${travelInfo.entryPort || "N/A"}`, leftMargin, y);
+    y += lineHeight;
+    pdf.text(`Visa Type: ${getVisaTypeLabel(formData.visaType)}`, leftMargin, y);
+    y += lineHeight;
+    pdf.text(`Processing Type: ${getProcessingTypeLabel(formData.processingType)}`, leftMargin, y);
+    y += lineHeight * 2;
+
+    // 결제정보
+    pdf.text("=== Payment Information ===", leftMargin, y);
+    y += lineHeight;
+    pdf.text(`Total Amount: ${formatCurrency(currentPrice)}`, leftMargin, y);
+    y += lineHeight * 2;
+
+    // 발급일
+    pdf.text(`Issue Date: ${new Date().toLocaleDateString("en-US")}`, leftMargin, y);
+
+    pdf.save(`Vietnam_Visa_Receipt_${applicationId || "TEMP"}.pdf`);
+  };
+
+  const getVisaTypeLabel = (type) => {
+    const labels = {
+      [VISA_TYPES.E_VISA_90_SINGLE]: "E-VISA 90일 단수",
+      [VISA_TYPES.E_VISA_90_MULTIPLE]: "E-VISA 90일 복수",
+      [VISA_TYPES.VISA_FREE_45_MOKBAI]: "무비자 45일 + 목바이런",
+      [VISA_TYPES.E_VISA_90_MOKBAI]: "E-VISA 90일 + 목바이런",
+    };
+    return labels[type] || type;
+  };
