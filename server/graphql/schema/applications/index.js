@@ -13,7 +13,6 @@ const typeDefs = gql`
     REJECTED
     COMPLETED
   }
-
   type Application {
     id: ID
     applicationId: String
@@ -25,6 +24,7 @@ const typeDefs = gql`
     personalInfo: PersonalInfo
     travelInfo: TravelInfo
     additionalServices: [AdditionalService]
+    extractedInfo: ExtractedInfo
   }
 
   extend type Document {
@@ -59,6 +59,7 @@ const typeDefs = gql`
     id: ID
     firstName: String
     lastName: String
+    fullName: String
     email: String
     phone: String
     address: String
@@ -85,7 +86,6 @@ const typeDefs = gql`
     hasNextPage: Boolean!
     hasPreviousPage: Boolean!
   }
-
   type ApplicationStatistics {
     pending: Int!
     processing: Int!
@@ -93,6 +93,15 @@ const typeDefs = gql`
     total: Int!
   }
 
+  type ApplicationStatusCounts {
+    pending: Int!
+    processing: Int!
+    document_review: Int!
+    submitted_to_authority: Int!
+    approved: Int!
+    completed: Int!
+    total: Int!
+  }
   type Query {
     application(id: ID): Application
     applications(
@@ -104,6 +113,7 @@ const typeDefs = gql`
       processingTypeFilter: String
     ): ApplicationsResponse
     applicationStatistics: ApplicationStatistics
+    applicationStatusCounts: ApplicationStatusCounts
     documents(applicationId: ID): [Document]
     services: [AdditionalService]
   }
@@ -188,16 +198,22 @@ const typeDefs = gql`
   input PersonalInfoInput {
     firstName: String
     lastName: String
+    fullName: String
     email: String
     phone: String
     address: String
     phoneOfFriend: String
   }
-
   input TravelInfoInput {
     entryDate: Date
     entryPort: String
     visaType: String
+  }
+
+  type Subscription {
+    applicationCreated: Application
+    applicationUpdated: Application
+    applicationStatusCountsUpdated: ApplicationStatusCounts
   }
 `;
 

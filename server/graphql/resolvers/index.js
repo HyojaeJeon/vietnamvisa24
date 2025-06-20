@@ -9,6 +9,7 @@ const paymentResolvers = require("./payment");
 const workflowResolvers = require("./workflow");
 const reportsResolvers = require("./reports");
 const pricingResolvers = require("./pricing");
+const notificationResolvers = require("./notifications");
 
 const resolvers = mergeResolvers([
   scalars,
@@ -20,6 +21,7 @@ const resolvers = mergeResolvers([
   workflowResolvers,
   reportsResolvers,
   pricingResolvers,
+  notificationResolvers,
 ]);
 
 module.exports = resolvers;

@@ -1,23 +1,6 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
-export const MARK_NOTIFICATION_AS_READ_MUTATION = gql`
-  mutation MarkNotificationAsRead($id: ID!) {
-    adminMarkNotificationAsRead(id: $id) {
-      id
-      is_read
-    }
-  }
-`;
-
-export const MARK_ALL_NOTIFICATIONS_AS_READ = gql`
-  mutation MarkAllNotificationsAsRead {
-    markAllNotificationsAsRead {
-      success
-      message
-    }
-  }
-`;
-
+// 알림 전송/생성
 export const SEND_NOTIFICATION_MUTATION = gql`
   mutation SendNotification($input: NotificationInput!) {
     sendNotification(input: $input) {
@@ -28,32 +11,68 @@ export const SEND_NOTIFICATION_MUTATION = gql`
       recipient
       status
       priority
-      created_at
+      relatedId
+      targetUrl
+      createdAt
     }
   }
 `;
 
+// 알림을 읽음으로 표시
 export const MARK_NOTIFICATION_AS_READ = gql`
-  mutation MarkNotificationAsRead($id: ID!) {
-    markNotificationAsRead(id: $id) {
-      id
-      status
+  mutation MarkNotificationAsRead($input: MarkNotificationReadInput!) {
+    markNotificationAsRead(input: $input) {
+      success
+      message
+      notification {
+        id
+        status
+        isRead
+        updatedAt
+      }
     }
   }
 `;
 
-export const CREATE_NOTIFICATION = gql`
-  mutation CreateNotification($input: NotificationInput!) {
-    createNotification(input: $input) {
-      id
-      type
-      title
+// 알림 삭제
+export const DELETE_NOTIFICATION = gql`
+  mutation DeleteNotification($id: ID!) {
+    deleteNotification(id: $id) {
+      success
       message
-      recipient
-      status
-      priority
-      created_at
-      related_id
+    }
+  }
+`;
+
+// 대량 알림 작업 (읽음 처리/삭제)
+export const BULK_NOTIFICATION_ACTION = gql`
+  mutation BulkNotificationAction($input: BulkNotificationActionInput!) {
+    bulkNotificationAction(input: $input) {
+      success
+      message
+      affectedCount
+    }
+  }
+`;
+
+// 모든 알림을 읽음으로 표시
+export const MARK_ALL_NOTIFICATIONS_AS_READ = gql`
+  mutation MarkAllNotificationsAsRead($userId: String!) {
+    markAllNotificationsAsRead(userId: $userId) {
+      success
+      message
+      affectedCount
+    }
+  }
+`;
+
+// 모든 알림 삭제
+export const DELETE_ALL_NOTIFICATIONS = gql`
+  mutation DeleteAllNotifications($userId: String!) {
+    deleteAllNotifications(userId: $userId) {
+      success
+      message
+      affectedCount
     }
   }
 `;

@@ -1,22 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_APPLICATIONS = gql`
-  query GetApplications(
-    $page: Int
-    $limit: Int
-    $searchTerm: String
-    $statusFilter: String
-    $visaTypeFilter: String
-    $processingTypeFilter: String
-  ) {
-    applications(
-      page: $page
-      limit: $limit
-      searchTerm: $searchTerm
-      statusFilter: $statusFilter
-      visaTypeFilter: $visaTypeFilter
-      processingTypeFilter: $processingTypeFilter
-    ) {
+  query GetApplications($page: Int, $limit: Int, $searchTerm: String, $statusFilter: String, $visaTypeFilter: String, $processingTypeFilter: String) {
+    applications(page: $page, limit: $limit, searchTerm: $searchTerm, statusFilter: $statusFilter, visaTypeFilter: $visaTypeFilter, processingTypeFilter: $processingTypeFilter) {
       applications {
         id
         applicationId
@@ -28,6 +14,7 @@ export const GET_APPLICATIONS = gql`
           id
           firstName
           lastName
+          fullName
           email
           phone
           address
@@ -50,6 +37,8 @@ export const GET_APPLICATIONS = gql`
           fileSize
           fileType
           uploadedAt
+          fileUrl
+          fileData
           extractedInfo {
             type
             issuingCountry
@@ -100,6 +89,7 @@ export const GET_APPLICATION = gql`
         id
         firstName
         lastName
+        fullName
         email
         phone
         address
@@ -122,6 +112,8 @@ export const GET_APPLICATION = gql`
         fileSize
         fileType
         uploadedAt
+        fileUrl
+        fileData
         extractedInfo {
           type
           issuingCountry
@@ -206,6 +198,120 @@ export const GET_VISA_TYPES = gql`
       processingTime
       price
       requiredDocuments
+    }
+  }
+`;
+
+// Status counts query for dashboard
+export const GET_APPLICATION_STATUS_COUNTS = gql`
+  query GetApplicationStatusCounts {
+    applicationStatusCounts {
+      pending
+      processing
+      document_review
+      submitted_to_authority
+      approved
+      completed
+      total
+    }
+  }
+`;
+
+// GraphQL subscriptions for real-time updates
+export const APPLICATION_CREATED_SUBSCRIPTION = gql`
+  subscription ApplicationCreated {
+    applicationCreated {
+      id
+      applicationId
+      processingType
+      totalPrice
+      status
+      createdAt
+      personalInfo {
+        id
+        firstName
+        lastName
+        fullName
+        email
+        phone
+        address
+        phoneOfFriend
+      }
+      travelInfo {
+        id
+        entryDate
+        entryPort
+        visaType
+      }
+      additionalServices {
+        id
+        name
+      }
+      documents {
+        id
+        type
+        fileName
+        fileSize
+        fileType
+        uploadedAt
+        fileUrl
+      }
+    }
+  }
+`;
+
+export const APPLICATION_UPDATED_SUBSCRIPTION = gql`
+  subscription ApplicationUpdated {
+    applicationUpdated {
+      id
+      applicationId
+      processingType
+      totalPrice
+      status
+      createdAt
+      personalInfo {
+        id
+        firstName
+        lastName
+        fullName
+        email
+        phone
+        address
+        phoneOfFriend
+      }
+      travelInfo {
+        id
+        entryDate
+        entryPort
+        visaType
+      }
+      additionalServices {
+        id
+        name
+      }
+      documents {
+        id
+        type
+        fileName
+        fileSize
+        fileType
+        uploadedAt
+        fileUrl
+      }
+    }
+  }
+`;
+
+export const APPLICATION_STATUS_COUNTS_UPDATED_SUBSCRIPTION = gql`
+  subscription ApplicationStatusCountsUpdated {
+    applicationStatusCountsUpdated {
+      pending
+      processing
+      document_review
+      submitted_to_authority
+      approved
+      completed
+      total
     }
   }
 `;

@@ -25,16 +25,16 @@ module.exports = (sequelize) => {
       },
       status: {
         type: DataTypes.ENUM(
-          "pending",
-          "processing",
-          "document_review",
-          "submitted_to_authority",
-          "approved",
-          "rejected",
-          "completed"
+          "PENDING",
+          "PROCESSING",
+          "DOCUMENT_REVIEW",
+          "SUBMITTED_TO_AUTHORITY",
+          "APPROVED",
+          "REJECTED",
+          "COMPLETED",
         ),
         allowNull: false,
-        defaultValue: "pending",
+        defaultValue: "PENDING",
       },
       processingType: {
         type: DataTypes.STRING,
@@ -115,7 +115,7 @@ module.exports = (sequelize) => {
       underscored: false,
       createdAt: "createdAt",
       updatedAt: "updatedAt",
-    }
+    },
   );
 
   VisaApplication.associate = (models) => {
@@ -208,15 +208,15 @@ module.exports = (sequelize) => {
       },
       status: {
         type: DataTypes.ENUM(
-          "pending",
-          "processing",
-          "document_review",
-          "submitted_to_authority",
-          "approved",
-          "rejected",
-          "completed",
+          "PENDING",
+          "PROCESSING",
+          "DOCUMENT_REVIEW",
+          "SUBMITTED_TO_AUTHORITY",
+          "APPROVED",
+          "REJECTED",
+          "COMPLETED",
         ),
-        defaultValue: "pending",
+        defaultValue: "PENDING",
         allowNull: true,
       },
       assignedTo: {

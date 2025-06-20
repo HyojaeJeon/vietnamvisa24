@@ -17,6 +17,7 @@ const webhooksRouter = require("./routes/webhooks");
 const documentsRouter = require("./routes/documents");
 const uploadPassportImageRouter = require("./routes/uploadPassportImage");
 const uploadProfileImageRouter = require("./routes/uploadProfileImage");
+const notificationsRouter = require("./routes/notifications");
 
 // 리졸버 자동 래핑
 const wrapResolvers = (resolvers) => {
@@ -100,12 +101,15 @@ async function startServer() {
   app.use(express.json({ limit: "50mb" })); // 파일 업로드를 위해 크기 제한 증가
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   app.use(cookieParser());
-
   // 요청 로깅 미들웨어
   app.use((req, res, next) => {
     console.log(`📝 ${new Date().toISOString()} - ${req.method} ${req.url}`);
     next();
   });
+
+  // 정적 파일 서빙 (업로드된 파일들)
+  app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+  console.log("✅ Static file serving registered at /uploads");
 
   // 문서 관리 API
   app.use(
@@ -126,12 +130,15 @@ async function startServer() {
   console.log(
     "✅ Passport extraction router registered at /api/extract_passport",
   );
-
   // 프로필 이미지 업로드 API
   app.use("/api/upload_profile_image", uploadProfileImageRouter);
   console.log(
     "✅ Profile image upload router registered at /api/upload_profile_image",
   );
+
+  // 알림 관리 API
+  app.use("/api/notifications", notificationsRouter);
+  console.log("✅ Notifications router registered at /api/notifications");
 
   // 업로드된 파일 정적 서빙
   app.use("/uploads", express.static(path.join(__dirname, "uploads")));

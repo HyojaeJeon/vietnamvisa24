@@ -31,7 +31,7 @@ module.exports = {
         ],
         {
           ignoreDuplicates: true,
-        }
+        },
       );
 
       // Create visa applications
@@ -49,7 +49,7 @@ module.exports = {
           arrival_date: "2024-02-15",
           departure_date: "2024-02-25",
           purpose: "관광",
-          status: "pending",
+          status: "PENDING",
         },
         {
           application_number: "VN-2024-002",
@@ -64,7 +64,7 @@ module.exports = {
           arrival_date: "2024-02-20",
           departure_date: "2024-03-20",
           purpose: "비즈니스",
-          status: "processing",
+          status: "PROCESSING",
         },
         {
           application_number: "VN-2024-003",
@@ -79,7 +79,7 @@ module.exports = {
           arrival_date: "2024-03-01",
           departure_date: "2025-03-01",
           purpose: "취업",
-          status: "document_review",
+          status: "DOCUMENT_REVIEW",
         },
         {
           application_number: "VN-2024-004",
@@ -93,7 +93,7 @@ module.exports = {
           arrival_date: "2024-02-10",
           departure_date: "2024-02-20",
           purpose: "관광",
-          status: "approved",
+          status: "APPROVED",
         },
         {
           application_number: "VN-2024-005",
@@ -107,7 +107,7 @@ module.exports = {
           arrival_date: "2024-01-25",
           departure_date: "2024-02-05",
           purpose: "회의",
-          status: "rejected",
+          status: "REJECTED",
         },
       ]);
 

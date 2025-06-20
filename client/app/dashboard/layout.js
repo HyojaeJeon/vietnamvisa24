@@ -28,22 +28,51 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-import useSocket from "../src/hooks/useSocket";
-import NotificationCenter from "../src/components/NotificationCenter";
+import { SocketProvider } from "../src/contexts/SocketContext";
+import NotificationCenterEnhanced from "../src/components/NotificationCenterEnhanced";
+import useSocket from "../src/hooks/useSocket.simple";
 
 export default function DashboardLayout({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-
-  const { data, loading, error } = useQuery(GET_ME_QUERY, {
+  const { data, loading } = useQuery(GET_ME_QUERY, {
     errorPolicy: "all",
-  }); // User 기반 토큰/ID
-  const token = typeof window !== "undefined" ? localStorage.getItem("accessToken") : null;
-  const userId = data?.getMe?.id;
+  });
 
-  const { isConnected, notifications, unreadCount, markNotificationAsRead, markAllNotificationsAsRead, removeNotification, clearAllNotifications } = useSocket(userId, token);
+  // Socket 연결 및 알림 관리 - 클라이언트 사이드에서만 실행
+  const [token, setToken] = useState(null);
+
+  useEffect(() => {
+    // localStorage는 클라이언트 사이드에서만 접근
+    if (typeof window !== "undefined") {
+      setToken(localStorage.getItem("accessToken"));
+    }
+  }, []);
+
+  // useSocket 호출을 조건부로 처리
+  const socketResult = useSocket(data?.getMe?.id, token);
+  const { isConnected, notifications, unreadCount, markNotificationAsRead, markAllNotificationsAsRead, removeNotification, clearAllNotifications } = socketResult || {
+    isConnected: false,
+    notifications: [],
+    unreadCount: 0,
+    markNotificationAsRead: () => {},
+    markAllNotificationsAsRead: () => {},
+    removeNotification: () => {},
+    clearAllNotifications: () => {},
+  };
+
+  // 연결 상태 디버깅
+  useEffect(() => {
+    console.log("🔍 Dashboard Layout - Socket state:", {
+      isConnected,
+      userId: data?.getMe?.id,
+      token: localStorage.getItem("accessToken") ? "존재" : "없음",
+      notificationsCount: notifications.length,
+      unreadCount,
+    });
+  }, [isConnected, data?.getMe?.id, notifications.length, unreadCount]);
 
   // 화면 크기 감지
   useEffect(() => {
@@ -190,15 +219,15 @@ export default function DashboardLayout({ children }) {
       </div>
     );
   }
-
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      {/* Mobile sidebar overlay */}
-      {isMobile && sidebarOpen && <div className="fixed inset-0 z-40 transition-opacity duration-300 bg-black bg-opacity-50" onClick={() => setSidebarOpen(false)} />}
+    <SocketProvider>
+      <div className="flex min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+        {/* Mobile sidebar overlay */}
+        {isMobile && sidebarOpen && <div className="fixed inset-0 z-40 transition-opacity duration-300 bg-black bg-opacity-50" onClick={() => setSidebarOpen(false)} />}
 
-      {/* Sidebar */}
-      <div
-        className={`
+        {/* Sidebar */}
+        <div
+          className={`
         fixed lg:static inset-y-0 left-0 z-50
         ${sidebarOpen ? "w-72" : "w-0 lg:w-16"}
         bg-white shadow-2xl
@@ -206,191 +235,191 @@ export default function DashboardLayout({ children }) {
         ${isMobile ? (sidebarOpen ? "translate-x-0" : "-translate-x-full") : "translate-x-0"}
         border-r border-gray-200 overflow-hidden
       `}
-      >
-        {/* Sidebar header */}
-        <div className={`relative flex items-center justify-between h-20 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 ${!sidebarOpen && !isMobile ? "px-2" : ""}`}>
-          {sidebarOpen && (
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="flex items-center justify-center w-12 h-12 bg-white shadow-lg rounded-xl">
-                  <Shield className="text-blue-600 h-7 w-7" />
+        >
+          {/* Sidebar header */}
+          <div className={`relative flex items-center justify-between h-20 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 ${!sidebarOpen && !isMobile ? "px-2" : ""}`}>
+            {sidebarOpen && (
+              <div className="flex items-center space-x-3">
+                <div className="relative">
+                  <div className="flex items-center justify-center w-12 h-12 bg-white shadow-lg rounded-xl">
+                    <Shield className="text-blue-600 h-7 w-7" />
+                  </div>
+                  <div className="absolute w-4 h-4 bg-green-500 border-2 border-white rounded-full -top-1 -right-1"></div>
                 </div>
-                <div className="absolute w-4 h-4 bg-green-500 border-2 border-white rounded-full -top-1 -right-1"></div>
-              </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">VietnamVisa</h2>
-                <p className="text-sm font-medium text-blue-100">대시보드 시스템</p>
-              </div>
-            </div>
-          )}
-
-          {!sidebarOpen && !isMobile && (
-            <div className="flex items-center justify-center w-12 h-12 mx-auto bg-white shadow-lg rounded-xl">
-              <Shield className="text-blue-600 h-7 w-7" />
-            </div>
-          )}
-
-          {/* Desktop toggle button */}
-          {!isMobile && (
-            <button onClick={toggleSidebar} className="p-2 text-white transition-colors rounded-lg hover:bg-white/20">
-              {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
-            </button>
-          )}
-
-          {/* Mobile close button */}
-          {isMobile && (
-            <button onClick={() => setSidebarOpen(false)} className="p-2 text-white transition-colors rounded-lg hover:bg-white/20">
-              <X className="w-5 h-5" />
-            </button>
-          )}
-        </div>{" "}
-        {/* User info */}
-        {data?.getMe && sidebarOpen && (
-          <div className="px-6 py-6 border-b border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="flex items-center justify-center shadow-lg w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
-                  <span className="text-lg font-bold text-white">{data.getMe.name.charAt(0)}</span>
-                </div>
-                <div className="absolute -bottom-1 -right-1">
-                  <Sparkles className="w-5 h-5 text-yellow-500" />
+                <div>
+                  <h2 className="text-xl font-bold text-white">VietnamVisa</h2>
+                  <p className="text-sm font-medium text-blue-100">대시보드 시스템</p>
                 </div>
               </div>
-              <div className="flex-1">
-                <p className="text-lg font-bold text-gray-900">{data.getMe.name}</p>
-                <p className="mb-2 text-sm text-gray-600">{data.getMe.email}</p>
-                <span
-                  className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
-                    data.getMe.role === "SUPER_ADMIN"
-                      ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
-                      : data.getMe.role === "MANAGER"
-                      ? "bg-blue-100 text-blue-800 border border-blue-200"
-                      : "bg-green-100 text-green-800 border border-green-200"
-                  }`}
-                >
-                  {data.getMe.role === "SUPER_ADMIN" ? "최고권한" : data.getMe.role === "MANAGER" ? "매니저" : "스태프"}
-                </span>
+            )}
+
+            {!sidebarOpen && !isMobile && (
+              <div className="flex items-center justify-center w-12 h-12 mx-auto bg-white shadow-lg rounded-xl">
+                <Shield className="text-blue-600 h-7 w-7" />
               </div>
-            </div>
-          </div>
-        )}
-        {/* Collapsed user info */}
-        {data?.getMe && !sidebarOpen && !isMobile && (
-          <div className="px-2 py-4 border-b border-gray-200">
-            <div className="flex justify-center">
-              <div className="flex items-center justify-center w-10 h-10 rounded-lg shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600">
-                <span className="text-sm font-bold text-white">{data.getMe.name.charAt(0)}</span>
-              </div>
-            </div>
-          </div>
-        )}
-        {/* Navigation */}
-        <nav className={`flex-1 py-6 space-y-2 overflow-y-auto ${sidebarOpen ? "px-4" : "px-2"}`}>
-          {menuItems.map((item) => {
-            const IconComponent = item.icon;
-            return (
-              <button
-                key={item.name}
-                onClick={() => {
-                  router.push(item.href);
-                  if (isMobile) setSidebarOpen(false);
-                }}
-                className={`w-full group flex items-center text-sm font-medium rounded-xl transition-all duration-200 ${sidebarOpen ? "px-4 py-3" : "px-3 py-3 justify-center"} ${
-                  item.active
-                    ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transform scale-[1.02]"
-                    : "text-gray-700 hover:bg-gradient-to-r hover:from-gray-100 hover:to-blue-50 hover:text-blue-700"
-                }`}
-                title={!sidebarOpen ? item.name : ""}
-              >
-                <IconComponent className={`h-5 w-5 transition-colors ${sidebarOpen ? "mr-3" : ""} ${item.active ? "text-white" : item.color + " group-hover:text-blue-600"}`} />
-                {sidebarOpen && (
-                  <>
-                    <span className="font-medium">{item.name}</span>
-                    {item.active && (
-                      <div className="ml-auto">
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                      </div>
-                    )}
-                  </>
-                )}
+            )}
+
+            {/* Desktop toggle button */}
+            {!isMobile && (
+              <button onClick={toggleSidebar} className="p-2 text-white transition-colors rounded-lg hover:bg-white/20">
+                {sidebarOpen ? <ChevronLeft className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
               </button>
-            );
-          })}
-        </nav>
-        {/* Logout button */}
-        <div className={`border-t border-gray-200 bg-gray-50 ${sidebarOpen ? "p-4" : "p-2"}`}>
-          <button
-            onClick={handleLogout}
-            className={`w-full flex items-center text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group ${
-              sidebarOpen ? "px-4 py-3" : "px-3 py-3 justify-center"
-            }`}
-            title={!sidebarOpen ? "로그아웃" : ""}
-          >
-            <LogOut className={`h-5 w-5 text-gray-500 group-hover:text-red-600 transition-colors ${sidebarOpen ? "mr-3" : ""}`} />
-            {sidebarOpen && <span className="font-medium">로그아웃</span>}
-          </button>
-        </div>
-      </div>
+            )}
 
-      {/* Main content */}
-      <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${!isMobile && !sidebarOpen ? "ml-0" : ""}`}>
-        {/* Top bar */}
-        <div className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 border-b border-gray-200 shadow-sm bg-white/90 backdrop-blur-md">
-          <div className="flex items-center space-x-4">
-            <button onClick={toggleSidebar} className="p-2 text-gray-500 transition-all rounded-lg hover:text-gray-700 hover:bg-gray-100">
-              <Menu className="w-5 h-5" />
+            {/* Mobile close button */}
+            {isMobile && (
+              <button onClick={() => setSidebarOpen(false)} className="p-2 text-white transition-colors rounded-lg hover:bg-white/20">
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>{" "}
+          {/* User info */}
+          {data?.getMe && sidebarOpen && (
+            <div className="px-6 py-6 border-b border-blue-100 bg-gradient-to-r from-blue-50 to-indigo-50">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="flex items-center justify-center shadow-lg w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
+                    <span className="text-lg font-bold text-white">{data.getMe.name.charAt(0)}</span>
+                  </div>
+                  <div className="absolute -bottom-1 -right-1">
+                    <Sparkles className="w-5 h-5 text-yellow-500" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <p className="text-lg font-bold text-gray-900">{data.getMe.name}</p>
+                  <p className="mb-2 text-sm text-gray-600">{data.getMe.email}</p>
+                  <span
+                    className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${
+                      data.getMe.role === "SUPER_ADMIN"
+                        ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                        : data.getMe.role === "MANAGER"
+                        ? "bg-blue-100 text-blue-800 border border-blue-200"
+                        : "bg-green-100 text-green-800 border border-green-200"
+                    }`}
+                  >
+                    {data.getMe.role === "SUPER_ADMIN" ? "최고권한" : data.getMe.role === "MANAGER" ? "매니저" : "스태프"}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Collapsed user info */}
+          {data?.getMe && !sidebarOpen && !isMobile && (
+            <div className="px-2 py-4 border-b border-gray-200">
+              <div className="flex justify-center">
+                <div className="flex items-center justify-center w-10 h-10 rounded-lg shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600">
+                  <span className="text-sm font-bold text-white">{data.getMe.name.charAt(0)}</span>
+                </div>
+              </div>
+            </div>
+          )}
+          {/* Navigation */}
+          <nav className={`flex-1 py-6 space-y-2 overflow-y-auto ${sidebarOpen ? "px-4" : "px-2"}`}>
+            {menuItems.map((item) => {
+              const IconComponent = item.icon;
+              return (
+                <button
+                  key={item.name}
+                  onClick={() => {
+                    router.push(item.href);
+                    if (isMobile) setSidebarOpen(false);
+                  }}
+                  className={`w-full group flex items-center text-sm font-medium rounded-xl transition-all duration-200 ${sidebarOpen ? "px-4 py-3" : "px-3 py-3 justify-center"} ${
+                    item.active
+                      ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transform scale-[1.02]"
+                      : "text-gray-700 hover:bg-gradient-to-r hover:from-gray-100 hover:to-blue-50 hover:text-blue-700"
+                  }`}
+                  title={!sidebarOpen ? item.name : ""}
+                >
+                  <IconComponent className={`h-5 w-5 transition-colors ${sidebarOpen ? "mr-3" : ""} ${item.active ? "text-white" : item.color + " group-hover:text-blue-600"}`} />
+                  {sidebarOpen && (
+                    <>
+                      <span className="font-medium">{item.name}</span>
+                      {item.active && (
+                        <div className="ml-auto">
+                          <div className="w-2 h-2 bg-white rounded-full"></div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+          {/* Logout button */}
+          <div className={`border-t border-gray-200 bg-gray-50 ${sidebarOpen ? "p-4" : "p-2"}`}>
+            <button
+              onClick={handleLogout}
+              className={`w-full flex items-center text-sm font-medium text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 group ${
+                sidebarOpen ? "px-4 py-3" : "px-3 py-3 justify-center"
+              }`}
+              title={!sidebarOpen ? "로그아웃" : ""}
+            >
+              <LogOut className={`h-5 w-5 text-gray-500 group-hover:text-red-600 transition-colors ${sidebarOpen ? "mr-3" : ""}`} />
+              {sidebarOpen && <span className="font-medium">로그아웃</span>}
             </button>
+          </div>
+        </div>
 
-            <div className="items-center hidden space-x-2 lg:flex">
-              <Home className="w-4 h-4 text-gray-400" />
-              <ChevronDown className="h-4 w-4 text-gray-400 rotate-[-90deg]" />
-              <span className="text-sm font-medium text-gray-600">{menuItems.find((item) => item.active)?.name || "대시보드"}</span>
+        {/* Main content */}
+        <div className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${!isMobile && !sidebarOpen ? "ml-0" : ""}`}>
+          {/* Top bar */}
+          <div className="sticky top-0 z-30 flex items-center justify-between h-16 px-6 border-b border-gray-200 shadow-sm bg-white/90 backdrop-blur-md">
+            <div className="flex items-center space-x-4">
+              <button onClick={toggleSidebar} className="p-2 text-gray-500 transition-all rounded-lg hover:text-gray-700 hover:bg-gray-100">
+                <Menu className="w-5 h-5" />
+              </button>
+
+              <div className="items-center hidden space-x-2 lg:flex">
+                <Home className="w-4 h-4 text-gray-400" />
+                <ChevronDown className="h-4 w-4 text-gray-400 rotate-[-90deg]" />
+                <span className="text-sm font-medium text-gray-600">{menuItems.find((item) => item.active)?.name || "대시보드"}</span>
+              </div>
+            </div>{" "}
+            <div className="flex items-center space-x-4">
+              <NotificationCenterEnhanced
+                socketNotifications={notifications}
+                isConnected={isConnected}
+                onMarkAsRead={markNotificationAsRead}
+                onMarkAllAsRead={markAllNotificationsAsRead}
+                onRemove={removeNotification}
+                onClear={clearAllNotifications}
+              />
+
+              <div className="hidden px-3 py-1 text-sm text-gray-600 bg-gray-100 rounded-lg sm:block">
+                {new Date().toLocaleDateString("ko-KR", {
+                  month: "short",
+                  day: "numeric",
+                  weekday: "short",
+                })}
+              </div>
             </div>
           </div>{" "}
-          <div className="flex items-center space-x-4">
-            <NotificationCenter
-              notifications={notifications}
-              unreadCount={unreadCount}
-              isConnected={isConnected}
-              onMarkAsRead={markNotificationAsRead}
-              onMarkAllAsRead={markAllNotificationsAsRead}
-              onRemove={removeNotification}
-              onClear={clearAllNotifications}
-            />
+          {/* Page content */}
+          <main className="flex-1 p-6 overflow-auto">
+            <div className="mx-auto max-w-7xl">{children}</div>
+          </main>
+        </div>
 
-            <div className="hidden px-3 py-1 text-sm text-gray-600 bg-gray-100 rounded-lg sm:block">
-              {new Date().toLocaleDateString("ko-KR", {
-                month: "short",
-                day: "numeric",
-                weekday: "short",
-              })}
-            </div>
-          </div>
-        </div>{" "}
-        {/* Page content */}
-        <main className="flex-1 p-6 overflow-auto">
-          <div className="mx-auto max-w-7xl">{children}</div>
-        </main>
-      </div>
-
-      {/* Toast notifications */}
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: "#363636",
-            color: "#fff",
-          },
-          success: {
-            duration: 3000,
-            theme: {
-              primary: "green",
-              secondary: "black",
+        {/* Toast notifications */}
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: "#363636",
+              color: "#fff",
             },
-          },
-        }}
-      />
-    </div>
+            success: {
+              duration: 3000,
+              theme: {
+                primary: "green",
+                secondary: "black",
+              },
+            },
+          }}
+        />
+      </div>
+    </SocketProvider>
   );
 }

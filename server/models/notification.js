@@ -16,6 +16,10 @@ module.exports = (sequelize) => {
           "consultation",
           "system",
           "document_required",
+          "dashboard_new_application",
+          "new_application",
+          "application_status_change",
+          "notification",
         ),
         allowNull: false,
       },
@@ -42,6 +46,11 @@ module.exports = (sequelize) => {
       relatedId: {
         type: DataTypes.STRING(100),
         allowNull: true,
+      },
+      targetUrl: {
+        type: DataTypes.STRING(500),
+        allowNull: true,
+        comment: "클릭 시 이동할 URL 경로",
       },
       createdAt: {
         type: DataTypes.DATE,

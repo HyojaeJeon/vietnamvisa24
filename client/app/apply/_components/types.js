@@ -1,18 +1,18 @@
 // Types and interfaces for the apply form
 
 export const VISA_TYPES = {
-  E_VISA_GENERAL: "e-visa_general",
-  E_VISA_URGENT: "e-visa_urgent",
-  E_VISA_TRANSIT: "e-visa_transit",
+  E_VISA_GENERAL: "E_VISA_GENERAL",
+  E_VISA_URGENT: "E_VISA_URGENT",
+  E_VISA_TRANSIT: "E_VISA_TRANSIT",
 };
 
 export const PROCESSING_TYPES = {
   EXPRESS_1HOUR: "1시간",
-  EXPRESS_2HOUR: "2시간", 
+  EXPRESS_2HOUR: "2시간",
   EXPRESS_4HOUR: "4시간",
   EXPRESS_1DAY: "1일",
   EXPRESS_2DAY: "2일",
-  STANDARD: "3~4일",
+  STANDARD: "STANDARD",
 };
 
 export const DOCUMENT_TYPES = {
@@ -143,9 +143,9 @@ export const ADDITIONAL_SERVICES = [
 
 export const initialFormData = {
   // Service Selection
-  serviceType: "e_visa",
-  visaDurationType: "single_90",
-  processingType: "standard",
+  visaType: "", // 기본값은 빈 문자열로 사용자가 선택하도록
+  visaDurationType: "",
+  processingType: "",
 
   // Personal Information
   firstName: "",
@@ -162,9 +162,7 @@ export const initialFormData = {
   address: "",
   city: "",
   country: "",
-
   // Travel Information
-  visaType: "general",
   entryDate: "",
   exitDate: "",
   purpose: "",

@@ -2,7 +2,6 @@
 
 import { ADDITIONAL_SERVICES } from "./types.js";
 
-
 export const formatDate = (date) => {
   return new Date(date).toLocaleDateString("ko-KR");
 };
@@ -16,7 +15,7 @@ export const validateEmail = (email) => {
 export const validatePhone = (phone) => {
   // 국제 전화번호 형식 검증 (한국: +82, 베트남: +84 등)
   const phoneRegex = /^(\+\d{1,3}[-.\s]?)?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}$/;
-  const cleanPhone = phone.replace(/[\s\-()]/g, '');
+  const cleanPhone = phone.replace(/[\s\-()]/g, "");
 
   // 최소 8자리, 최대 15자리 (국제표준)
   return phoneRegex.test(phone) && cleanPhone.length >= 8 && cleanPhone.length <= 15;
@@ -78,12 +77,14 @@ export const validateStep = (step, formData) => {
   console.log("formData : ", formData);
   switch (step) {
     case 1:
-      // Step 1에서는 serviceType, visaDurationType(E-visa인 경우), processingType이 필요
-      if (!formData.serviceType) return false;
-      if (formData.serviceType === "e_visa" && !formData.visaDurationType) return false;
-      return formData.processingType;
+      // Step 1에서는 visaType, visaDurationType, processingType(긴급 비자인 경우)이 필요
+      if (!formData.visaType) return false;
+      if (!formData.visaDurationType) return false; // 긴급 비자의 경우에만 processingType이 필요
+      if (formData.visaType === "E_VISA_URGENT" && !formData.processingType) return false;
+      return true;
     case 2:
       return (
+        formData?.personalInfo?.fullName &&
         formData?.personalInfo?.email &&
         formData?.personalInfo?.phone &&
         formData?.personalInfo?.address &&
@@ -155,12 +156,12 @@ export const generateApplicationId = () => {
 
 // Format currency to Korean Won
 export const formatCurrency = (amount) => {
-  if (typeof amount !== 'number') {
-    return '₩0';
+  if (typeof amount !== "number") {
+    return "₩0";
   }
-  return new Intl.NumberFormat('ko-KR', {
-    style: 'currency',
-    currency: 'KRW'
+  return new Intl.NumberFormat("ko-KR", {
+    style: "currency",
+    currency: "KRW",
   }).format(amount);
 };
 

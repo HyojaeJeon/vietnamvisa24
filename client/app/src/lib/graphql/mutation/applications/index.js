@@ -147,16 +147,8 @@ export const UPDATE_STATUS_MUTATION = gql`
 
 // 새로운 이메일 발송 뮤테이션
 export const SEND_NOTIFICATION_EMAIL_MUTATION = gql`
-  mutation SendNotificationEmail(
-    $applicationId: ID!
-    $emailType: String!
-    $customMessage: String
-  ) {
-    sendNotificationEmail(
-      applicationId: $applicationId
-      emailType: $emailType
-      customMessage: $customMessage
-    ) {
+  mutation SendNotificationEmail($applicationId: ID!, $emailType: String!, $customMessage: String) {
+    sendNotificationEmail(applicationId: $applicationId, emailType: $emailType, customMessage: $customMessage) {
       success
       message
       emailType
@@ -178,6 +170,7 @@ export const UPDATE_APPLICATION_MUTATION = gql`
         id
         firstName
         lastName
+        fullName
         email
         phone
         address

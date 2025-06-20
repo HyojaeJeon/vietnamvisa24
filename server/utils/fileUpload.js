@@ -15,7 +15,13 @@ const createUploadDir = async (applicationId) => {
 };
 
 // Base64 파일을 디스크에 저장
-const saveBase64File = async (base64Data, fileName, applicationId) => {
+const saveBase64File = async (
+  base64Data,
+  fileName,
+  applicationId,
+  applicantName = null,
+  documentType = null,
+) => {
   try {
     // Base64 데이터에서 메타데이터 제거
     const base64Content = base64Data.replace(/^data:[^;]+;base64,/, "");
@@ -23,10 +29,29 @@ const saveBase64File = async (base64Data, fileName, applicationId) => {
     // 파일 확장자 추출
     const fileExtension = path.extname(fileName);
 
-    // 안전한 파일명 생성 (타임스탬프 + 랜덤 해시 + 확장자)
-    const timestamp = Date.now();
-    const randomHash = crypto.randomBytes(8).toString("hex");
-    const safeFileName = `${timestamp}_${randomHash}${fileExtension}`;
+    // 현재 날짜와 시간을 형식화 (분/초까지)
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hour = String(now.getHours()).padStart(2, "0");
+    const minute = String(now.getMinutes()).padStart(2, "0");
+    const second = String(now.getSeconds()).padStart(2, "0");
+    const timeString = `${year}${month}${day}_${hour}${minute}${second}`;
+
+    // 신청자명_image type_업로드 시간 형식으로 파일명 생성
+    let safeFileName;
+    if (applicantName && documentType) {
+      // 한글 이름은 그대로 사용, 특수문자만 제거
+      const cleanApplicantName = applicantName.replace(/[/\\:*?"<>|]/g, "");
+      const cleanDocumentType = documentType.replace(/[/\\:*?"<>|]/g, "");
+      safeFileName = `${cleanApplicantName}_${cleanDocumentType}_${timeString}${fileExtension}`;
+    } else {
+      // 기존 방식 (후방 호환성)
+      const timestamp = Date.now();
+      const randomHash = crypto.randomBytes(8).toString("hex");
+      safeFileName = `${timestamp}_${randomHash}${fileExtension}`;
+    }
 
     // 업로드 디렉토리 생성
     const uploadDir = await createUploadDir(applicationId);
@@ -53,6 +78,12 @@ const saveBase64File = async (base64Data, fileName, applicationId) => {
   }
 };
 
+// Base64 데이터에서 MIME 타입 추출
+const getMimeTypeFromBase64 = (base64Data) => {
+  const match = base64Data.match(/^data:([^;]+);base64,/);
+  return match ? match[1] : "application/octet-stream";
+};
+
 // 파일 타입 검증
 const validateFileType = (
   fileName,
@@ -75,4 +106,5 @@ module.exports = {
   saveBase64File,
   validateFileType,
   validateFileSize,
+  getMimeTypeFromBase64,
 };

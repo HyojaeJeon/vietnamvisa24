@@ -2,31 +2,9 @@
 
 import React, { useState, useRef } from "react";
 import PropTypes from "prop-types";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "../../src/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
 import { Button } from "../../src/components/ui/button";
-import {
-  CheckCircle,
-  Download,
-  Mail,
-  Phone,
-  MessageCircle,
-  FileText,
-  Clock,
-  Calendar,
-  User,
-  Globe,
-  MapPin,
-  CreditCard,
-  Plane,
-  Building,
-  Share2,
-  Copy,
-} from "lucide-react";
+import { CheckCircle, Download, Mail, Phone, MessageCircle, FileText, Clock, Calendar, User, Globe, MapPin, CreditCard, Plane, Building, Share2, Copy } from "lucide-react";
 
 import { formatCurrency } from "./utils";
 
@@ -41,14 +19,19 @@ const calculateTotalPrice = (formData) => {
 const ConfirmationStep = ({ formData, applicationId }) => {
   const currentPrice = calculateTotalPrice(formData);
   const receiptRef = useRef(null);
-  const [isDownloading, setIsDownloading] =useState(false)
+  const [isDownloading, setIsDownloading] = useState(false);
   const getEntryPortLabel = (portCode) => {
     const portMap = {
-      DAD: "다낭",
-      HAN: "하노이",
       SGN: "호치민",
+      HAN: "하노이",
+      DAD: "다낭",
       CXR: "나트랑",
-      PQC: "푸꿕",
+      PQC: "푸꾸옥",
+      VDO: "반돈",
+      HPH: "하이퐁",
+      UIH: "부온마투옷",
+      LAND_BORDER: "육로 국경",
+      OTHER: "기타",
     };
     return portMap[portCode] || "미정";
   };
@@ -75,8 +58,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
       // 접수증 요소를 일시적으로 표시
       const originalDisplay = element.style.display;
       element.style.display = "block";
-      element.style.fontFamily =
-        "'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif";
+      element.style.fontFamily = "'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif";
       element.style.backgroundColor = "#ffffff";
 
       // HTML 요소를 캔버스로 변환 (한글 폰트 개선)
@@ -137,9 +119,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
       }
 
       // 파일명 생성
-      const safeDate = new Date()
-        .toLocaleDateString("ko-KR")
-        .replace(/[.\s]/g, "");
+      const safeDate = new Date().toLocaleDateString("ko-KR").replace(/[.\s]/g, "");
       const fileName = `베트남비자_접수증_${applicationId}_${safeDate}.pdf`;
 
       // PDF 저장
@@ -148,9 +128,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
       console.log("PDF 다운로드 완료:", fileName);
     } catch (error) {
       console.error("PDF 생성 오류:", error);
-      alert(
-        `PDF 생성 중 오류가 발생했습니다: ${error.message || "알 수 없는 오류"}`,
-      );
+      alert(`PDF 생성 중 오류가 발생했습니다: ${error.message || "알 수 없는 오류"}`);
     }
   };
 
@@ -170,9 +148,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
       await downloadReceipt();
     } catch (error) {
       console.error("PDF 생성 오류:", error);
-      alert(
-        `PDF 생성 중 오류가 발생했습니다: ${error.message || "알 수 없는 오류"}`,
-      );
+      alert(`PDF 생성 중 오류가 발생했습니다: ${error.message || "알 수 없는 오류"}`);
     } finally {
       setIsDownloading(false);
     }
@@ -232,8 +208,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
             body: JSON.stringify({
               email: formData.personalInfo.email,
               applicationId: applicationId,
-              applicantName:
-                `${formData.personalInfo?.firstName || ""} ${formData.personalInfo?.lastName || ""}`.trim(),
+              applicantName: `${formData.personalInfo?.firstName || ""} ${formData.personalInfo?.lastName || ""}`.trim(),
               pdfData: base64Data,
               fileName: fileName,
             }),
@@ -262,32 +237,28 @@ const ConfirmationStep = ({ formData, applicationId }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-4 md:py-8">
+    <div className="min-h-screen py-4 bg-gradient-to-br from-blue-50 via-white to-purple-50 md:py-8">
       {/* 성공 애니메이션 */}
-      <div className="text-center mb-4 md:mb-8">
-        <div className="inline-flex items-center justify-center w-20 h-20 md:w-32 md:h-32 bg-green-100 rounded-full mb-3 md:mb-6 animate-pulse">
-          <CheckCircle className="w-12 h-12 md:w-20 md:h-20 text-green-600" />
+      <div className="mb-4 text-center md:mb-8">
+        <div className="inline-flex items-center justify-center w-20 h-20 mb-3 bg-green-100 rounded-full md:w-32 md:h-32 md:mb-6 animate-pulse">
+          <CheckCircle className="w-12 h-12 text-green-600 md:w-20 md:h-20" />
         </div>
-        <h1 className="text-2xl md:text-4xl font-bold text-gray-800 mb-2 md:mb-4 px-4">
-          신청이 완료되었습니다!
-        </h1>
-        <p className="text-lg md:text-xl text-gray-600 mb-1 md:mb-2 px-4">
-          신청번호:{" "}
+        <h1 className="px-4 mb-2 text-2xl font-bold text-gray-800 md:text-4xl md:mb-4">신청이 완료되었습니다!</h1>
+        <p className="px-4 mb-1 text-lg text-gray-600 md:text-xl md:mb-2">
+          신청번호:
           <span className="font-bold text-blue-600">{applicationId}</span>
         </p>
-        <p className="text-base md:text-lg text-gray-500 px-4">
-          확인 이메일이 발송되었습니다.
-        </p>
+        <p className="px-4 text-base text-gray-500 md:text-lg">확인 이메일이 발송되었습니다.</p>
       </div>
 
       {/* 메인 컨텐츠 */}
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
+      <div className="max-w-4xl px-4 mx-auto">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3 md:gap-8">
           {/* 신청 정보 카드 */}
           <div className="lg:col-span-2">
-            <Card className="mb-4 md:mb-6 shadow-lg border-0 bg-white/90 backdrop-blur-sm">
-              <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-t-lg p-4 md:p-6">
-                <CardTitle className="flex items-center gap-2 md:gap-3 text-lg md:text-2xl">
+            <Card className="mb-4 border-0 shadow-lg md:mb-6 bg-white/90 backdrop-blur-sm">
+              <CardHeader className="p-4 text-white rounded-t-lg bg-gradient-to-r from-blue-600 to-purple-600 md:p-6">
+                <CardTitle className="flex items-center gap-2 text-lg md:gap-3 md:text-2xl">
                   <FileText className="w-5 h-5 md:w-8 md:h-8" />
                   신청 정보
                 </CardTitle>
@@ -295,76 +266,49 @@ const ConfirmationStep = ({ formData, applicationId }) => {
               <CardContent className="p-4 md:p-6">
                 <div className="grid grid-cols-1 gap-4 md:gap-6">
                   <div className="space-y-3 md:space-y-4">
-                    <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
-                      <User className="w-4 h-4 md:w-5 md:h-5 text-blue-500 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">
-                          신청자명
-                        </p>
-                        <p className="font-semibold text-sm md:text-base truncate">
-                          {formData.personalInfo?.firstName}{" "}
-                          {formData.personalInfo?.lastName}
-                        </p>
+                    <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-gray-50">
+                      <User className="flex-shrink-0 w-4 h-4 text-blue-500 md:w-5 md:h-5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 md:text-sm">신청자명</p>
+                        <p className="text-sm font-semibold truncate md:text-base">{formData.personalInfo?.fullName}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
-                      <Mail className="w-4 h-4 md:w-5 md:h-5 text-green-500 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">
-                          이메일
-                        </p>
-                        <p className="font-semibold text-sm md:text-base truncate">
-                          {formData.personalInfo?.email}
-                        </p>
+                    <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-gray-50">
+                      <Mail className="flex-shrink-0 w-4 h-4 text-green-500 md:w-5 md:h-5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 md:text-sm">이메일</p>
+                        <p className="text-sm font-semibold truncate md:text-base">{formData.personalInfo?.email}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
-                      <Phone className="w-4 h-4 md:w-5 md:h-5 text-orange-500 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">
-                          연락처
-                        </p>
-                        <p className="font-semibold text-sm md:text-base">
-                          {formData.personalInfo?.phone}
-                        </p>
+                    <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-gray-50">
+                      <Phone className="flex-shrink-0 w-4 h-4 text-orange-500 md:w-5 md:h-5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 md:text-sm">연락처</p>
+                        <p className="text-sm font-semibold md:text-base">{formData.personalInfo?.phone}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
-                      <Calendar className="w-4 h-4 md:w-5 md:h-5 text-purple-500 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">
-                          입국 예정일
-                        </p>
-                        <p className="font-semibold text-sm md:text-base">
-                          {formData.travelInfo?.entryDate}
-                        </p>
+                    <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-gray-50">
+                      <Calendar className="flex-shrink-0 w-4 h-4 text-purple-500 md:w-5 md:h-5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 md:text-sm">입국 예정일</p>
+                        <p className="text-sm font-semibold md:text-base">{formData.travelInfo?.entryDate}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
-                      <MapPin className="w-4 h-4 md:w-5 md:h-5 text-red-500 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">
-                          입국 공항
-                        </p>
-                        <p className="font-semibold text-sm md:text-base">
+                    <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-gray-50">
+                      <MapPin className="flex-shrink-0 w-4 h-4 text-red-500 md:w-5 md:h-5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 md:text-sm">입국 공항</p>
+                        <p className="text-sm font-semibold md:text-base">
                           {getEntryPortLabel(formData.travelInfo?.entryPort)} ({formData.travelInfo?.entryPort})
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
-                      <Globe className="w-4 h-4 md:w-5 md:h-5 text-indigo-500 flex-shrink-0" />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs md:text-sm text-gray-500">
-                          비자 유형 및 처리 속도
-                        </p>
-                        <p className="font-semibold text-sm md:text-base">
-                          {getVisaTypeInfo().name}
-                        </p>
-                        <p className="text-xs text-gray-600">
-                          {formData.processingType === "fast" 
-                            ? "긴급 처리 (24시간 이내)" 
-                            : "일반 처리 (2-3 영업일)"}
-                        </p>
+                    <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-gray-50">
+                      <Globe className="flex-shrink-0 w-4 h-4 text-indigo-500 md:w-5 md:h-5" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-gray-500 md:text-sm">비자 유형 및 처리 속도</p>
+                        <p className="text-sm font-semibold md:text-base">{getVisaTypeInfo().name}</p>
+                        <p className="text-xs text-gray-600">{formData.processingType === "fast" ? "긴급 처리 (24시간 이내)" : "일반 처리 (2-3 영업일)"}</p>
                       </div>
                     </div>
                   </div>
@@ -376,30 +320,30 @@ const ConfirmationStep = ({ formData, applicationId }) => {
           {/* 사이드바 - 추가 서비스, 결제 정보 및 다운로드 */}
           <div className="space-y-4 md:space-y-6">
             {/* 추가 부가서비스 카드 */}
-            <Card className="shadow-lg border-2 border-orange-200 bg-gradient-to-br from-orange-50 to-yellow-50">
-              <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
-                <CardTitle className="flex items-center gap-2 md:gap-3 text-lg md:text-xl text-orange-700">
+            <Card className="border-2 border-orange-200 shadow-lg bg-gradient-to-br from-orange-50 to-yellow-50">
+              <CardHeader className="p-4 pb-3 md:pb-4 md:p-6">
+                <CardTitle className="flex items-center gap-2 text-lg text-orange-700 md:gap-3 md:text-xl">
                   <Building className="w-5 h-5 md:w-6 md:h-6" />
                   추가 부가서비스
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2 md:space-y-3 p-4 md:p-6 pt-0">
+              <CardContent className="p-4 pt-0 space-y-2 md:space-y-3 md:p-6">
                 {formData.additionalServices && formData.additionalServices.length > 0 ? (
                   formData.additionalServices.map((serviceId, index) => (
-                    <div key={index} className="flex items-center gap-2 p-2 bg-white rounded-lg border">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0"></div>
+                    <div key={index} className="flex items-center gap-2 p-2 bg-white border rounded-lg">
+                      <div className="flex-shrink-0 w-2 h-2 bg-orange-500 rounded-full"></div>
                       <span className="text-sm font-medium text-gray-700">
-                        {serviceId === 'airport_pickup' && '공항 픽업 서비스'}
-                        {serviceId === 'fast_track' && '공항 패스트트랙'}
-                        {serviceId === 'car_rental' && '렌터카 서비스'}
-                        {serviceId === 'hotel_booking' && '호텔 예약'}
-                        {serviceId === 'tour_guide' && '관광 가이드'}
-                        {serviceId === 'translation' && '번역 서비스'}
+                        {serviceId === "airport_pickup" && "공항 픽업 서비스"}
+                        {serviceId === "fast_track" && "공항 패스트트랙"}
+                        {serviceId === "car_rental" && "렌터카 서비스"}
+                        {serviceId === "hotel_booking" && "호텔 예약"}
+                        {serviceId === "tour_guide" && "관광 가이드"}
+                        {serviceId === "translation" && "번역 서비스"}
                       </span>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-3">
+                  <div className="py-3 text-center">
                     <p className="text-sm text-gray-500">선택 안함</p>
                   </div>
                 )}
@@ -407,111 +351,87 @@ const ConfirmationStep = ({ formData, applicationId }) => {
             </Card>
 
             {/* 결제 정보 카드 */}
-            <Card className="shadow-lg border-2 border-green-200 bg-gradient-to-br from-green-50 to-emerald-50">
-              <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
-                <CardTitle className="flex items-center gap-2 md:gap-3 text-lg md:text-xl text-green-700">
+            <Card className="border-2 border-green-200 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50">
+              <CardHeader className="p-4 pb-3 md:pb-4 md:p-6">
+                <CardTitle className="flex items-center gap-2 text-lg text-green-700 md:gap-3 md:text-xl">
                   <CreditCard className="w-5 h-5 md:w-6 md:h-6" />
                   결제 정보
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 md:space-y-4 p-4 md:p-6 pt-0">
+              <CardContent className="p-4 pt-0 space-y-3 md:space-y-4 md:p-6">
                 <div className="space-y-2">
-                  <div className="flex justify-between items-center text-sm md:text-base">
+                  <div className="flex items-center justify-between text-sm md:text-base">
                     <span className="text-gray-600">기본 서비스</span>
-                    <span className="font-semibold">
-                      {formatCurrency(25000)}
-                    </span>
+                    <span className="font-semibold">{formatCurrency(25000)}</span>
                   </div>
                   {formData.processingType === "fast" && (
-                    <div className="flex justify-between items-center text-sm md:text-base">
+                    <div className="flex items-center justify-between text-sm md:text-base">
                       <span className="text-gray-600">긴급 처리</span>
-                      <span className="font-semibold text-orange-600">
-                        +{formatCurrency(10000)}
-                      </span>
+                      <span className="font-semibold text-orange-600">+{formatCurrency(10000)}</span>
                     </div>
                   )}
                 </div>
-                <div className="border-t pt-2 md:pt-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-base md:text-lg font-bold text-gray-900">
-                      총 결제금액
-                    </span>
-                    <span className="text-lg md:text-2xl font-bold text-green-600">
-                      {formatCurrency(currentPrice)}
-                    </span>
+                <div className="pt-2 border-t md:pt-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-base font-bold text-gray-900 md:text-lg">총 결제금액</span>
+                    <span className="text-lg font-bold text-green-600 md:text-2xl">{formatCurrency(currentPrice)}</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* 접수증 다운로드 카드 */}
-            <Card className="shadow-lg border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50">
-              <CardHeader className="pb-3 md:pb-4 p-4 md:p-6">
-                <CardTitle className="flex items-center gap-2 md:gap-3 text-lg md:text-xl text-blue-700">
+            <Card className="border-2 border-blue-200 shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+              <CardHeader className="p-4 pb-3 md:pb-4 md:p-6">
+                <CardTitle className="flex items-center gap-2 text-lg text-blue-700 md:gap-3 md:text-xl">
                   <Download className="w-5 h-5 md:w-6 md:h-6" />
                   접수증 다운로드
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 md:space-y-4 p-4 md:p-6 pt-0">
-                <p className="text-gray-600 text-xs md:text-sm">
-                  신청 접수증을 PDF로 다운로드하여 보관하세요.
-                </p>
+              <CardContent className="p-4 pt-0 space-y-3 md:space-y-4 md:p-6">
+                <p className="text-xs text-gray-600 md:text-sm">신청 접수증을 PDF로 다운로드하여 보관하세요.</p>
                 <Button
                   onClick={handleDownloadPDF}
-                  className="w-full py-2 md:py-3 text-sm md:text-lg font-bold text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="w-full py-2 text-sm font-bold text-white transition-all duration-300 shadow-lg md:py-3 md:text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl hover:shadow-xl"
                 >
-                  <Download className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                  <Download className="w-4 h-4 mr-2 md:w-5 md:h-5" />
                   접수증 다운로드
                 </Button>
               </CardContent>
             </Card>
-
-            
           </div>
         </div>
 
         {/* 다음 단계 안내 */}
-        <Card className="mt-4 md:mt-8 mb-4 md:mb-8 shadow-lg border-2 border-gray-200 bg-white/90 backdrop-blur-sm">
-          <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-t-lg p-4 md:p-6">
-            <CardTitle className="flex items-center gap-2 md:gap-3 text-lg md:text-2xl text-gray-700">
+        <Card className="mt-4 mb-4 border-2 border-gray-200 shadow-lg md:mt-8 md:mb-8 bg-white/90 backdrop-blur-sm">
+          <CardHeader className="p-4 rounded-t-lg bg-gradient-to-r from-gray-50 to-blue-50 md:p-6">
+            <CardTitle className="flex items-center gap-2 text-lg text-gray-700 md:gap-3 md:text-2xl">
               <Clock className="w-6 h-6 md:w-8 md:h-8" />
               다음 단계
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 md:p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
               <div className="text-center">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <FileText className="w-6 h-6 md:w-8 md:h-8 text-blue-600" />
+                <div className="flex items-center justify-center w-12 h-12 mx-auto mb-3 bg-blue-100 rounded-full md:w-16 md:h-16 md:mb-4">
+                  <FileText className="w-6 h-6 text-blue-600 md:w-8 md:h-8" />
                 </div>
-                <h3 className="font-bold text-base md:text-lg mb-2">
-                  1. 서류 검토
-                </h3>
-                <p className="text-gray-600 text-xs md:text-sm">
-                  담당자가 제출된 서류를 검토합니다 (1-2시간 소요)
-                </p>
+                <h3 className="mb-2 text-base font-bold md:text-lg">1. 서류 검토</h3>
+                <p className="text-xs text-gray-600 md:text-sm">담당자가 제출된 서류를 검토합니다 (1-2시간 소요)</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <Globe className="w-6 h-6 md:w-8 md:h-8 text-green-600" />
+                <div className="flex items-center justify-center w-12 h-12 mx-auto mb-3 bg-green-100 rounded-full md:w-16 md:h-16 md:mb-4">
+                  <Globe className="w-6 h-6 text-green-600 md:w-8 md:h-8" />
                 </div>
-                <h3 className="font-bold text-base md:text-lg mb-2">
-                  2. 공식 신청
-                </h3>
-                <p className="text-gray-600 text-xs md:text-sm">
-                  베트남 출입국관리소에 공식 신청합니다
-                </p>
+                <h3 className="mb-2 text-base font-bold md:text-lg">2. 공식 신청</h3>
+                <p className="text-xs text-gray-600 md:text-sm">베트남 출입국관리소에 공식 신청합니다</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 md:w-16 md:h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3 md:mb-4">
-                  <Mail className="w-6 h-6 md:w-8 md:h-8 text-purple-600" />
+                <div className="flex items-center justify-center w-12 h-12 mx-auto mb-3 bg-purple-100 rounded-full md:w-16 md:h-16 md:mb-4">
+                  <Mail className="w-6 h-6 text-purple-600 md:w-8 md:h-8" />
                 </div>
-                <h3 className="font-bold text-base md:text-lg mb-2">
-                  3. 비자 발급
-                </h3>
-                <p className="text-gray-600 text-xs md:text-sm">
-                  승인된 e-Visa를 이메일로 발송합니다
-                </p>
+                <h3 className="mb-2 text-base font-bold md:text-lg">3. 비자 발급</h3>
+                <p className="text-xs text-gray-600 md:text-sm">승인된 e-Visa를 이메일로 발송합니다</p>
               </div>
             </div>
           </CardContent>
@@ -526,8 +446,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
           width: "210mm",
           minHeight: "297mm",
           backgroundColor: "#ffffff",
-          fontFamily:
-            "'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif",
+          fontFamily: "'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif",
           padding: "15mm",
           boxSizing: "border-box",
         }}
@@ -676,7 +595,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                   fontWeight: "bold",
                 }}
               >
-                {new Date().toLocaleDateString("ko-KR")}{" "}
+                {new Date().toLocaleDateString("ko-KR")}
                 {new Date().toLocaleTimeString("ko-KR")}
               </p>
             </div>
@@ -764,9 +683,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
               }}
             >
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>
-                  신청자명:
-                </span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>신청자명:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -774,14 +691,11 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {formData.personalInfo?.firstName}{" "}
-                  {formData.personalInfo?.lastName}
+                  {formData.personalInfo?.fullName}
                 </span>
               </div>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>
-                  여권번호:
-                </span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>여권번호:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -793,9 +707,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 </span>
               </div>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>
-                  국적:
-                </span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>국적:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -807,9 +719,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 </span>
               </div>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>
-                  생년월일:
-                </span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>생년월일:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -821,9 +731,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 </span>
               </div>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>
-                  이메일:
-                </span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>이메일:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -835,9 +743,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 </span>
               </div>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>
-                  연락처:
-                </span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>연락처:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -893,9 +799,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
               }}
             >
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>
-                  비자유형:
-                </span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>비자유형:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -907,9 +811,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 </span>
               </div>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>
-                  처리유형:
-                </span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>처리유형:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -917,15 +819,11 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {formData.processingType === "fast"
-                    ? "긴급 처리"
-                    : "일반 처리"}
+                  {formData.processingType === "fast" ? "긴급 처리" : "일반 처리"}
                 </span>
               </div>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>
-                  입국예정일:
-                </span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>입국예정일:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -937,9 +835,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 </span>
               </div>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>
-                  완료예정:
-                </span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>완료예정:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -947,9 +843,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {formData.processingType === "fast"
-                    ? "24시간 이내"
-                    : "2-3 영업일"}
+                  {formData.processingType === "fast" ? "24시간 이내" : "2-3 영업일"}
                 </span>
               </div>
             </div>
@@ -1158,15 +1052,8 @@ const ConfirmationStep = ({ formData, applicationId }) => {
               lineHeight: "1.4",
             }}
           >
-            <li style={{ marginBottom: "3px" }}>
-              본 접수증은 공식 비자 승인서가 아닙니다.
-            </li>
-            <li style={{ marginBottom: "3px" }}>
-              처리 상황은 실시간으로 이메일과 SMS로 안내됩니다.
-            </li>
-            <li style={{ marginBottom: "3px" }}>
-              추가 서류 요청 시 즉시 제출해주세요.
-            </li>
+            <li style={{ marginBottom: "3px" }}>본 접수증은 공식 비자 승인서가 아닙니다.</li>
+            <li style={{ marginBottom: "3px" }}>처리 상황은 실시간으로 이메일과 SMS로 안내됩니다.</li>
             <li>문의사항이 있으시면 언제든지 고객지원팀에 연락주세요.</li>
           </ul>
         </div>
@@ -1204,8 +1091,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
               margin: "0",
             }}
           >
-            이 문서는 자동으로 생성되었습니다. 향후 참조를 위해 안전하게
-            보관하세요.
+            이 문서는 자동으로 생성되었습니다. 향후 참조를 위해 안전하게 보관하세요.
           </p>
         </div>
       </div>

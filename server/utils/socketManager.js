@@ -3,22 +3,42 @@ const jwt = require("jsonwebtoken");
 
 let io;
 
+// 비자 타입 한글 라벨 변환 함수
+const getVisaTypeLabel = (visaType) => {
+  const labels = {
+    E_VISA_GENERAL: "일반 E-비자",
+    E_VISA_TOURIST: "관광 E-비자",
+    E_VISA_BUSINESS: "상용 E-비자",
+    VISA_ON_ARRIVAL: "도착비자",
+    MULTIPLE_ENTRY: "복수입국비자",
+  };
+  return labels[visaType] || visaType;
+};
+
 // Socket.IO 초기화
 const initializeSocket = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: process.env.CLIENT_URL || "http://localhost:3000",
+      origin: [
+        "http://localhost:3000",
+        "http://localhost:3001",
+        "http://localhost:3002",
+        "http://localhost:3003",
+      ],
       methods: ["GET", "POST"],
       credentials: true,
     },
   });
 
-  // 인증 미들웨어
+  // 인증 미들웨어 (선택적)
   io.use((socket, next) => {
     const token = socket.handshake.auth.token;
 
+    // 토큰이 없는 경우에도 연결 허용 (대시보드 알림용)
     if (!token) {
-      return next(new Error("Authentication error"));
+      console.log("🔓 토큰 없는 연결 허용 (대시보드 알림용)");
+      socket.isGuest = true;
+      return next();
     }
 
     try {
@@ -28,18 +48,23 @@ const initializeSocket = (httpServer) => {
       );
       socket.userId = decoded.userId;
       socket.userRole = decoded.role;
+      socket.isAuthenticated = true;
       next();
     } catch (err) {
-      next(new Error("Authentication error"));
+      console.log("⚠️ 토큰 검증 실패, 게스트로 연결 허용");
+      socket.isGuest = true;
+      next();
     }
   });
-
   // 연결 이벤트 처리
   io.on("connection", (socket) => {
-    console.log(`✅ Socket connected: ${socket.id} (User: ${socket.userId})`);
+    const userInfo = socket.isAuthenticated
+      ? `User: ${socket.userId}, Role: ${socket.userRole}`
+      : "Guest (Dashboard)";
+    console.log(`✅ Socket connected: ${socket.id} (${userInfo})`);
 
-    // 사용자별 룸 참가
-    if (socket.userId) {
+    // 사용자별 룸 참가 (인증된 사용자만)
+    if (socket.userId && socket.isAuthenticated) {
       socket.join(`user_${socket.userId}`);
     }
 
@@ -52,11 +77,14 @@ const initializeSocket = (httpServer) => {
       socket.join("admins");
     }
 
+    // 게스트도 일반 대시보드 룸에 참가 (알림 수신용)
+    socket.join("dashboard");
+
     // 애플리케이션별 룸 참가
     socket.on("join_application", (applicationId) => {
       socket.join(`application_${applicationId}`);
       console.log(
-        `User ${socket.userId} joined application room: ${applicationId}`,
+        `Socket ${socket.id} joined application room: ${applicationId}`,
       );
     });
 
@@ -64,7 +92,7 @@ const initializeSocket = (httpServer) => {
     socket.on("leave_application", (applicationId) => {
       socket.leave(`application_${applicationId}`);
       console.log(
-        `User ${socket.userId} left application room: ${applicationId}`,
+        `Socket ${socket.id} left application room: ${applicationId}`,
       );
     });
 
@@ -80,20 +108,65 @@ const initializeSocket = (httpServer) => {
 // 실시간 알림 전송 함수들
 const socketNotifications = {
   // 새로운 애플리케이션 알림 (관리자에게)
-  notifyNewApplication: (application) => {
+  notifyNewApplication: async (application) => {
     if (io) {
+      console.log("📢 새로운 비자 신청 알림 전송:", application.applicationId);
+
+      const notificationData = {
+        type: "dashboard_new_application",
+        title: "새로운 비자 신청",
+        message: `${application.firstName} ${application.lastName}님의 ${getVisaTypeLabel(application.visaType)} 신청이 접수되었습니다.`,
+        data: {
+          id: application.id,
+          applicationId: application.applicationId,
+          userId: application.userId,
+          firstName: application.firstName,
+          lastName: application.lastName,
+          email: application.email,
+          visaType: application.visaType,
+          processingType: application.processingType,
+          totalPrice: application.totalPrice,
+          status: application.status,
+          createdAt: application.createdAt,
+        },
+        timestamp: new Date().toISOString(),
+      };
+
+      // 1. 데이터베이스에 알림 저장
+      try {
+        const models = require("../models");
+        await models.Notification.create({
+          type: notificationData.type,
+          title: notificationData.title,
+          message: notificationData.message,
+          recipient: "system", // 관리자용 알림
+          priority: "normal",
+          relatedId: application.applicationId,
+          read: false,
+          status: "unread",
+          created_at: new Date(),
+          data: JSON.stringify(notificationData.data),
+        });
+        console.log("✅ 알림이 데이터베이스에 저장되었습니다");
+      } catch (dbError) {
+        console.error("❌ 데이터베이스 알림 저장 실패:", dbError);
+      }
+
+      // 2. 관리자들에게 Socket.IO 알림 전송
       io.to("admins").emit("new_application", {
         type: "new_application",
-        title: "새로운 비자 신청",
-        message: `${application.full_name}님의 ${application.visa_type} 신청이 접수되었습니다.`,
-        data: application,
-        timestamp: new Date().toISOString(),
-      });
+        title: notificationData.title,
+        message: notificationData.message,
+        data: notificationData.data,
+        timestamp: notificationData.timestamp,
+      }); // 3. 대시보드 룸에도 브로드캐스트 (토큰 없이도 접근 가능한 관리자 화면용)
+      io.to("dashboard").emit("dashboard_new_application", notificationData);
+
+      console.log("✅ 신청서 알림 전송 완료");
     }
   },
-
   // 애플리케이션 상태 변경 알림 (고객에게)
-  notifyApplicationStatusChange: (
+  notifyApplicationStatusChange: async (
     userId,
     application,
     previousStatus,
@@ -110,8 +183,8 @@ const socketNotifications = {
         completed: "처리가 완료되었습니다",
       };
 
-      io.to(`user_${userId}`).emit("application_status_change", {
-        type: "status_change",
+      const notificationData = {
+        type: "application_status_change",
         title: "신청 상태 변경",
         message: statusMessages[newStatus] || "상태가 변경되었습니다",
         data: {
@@ -122,7 +195,33 @@ const socketNotifications = {
           application,
         },
         timestamp: new Date().toISOString(),
-      });
+      };
+
+      // 1. 데이터베이스에 알림 저장
+      try {
+        const models = require("../models");
+        await models.Notification.create({
+          type: notificationData.type,
+          title: notificationData.title,
+          message: notificationData.message,
+          recipient: userId || "system",
+          priority: "normal",
+          relatedId: application.applicationNumber,
+          read: false,
+          status: "unread",
+          created_at: new Date(),
+          data: JSON.stringify(notificationData.data),
+        });
+        console.log("✅ 상태 변경 알림이 데이터베이스에 저장되었습니다");
+      } catch (dbError) {
+        console.error("❌ 데이터베이스 알림 저장 실패:", dbError);
+      }
+
+      // 2. Socket.IO 알림 전송
+      io.to(`user_${userId}`).emit(
+        "application_status_change",
+        notificationData,
+      );
 
       // 애플리케이션 룸에도 전송
       io.to(`application_${application.id}`).emit("application_update", {
@@ -259,12 +358,11 @@ const socketNotifications = {
       console.error("❌ Failed to send consultation notification:", error);
     }
   },
-
-  // 새로운 비자 신청 알림
-  notifyNewApplication: (applicationData) => {
+  // 새로운 비자 신청 알림 (Dashboard용 - 토큰 인증 없이)
+  notifyNewApplicationToDashboard: (applicationData) => {
     try {
       if (io) {
-        io.emit("new_application", {
+        io.emit("new_application_dashboard", {
           id: applicationData.id,
           application_number: applicationData.applicationNumber,
           full_name: applicationData.fullName,
@@ -273,7 +371,7 @@ const socketNotifications = {
           created_at: applicationData.createdAt,
         });
         console.log(
-          `📢 New application notification sent: ${applicationData.applicationNumber}`,
+          `📢 Dashboard application notification sent: ${applicationData.applicationNumber}`,
         );
       }
     } catch (error) {

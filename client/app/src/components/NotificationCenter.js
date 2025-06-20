@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Bell, X, Check, CheckCheck, Trash2, Eye } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { ko } from "date-fns/locale";
+import { useQuery } from "@apollo/client";
+import { GET_NOTIFICATIONS } from "../lib/graphql/query/notifications";
 
 /**
  * 실시간 알림을 표시하는 컴포넌트
@@ -10,11 +12,26 @@ const NotificationCenter = ({ notifications, unreadCount, isConnected, onMarkAsR
   const [isOpen, setIsOpen] = useState(false);
   const [filter, setFilter] = useState("all"); // all, unread, read
 
-  const filteredNotifications = notifications.filter((notification) => {
+  // 연결 상태 디버깅
+  useEffect(() => {
+    console.log("🔔 NotificationCenter - Connection state:", {
+      isConnected,
+      notificationsCount: notifications?.length || 0,
+      unreadCount,
+    });
+  }, [isConnected, notifications, unreadCount]);
+
+  const filteredNotifications = notifications?.filter((notification) => {
     if (filter === "unread") return !notification.isRead;
     if (filter === "read") return notification.isRead;
     return true;
   });
+
+  const getEmptyMessage = () => {
+    if (filter === "unread") return "읽지 않은 알림이 없습니다";
+    if (filter === "read") return "읽은 알림이 없습니다";
+    return "알림이 없습니다";
+  };
 
   const getNotificationIcon = (type) => {
     const iconMap = {
@@ -56,41 +73,39 @@ const NotificationCenter = ({ notifications, unreadCount, isConnected, onMarkAsR
 
   return (
     <div className="relative">
+      {" "}
       {/* 알림 버튼 */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg"
+        className="relative p-2 transition-colors rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         aria-label="알림"
+        title={isConnected ? "실시간 연결됨" : "연결 끊김"}
       >
-        <Bell className="w-6 h-6" />
+        {/* 종 아이콘 - 연결 상태에 따라 색상 변경 */}
+        <Bell className={`w-6 h-6 ${isConnected ? "text-green-600" : "text-red-500"}`} />
 
-        {/* 연결 상태 표시 */}
-        <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`} />
-
-        {/* 읽지 않은 알림 카운트 */}
+        {/* 읽지 않은 알림 개수 배지 */}
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">
+          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center min-w-[20px] h-5 text-xs font-bold text-white bg-red-500 rounded-full px-1">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
-
       {/* 알림 패널 */}
       {isOpen && (
-        <div className="absolute right-0 z-50 w-96 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg">
+        <div className="absolute right-0 z-50 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg w-96">
+          {" "}
           {/* 헤더 */}
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3">
               <h3 className="text-lg font-semibold text-gray-900">알림</h3>
-              <div className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`} />
             </div>
             <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-gray-600">
               <X className="w-5 h-5" />
             </button>
           </div>
-
           {/* 필터 및 액션 */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 border-b border-gray-200">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
             <div className="flex space-x-2">
               <button onClick={() => setFilter("all")} className={`px-3 py-1 text-sm rounded-md ${filter === "all" ? "bg-blue-100 text-blue-700" : "text-gray-600 hover:text-gray-900"}`}>
                 전체
@@ -114,13 +129,13 @@ const NotificationCenter = ({ notifications, unreadCount, isConnected, onMarkAsR
               </button>
             </div>
           </div>
-
           {/* 알림 목록 */}
-          <div className="max-h-96 overflow-y-auto">
+          <div className="overflow-y-auto max-h-96">
+            {" "}
             {filteredNotifications.length === 0 ? (
               <div className="p-6 text-center text-gray-500">
                 <Bell className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">{filter === "unread" ? "읽지 않은 알림이 없습니다" : filter === "read" ? "읽은 알림이 없습니다" : "알림이 없습니다"}</p>
+                <p className="text-sm">{getEmptyMessage()}</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-100">
@@ -149,20 +164,26 @@ const NotificationCenter = ({ notifications, unreadCount, isConnected, onMarkAsR
                             </button>
                           </div>
                         </div>
-
-                        <p className={`mt-1 text-sm ${notification.isRead ? "text-gray-500" : "text-gray-700"}`}>{notification.message}</p>
-
-                        {/* 타임스탬프 */}
+                        <p className={`mt-1 text-sm ${notification.isRead ? "text-gray-500" : "text-gray-700"}`}>{notification.message}</p> {/* 타임스탬프 */}
                         <p className="mt-1 text-xs text-gray-400">
-                          {formatDistanceToNow(new Date(notification.timestamp), {
-                            addSuffix: true,
-                            locale: ko,
-                          })}
-                        </p>
+                          {(() => {
+                            const dateValue = notification.timestamp || notification.createdAt;
+                            const date = new Date(dateValue);
 
+                            // 유효한 날짜인지 확인
+                            if (isNaN(date.getTime())) {
+                              return "날짜 정보 없음";
+                            }
+
+                            return formatDistanceToNow(date, {
+                              addSuffix: true,
+                              locale: ko,
+                            });
+                          })()}
+                        </p>
                         {/* 추가 데이터 (있는 경우) */}
                         {notification.data && (
-                          <div className="mt-2 p-2 bg-gray-100 rounded text-xs text-gray-600">
+                          <div className="p-2 mt-2 text-xs text-gray-600 bg-gray-100 rounded">
                             {notification.type === "application_status_change" && <p>신청번호: {notification.data.applicationNumber}</p>}
                             {notification.type === "payment_status_change" && notification.data.payment && (
                               <p>
@@ -178,13 +199,11 @@ const NotificationCenter = ({ notifications, unreadCount, isConnected, onMarkAsR
                 ))}
               </div>
             )}
-          </div>
-
-          {/* 푸터 (연결 상태) */}
-          <div className="p-3 bg-gray-50 border-t border-gray-200">
+          </div>{" "}
+          {/* 푸터 (총 알림 수) */}
+          <div className="p-3 border-t border-gray-200 bg-gray-50">
             <div className="flex items-center justify-center space-x-2 text-xs text-gray-500">
-              <div className={`w-2 h-2 rounded-full ${isConnected ? "bg-green-500" : "bg-red-500"}`} />
-              <span>{isConnected ? "실시간 연결됨" : "연결 끊김"}</span>
+              <span>총 {notifications?.length}개의 알림</span>
             </div>
           </div>
         </div>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -59,7 +58,6 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           delete errors.address;
         }
         break;
-
       case "phoneOfFriend":
         if (!value) {
           errors.phoneOfFriend = "베트남 현지 연락처를 입력해주세요.";
@@ -67,6 +65,16 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           errors.phoneOfFriend = "올바른 전화번호를 입력해주세요.";
         } else {
           delete errors.phoneOfFriend;
+        }
+        break;
+
+      case "fullName":
+        if (!value) {
+          errors.fullName = "한글성명을 입력해주세요.";
+        } else if (value.length < 2) {
+          errors.fullName = "올바른 성명을 입력해주세요.";
+        } else {
+          delete errors.fullName;
         }
         break;
 
@@ -93,7 +101,7 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
   const getInputClassName = (field) => {
     const state = getFieldValidationState(field);
     const baseClasses = "font-medium border-2 transition-all duration-200";
-    
+
     switch (state) {
       case "error":
         return `${baseClasses} border-red-500 focus:border-red-500 focus:ring-red-200 bg-red-50`;
@@ -125,14 +133,45 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
               <Phone className="w-4 h-4 md:w-6 md:h-6 text-blue-600" />
             </div>
             <h3 className="text-lg md:text-2xl font-bold text-gray-800">연락처 정보</h3>
-          </div>
-
+          </div>{" "}
           <div className="grid grid-cols-1 gap-4 md:gap-6 sm:grid-cols-1 lg:grid-cols-2">
+            {/* 한글성명 */}
+            <div className="space-y-2 md:space-y-3 lg:col-span-2">
+              <label htmlFor="fullName" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-bold tracking-wide text-gray-800 uppercase">
+                <Mail className="w-3 h-3 md:w-4 md:h-4 text-indigo-500" />
+                한글성명
+                <span className="text-red-500">*</span>
+              </label>
+              <div className="relative">
+                <Mail className="absolute w-4 h-4 md:w-5 md:h-5 text-gray-400 transform -translate-y-1/2 left-2 md:left-3 top-1/2" />
+                <Input
+                  id="fullName"
+                  type="text"
+                  value={formData.personalInfo?.fullName || ""}
+                  onChange={(e) => handleInputChange("fullName", e.target.value)}
+                  onBlur={() => setFieldTouched({ ...fieldTouched, fullName: true })}
+                  placeholder="홍길동"
+                  className={`${getInputClassName("fullName")} pl-8 md:pl-10 h-10 md:h-12 text-sm md:text-lg`}
+                  aria-invalid={!!fieldErrors.fullName}
+                  aria-describedby={fieldErrors.fullName ? "fullName-error" : undefined}
+                />
+                {getFieldValidationState("fullName") === "success" && <CheckCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-green-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />}
+                {getFieldValidationState("fullName") === "error" && <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />}
+              </div>
+              <p className="text-xs text-gray-500">여권상의 한글이름을 정확히 입력해주세요</p>
+              {fieldErrors.fullName && fieldTouched.fullName && (
+                <p id="fullName-error" className="flex items-center gap-1 mt-1 text-xs md:text-sm text-red-500">
+                  <AlertCircle className="w-3 h-3 md:w-4 md:h-4" />
+                  {fieldErrors.fullName}
+                </p>
+              )}
+            </div>
+
             {/* 이메일 */}
             <div className="space-y-2 md:space-y-3">
               <label htmlFor="email" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-bold tracking-wide text-gray-800 uppercase">
                 <Mail className="w-3 h-3 md:w-4 md:h-4 text-blue-500" />
-                이메일 주소 
+                이메일 주소
                 <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -148,12 +187,8 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   aria-invalid={!!fieldErrors.email}
                   aria-describedby={fieldErrors.email ? "email-error" : undefined}
                 />
-                {getFieldValidationState("email") === "success" && (
-                  <CheckCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-green-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />
-                )}
-                {getFieldValidationState("email") === "error" && (
-                  <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />
-                )}
+                {getFieldValidationState("email") === "success" && <CheckCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-green-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />}
+                {getFieldValidationState("email") === "error" && <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />}
               </div>
               <p className="text-xs text-gray-500">비자 승인서를 받을 이메일 주소</p>
               {fieldErrors.email && fieldTouched.email && (
@@ -168,7 +203,7 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             <div className="space-y-2 md:space-y-3">
               <label htmlFor="phone" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-bold tracking-wide text-gray-800 uppercase">
                 <Phone className="w-3 h-3 md:w-4 md:h-4 text-green-500" />
-                휴대폰 번호 
+                휴대폰 번호
                 <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -184,12 +219,8 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   aria-invalid={!!fieldErrors.phone}
                   aria-describedby={fieldErrors.phone ? "phone-error" : undefined}
                 />
-                {getFieldValidationState("phone") === "success" && (
-                  <CheckCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-green-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />
-                )}
-                {getFieldValidationState("phone") === "error" && (
-                  <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />
-                )}
+                {getFieldValidationState("phone") === "success" && <CheckCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-green-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />}
+                {getFieldValidationState("phone") === "error" && <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />}
               </div>
               <p className="text-xs text-gray-500">국가코드를 포함한 전체 번호</p>
               {fieldErrors.phone && fieldTouched.phone && (
@@ -216,7 +247,7 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             <div className="space-y-2 md:space-y-3">
               <label htmlFor="address" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-bold tracking-wide text-gray-800 uppercase">
                 <MapPin className="w-3 h-3 md:w-4 md:h-4 text-purple-500" />
-                한국 주소 (영문) 
+                한국 주소 (영문)
                 <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -231,12 +262,8 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                   aria-invalid={!!fieldErrors.address}
                   aria-describedby={fieldErrors.address ? "address-error" : undefined}
                 />
-                {getFieldValidationState("address") === "success" && (
-                  <CheckCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-green-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />
-                )}
-                {getFieldValidationState("address") === "error" && (
-                  <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />
-                )}
+                {getFieldValidationState("address") === "success" && <CheckCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-green-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />}
+                {getFieldValidationState("address") === "error" && <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />}
               </div>
               <p className="text-xs text-gray-500">시, 도, 동까지만 기재하셔도 됩니다</p>
               {fieldErrors.address && fieldTouched.address && (
@@ -251,7 +278,7 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             <div className="space-y-2 md:space-y-3">
               <label htmlFor="phoneOfFriend" className="flex items-center gap-1 md:gap-2 text-xs md:text-sm font-bold tracking-wide text-gray-800 uppercase">
                 <Phone className="w-3 h-3 md:w-4 md:h-4 text-orange-500" />
-                베트남 현지 연락처 
+                베트남 현지 연락처
                 <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -269,9 +296,7 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
                 {getFieldValidationState("phoneOfFriend") === "success" && (
                   <CheckCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-green-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />
                 )}
-                {getFieldValidationState("phoneOfFriend") === "error" && (
-                  <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />
-                )}
+                {getFieldValidationState("phoneOfFriend") === "error" && <AlertCircle className="absolute w-4 h-4 md:w-5 md:h-5 text-red-500 transform -translate-y-1/2 right-2 md:right-3 top-1/2" />}
               </div>
               <p className="text-xs text-gray-500">정확하지 않아도 괜찮으며 대략적인 번호로 기입 가능합니다</p>
               {fieldErrors.phoneOfFriend && fieldTouched.phoneOfFriend && (
@@ -286,9 +311,9 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
 
         {/* 네비게이션 버튼 */}
         <div className="flex flex-col gap-3 md:gap-4 pt-4 md:pt-8 border-t border-gray-200 sm:flex-row sm:justify-between">
-          <Button 
-            onClick={onPrevious} 
-            variant="outline" 
+          <Button
+            onClick={onPrevious}
+            variant="outline"
             className="px-6 md:px-8 py-3 md:py-4 text-sm md:text-lg font-bold text-gray-700 transition-all duration-300 border-2 border-gray-300 hover:border-gray-400 rounded-xl md:rounded-2xl order-2 sm:order-1"
           >
             <ArrowLeft className="w-4 h-4 md:w-6 md:h-6 mr-2 md:mr-3" />
@@ -312,6 +337,7 @@ const PersonalInfoStep = ({ formData, onUpdate, onNext, onPrevious }) => {
 PersonalInfoStep.propTypes = {
   formData: PropTypes.shape({
     personalInfo: PropTypes.shape({
+      fullName: PropTypes.string,
       email: PropTypes.string,
       phone: PropTypes.string,
       address: PropTypes.string,

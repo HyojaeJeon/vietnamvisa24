@@ -48,29 +48,39 @@ const authTypeDefs = gql`
     APPROVED
     REJECTED
   }
-
   enum NotificationType {
+    APPLICATION_UPDATE
+    STATUS_CHANGE
+    CONSULTATION
     SYSTEM
-    EMAIL
-    SMS
+    DOCUMENT_REQUIRED
+    DASHBOARD_NEW_APPLICATION
+    NEW_APPLICATION
+    APPLICATION_STATUS_CHANGE
+    NOTIFICATION
+  }
+
+  enum NotificationStatus {
+    UNREAD
+    READ
   }
 
   enum NotificationPriority {
+    NORMAL
     HIGH
-    MEDIUM
-    LOW
+    URGENT
   }
-
   type Notification {
     id: ID!
     type: NotificationType!
     title: String!
     message: String!
     recipient: String!
+    status: NotificationStatus!
     priority: NotificationPriority
-    read: Boolean!
-    related_id: String
-    created_at: String!
+    isRead: Boolean!
+    relatedId: String
+    createdAt: String!
   }
 
   type SuccessResponse {
@@ -143,11 +153,18 @@ const authTypeDefs = gql`
     MANAGER
     SUPER_ADMIN
   }
+  type NotificationConnection {
+    notifications: [Notification]
+    totalCount: Int!
+    hasNextPage: Boolean!
+    cursor: String
+  }
+
   extend type Query {
     getMe: User
     getDocuments: [Document!]!
     getDocumentsByApplication(applicationId: String!): [Document!]!
-    getNotifications: [Notification!]!
+    getNotifications(limit: Int = 10, offset: Int = 0): NotificationConnection
     getUnreadNotifications: [Notification!]!
     userLogin(input: LoginInput!): AuthResponse!
   }
@@ -161,8 +178,6 @@ const authTypeDefs = gql`
       notes: String
     ): Document!
     createNotification(input: NotificationInput!): Notification!
-    markNotificationAsRead(id: ID!): Notification!
-    markAllNotificationsAsRead(userId: String!): SuccessResponse!
   }
 `;
 

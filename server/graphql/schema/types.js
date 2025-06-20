@@ -79,6 +79,8 @@ const typeDefs = gql`
     reviewer: String
     notes: String
     application: VisaApplication
+    fileUrl: String
+    fileData: String
   }
   type ApplicationStatusHistory {
     id: ID
@@ -100,7 +102,9 @@ const typeDefs = gql`
     status: NotificationStatus
     priority: NotificationPriority
     createdAt: String
+    updatedAt: String
     relatedId: String
+    targetUrl: String
     isRead: Boolean
   }
   type Payment {
@@ -146,24 +150,37 @@ const typeDefs = gql`
     APPROVED
     REJECTED
   }
-
   enum NotificationType {
+    APPLICATION_UPDATE
+    STATUS_CHANGE
+    CONSULTATION
     SYSTEM
-    EMAIL
-    SMS
+    DOCUMENT_REQUIRED
+    DASHBOARD_NEW_APPLICATION
+    NEW_APPLICATION
+    APPLICATION_STATUS_CHANGE
+    NOTIFICATION
+    WORKFLOW_PROGRESS
+    DOCUMENT_REVIEWED
+    PAYMENT_STATUS_CHANGE
+    CONSULTATION_REPLY
+    ADMIN_NOTIFICATION
+    EMAIL_SENT
+    PAYMENT_REQUEST
+    DOCUMENT_REVIEW
+    GOVERNMENT_SUBMISSION
+    VISA_GENERATED
+    VISA_EMAIL_SENT
+    APPLICATION_COMPLETED
   }
-
   enum NotificationStatus {
-    SENT
-    DELIVERED
+    UNREAD
     READ
-    FAILED
   }
-
   enum NotificationPriority {
+    NORMAL
     HIGH
-    MEDIUM
-    LOW
+    URGENT
   }
 
   enum PaymentStatus {
@@ -462,12 +479,62 @@ const typeDefs = gql`
     fileName: String!
     generatedAt: String!
   }
-
   # 이메일 타입 열거형
   enum EmailType {
     STATUS_UPDATE
     DOCUMENT_REQUEST
     APPROVAL_NOTICE
+  }
+
+  # 알림 관련 입력 및 응답 타입
+  input NotificationInput {
+    type: NotificationType!
+    title: String!
+    message: String!
+    recipient: String!
+    priority: NotificationPriority
+    relatedId: String
+    targetUrl: String
+  }
+
+  input MarkNotificationReadInput {
+    notificationId: ID!
+  }
+
+  input BulkNotificationActionInput {
+    notificationIds: [ID!]!
+    action: BulkNotificationAction!
+  }
+
+  enum BulkNotificationAction {
+    MARK_ALL_READ
+    DELETE_ALL
+  }
+  type NotificationResponse {
+    success: Boolean!
+    message: String!
+    notification: Notification
+  }
+
+  type BulkNotificationResponse {
+    success: Boolean!
+    message: String!
+    affectedCount: Int!
+  }
+
+  type NotificationConnection {
+    notifications: [Notification!]!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+    totalCount: Int!
+    pageInfo: PageInfo!
+  }
+
+  type PageInfo {
+    startCursor: String
+    endCursor: String
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
   }
 `;
 

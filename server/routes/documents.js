@@ -1,29 +1,35 @@
 const express = require("express");
 const router = express.Router();
-const { models } = require("../models");
-const { uploadSingle, uploadMultiple, handleUploadError, downloadFile, deleteFile } = require("../middleware/upload");
+const models = require("../models");
+const {
+  uploadSingle,
+  uploadMultiple,
+  handleUploadError,
+  downloadFile,
+  deleteFile,
+} = require("../middleware/upload");
 const path = require("path");
 const fs = require("fs");
 const archiver = require("archiver");
-const multer = require('multer');
+const multer = require("multer");
 
 // 업로드 디렉토리 생성
-const uploadsDir = path.join(__dirname, '../uploads');
+const uploadsDir = path.join(__dirname, "../uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
 
 // 단일 파일 업로드
-router.post('/upload', uploadSingle, async (req, res) => {
+router.post("/upload", uploadSingle, async (req, res) => {
   console.log(`📤 File upload request received at /upload`);
   console.log(`📤 Request body:`, req.body);
-  console.log(`📤 Request file:`, req.file ? 'File present' : 'No file');
-  
+  console.log(`📤 Request file:`, req.file ? "File present" : "No file");
+
   try {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: '파일이 업로드되지 않았습니다.'
+        message: "파일이 업로드되지 않았습니다.",
       });
     }
 
@@ -32,25 +38,25 @@ router.post('/upload', uploadSingle, async (req, res) => {
     if (!application_id || !document_type) {
       return res.status(400).json({
         success: false,
-        message: '필수 정보가 누락되었습니다.'
+        message: "필수 정보가 누락되었습니다.",
       });
     }
 
     // 임시 application_id인 경우 비자 신청을 먼저 생성
     let actualApplicationId = application_id;
-    if (application_id.startsWith('temp_')) {
+    if (application_id.startsWith("temp_")) {
       const visaApplication = await models.VisaApplication.create({
         application_number: `APP-${Date.now()}`,
-        visa_type: 'tourist',
-        full_name: '임시 신청자',
-        passport_number: 'TEMP',
-        nationality: 'KR',
-        birth_date: '1990-01-01',
-        phone: '010-0000-0000',
-        email: 'temp@example.com',
+        visa_type: "tourist",
+        full_name: "임시 신청자",
+        passport_number: "TEMP",
+        nationality: "KR",
+        birth_date: "1990-01-01",
+        phone: "010-0000-0000",
+        email: "temp@example.com",
         arrival_date: new Date(),
         departure_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30일 후
-        status: 'pending'
+        status: "pending",
       });
       actualApplicationId = visaApplication.id;
     }
@@ -62,24 +68,23 @@ router.post('/upload', uploadSingle, async (req, res) => {
       document_name: req.file.originalname,
       file_path: req.file.path,
       file_size: req.file.size,
-      status: 'pending'
+      status: "pending",
     });
 
     res.json({
       success: true,
-      message: '파일이 성공적으로 업로드되었습니다.',
+      message: "파일이 성공적으로 업로드되었습니다.",
       document: {
         id: document.id,
         document_type: document.document_type,
         document_name: document.document_name,
         file_size: document.file_size,
         status: document.status,
-        uploaded_at: document.created_at
-      }
+        uploaded_at: document.created_at,
+      },
     });
-
   } catch (error) {
-    console.error('File upload error:', error);
+    console.error("File upload error:", error);
 
     // 업로드된 파일이 있다면 삭제
     if (req.file && fs.existsSync(req.file.path)) {
@@ -88,8 +93,8 @@ router.post('/upload', uploadSingle, async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: '파일 업로드 중 오류가 발생했습니다.',
-      error: error.message
+      message: "파일 업로드 중 오류가 발생했습니다.",
+      error: error.message,
     });
   }
 });
@@ -125,7 +130,10 @@ router.post("/upload-multiple", uploadMultiple, async (req, res) => {
     }
 
     const documents = [];
-    const documentTypesArray = typeof document_types === "string" ? JSON.parse(document_types) : document_types;
+    const documentTypesArray =
+      typeof document_types === "string"
+        ? JSON.parse(document_types)
+        : document_types;
 
     // 각 파일에 대해 문서 레코드 생성
     for (let i = 0; i < req.files.length; i++) {
@@ -336,7 +344,8 @@ router.get("/application/:applicationId/download-zip", async (req, res) => {
     }
 
     const application = documents[0].application;
-    const applicationNumber = application.application_number || `app_${applicationId}`;
+    const applicationNumber =
+      application.application_number || `app_${applicationId}`;
     const zipFileName = `${applicationNumber}_documents.zip`;
 
     // ZIP 스트림 설정
@@ -345,7 +354,10 @@ router.get("/application/:applicationId/download-zip", async (req, res) => {
     });
 
     res.setHeader("Content-Type", "application/zip");
-    res.setHeader("Content-Disposition", `attachment; filename="${zipFileName}"`);
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${zipFileName}"`,
+    );
 
     archive.pipe(res);
 
@@ -386,7 +398,11 @@ router.patch("/bulk-update", async (req, res) => {
   try {
     const { documentIds, status, notes, reviewerId } = req.body;
 
-    if (!documentIds || !Array.isArray(documentIds) || documentIds.length === 0) {
+    if (
+      !documentIds ||
+      !Array.isArray(documentIds) ||
+      documentIds.length === 0
+    ) {
       return res.status(400).json({
         success: false,
         message: "문서 ID 목록이 필요합니다.",
@@ -429,6 +445,153 @@ router.patch("/bulk-update", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "문서 일괄 업데이트 중 오류가 발생했습니다.",
+    });
+  }
+});
+
+// 문서 이미지 교체 엔드포인트
+router.post("/update-image/:applicationId", uploadSingle, async (req, res) => {
+  console.log(
+    `📷 Image update request received for application:`,
+    req.params.applicationId,
+  );
+  console.log(`📷 Request body:`, req.body);
+  console.log(`📷 Request file:`, req.file ? "File present" : "No file");
+  console.log("📷 Models available:", Object.keys(models));
+  console.log(
+    "📷 Document model:",
+    models.Document ? "Available" : "Not available",
+  );
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "새로운 이미지 파일이 업로드되지 않았습니다.",
+      });
+    }
+
+    const { applicationId } = req.params;
+    const { type } = req.body; // 문서 타입 (예: 'passport')
+
+    if (!applicationId || !type) {
+      return res.status(400).json({
+        success: false,
+        message: "필수 정보가 누락되었습니다.",
+      });
+    } // 기존 문서 찾기 (신청자 정보도 함께 가져오기)
+    const existingDocument = await models.Document.findOne({
+      where: {
+        applicationId: applicationId,
+        type: type,
+      },
+      include: [
+        {
+          model: models.VisaApplication,
+          as: "application",
+          attributes: ["fullName", "firstName", "lastName"],
+        },
+      ],
+    });
+
+    if (!existingDocument) {
+      // 업로드된 파일 삭제
+      if (fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      return res.status(404).json({
+        success: false,
+        message: "교체할 문서를 찾을 수 없습니다.",
+      });
+    } // 기존 파일 삭제
+    if (existingDocument.filePath) {
+      // 상대 경로를 절대 경로로 변환
+      const oldAbsolutePath = existingDocument.filePath.startsWith("/uploads")
+        ? path.join(__dirname, "..", existingDocument.filePath)
+        : existingDocument.filePath;
+
+      if (fs.existsSync(oldAbsolutePath)) {
+        fs.unlinkSync(oldAbsolutePath);
+      }
+    } // Application ID별 디렉토리 생성
+    const appDir = path.join(__dirname, "../uploads", applicationId.toString());
+    if (!fs.existsSync(appDir)) {
+      fs.mkdirSync(appDir, { recursive: true });
+    }
+
+    // 신청자 이름과 문서 타입으로 새로운 파일명 생성
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    const hour = String(now.getHours()).padStart(2, "0");
+    const minute = String(now.getMinutes()).padStart(2, "0");
+    const second = String(now.getSeconds()).padStart(2, "0");
+    const timeString = `${year}${month}${day}_${hour}${minute}${second}`;
+
+    // 신청자 이름 생성 (한글 이름 우선, 없으면 영문 이름)
+    const applicantName =
+      existingDocument.application?.fullName ||
+      `${existingDocument.application?.firstName}_${existingDocument.application?.lastName}` ||
+      "신청자";
+
+    // 문서 타입을 한글로 매핑
+    const documentTypeMap = {
+      passport: "여권",
+      photo: "증명사진",
+      visa: "비자",
+      ticket: "항공권",
+      hotel: "숙박예약증",
+      invitation: "초청장",
+      insurance: "보험증서",
+    };
+    const documentTypeName = documentTypeMap[type] || type;
+
+    const fileExtension = path.extname(req.file.originalname);
+    const cleanApplicantName = applicantName.replace(/[/\\:*?"<>|]/g, "");
+    const cleanDocumentType = documentTypeName.replace(/[/\\:*?"<>|]/g, "");
+    const newFileName = `${cleanApplicantName}_${cleanDocumentType}_${timeString}${fileExtension}`;
+
+    // 새로운 파일 경로
+    const newFilePath = path.join(appDir, newFileName);
+    const relativeFilePath = `/uploads/${applicationId}/${newFileName}`;
+
+    // 파일 이동
+    fs.renameSync(req.file.path, newFilePath);
+
+    // 문서 정보 업데이트
+    await existingDocument.update({
+      fileName: req.file.originalname,
+      filePath: relativeFilePath, // 상대 경로로 저장
+      fileSize: req.file.size,
+      status: "pending", // 새로 업로드된 파일은 다시 검토가 필요할 수 있음
+      updatedAt: new Date(),
+    });
+    res.json({
+      success: true,
+      message: "이미지가 성공적으로 교체되었습니다.",
+      document: {
+        id: existingDocument.id,
+        type: existingDocument.type,
+        fileName: existingDocument.fileName,
+        fileSize: existingDocument.fileSize,
+        filePath: existingDocument.filePath, // 상대 경로 반환
+        status: existingDocument.status,
+        updatedAt: existingDocument.updatedAt,
+      },
+    });
+  } catch (error) {
+    console.error("Image update error:", error);
+
+    // 업로드된 파일이 있다면 삭제
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "이미지 교체 중 오류가 발생했습니다.",
+      error: error.message,
     });
   }
 });

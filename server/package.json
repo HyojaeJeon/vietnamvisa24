@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "PORT=5002 nodemon index.js",
+    "dev": "nodemon index.js",
     "db:setup": "bash scripts/setup-db.sh",
     "db:setup:win": "scripts\\setup-db.bat",
     "db:start": "echo MySQL should be running as a service on Windows",
@@ -39,6 +39,7 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.5",
     "nodemon": "^2.0.20",
