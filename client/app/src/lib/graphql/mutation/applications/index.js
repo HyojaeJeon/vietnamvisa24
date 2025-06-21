@@ -7,7 +7,13 @@ export const CREATE_APPLICATION_MUTATION = gql`
       id
       applicationId
       processingType
-      totalPrice
+      totalPrice {
+        totalPrice
+        currency
+        formatted {
+          totalPrice
+        }
+      }
       createdAt
       personalInfo {
         id
@@ -163,7 +169,13 @@ export const UPDATE_APPLICATION_MUTATION = gql`
       id
       applicationId
       processingType
-      totalPrice
+      totalPrice {
+        totalPrice
+        currency
+        formatted {
+          totalPrice
+        }
+      }
       status
       createdAt
       personalInfo {

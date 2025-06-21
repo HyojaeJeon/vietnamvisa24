@@ -5,17 +5,60 @@ const path = require("path");
 
 // 이메일 전송 설정
 const transporter = nodemailer.createTransport({
+  service: "gmail",
   host: process.env.SMTP_HOST || "smtp.gmail.com",
   port: process.env.SMTP_PORT || 587,
   secure: false, // true for 465, false for other ports
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
+    pass: process.env.GOOGLE_MAILER_APP_KEY, // 앱 패스워드 사용
   },
 });
 
 // 이메일 템플릿 캐시
 const templateCache = new Map();
+
+// 추가 서비스 한글 매핑 함수
+const getServiceNameInKorean = (serviceName) => {
+  const serviceMapping = {
+    FAST_TRACK_ARRIVAL_PREMIUM: "패스트트랙 입국 프리미엄",
+    FAST_TRACK_ARRIVAL_STANDARD: "패스트트랙 입국 스탠다드",
+    FAST_TRACK_DEPARTURE_PREMIUM: "패스트트랙 출국 프리미엄",
+    FAST_TRACK_DEPARTURE_STANDARD: "패스트트랙 출국 스탠다드",
+    AIRPORT_PICKUP_SEDAN_DISTRICT1: "공항 픽업 세단 (1,3,푸년군)",
+    AIRPORT_PICKUP_SUV_DISTRICT1: "공항 픽업 SUV (1,3,푸년군)",
+    AIRPORT_PICKUP_SEDAN_DISTRICT2: "공항 픽업 세단 (2,4,7,빈탄군)",
+    AIRPORT_PICKUP_SUV_DISTRICT2: "공항 픽업 SUV (2,4,7,빈탄군)",
+    AIRPORT_PICKUP_SEDAN_DISTRICT3: "공항 픽업 세단 (5,6,8,투득군)",
+    AIRPORT_PICKUP_SUV_DISTRICT3: "공항 픽업 SUV (5,6,8,투득군)",
+    AIRPORT_PICKUP_SEDAN_DISTRICT4: "공항 픽업 세단 (9,10,11,12군)",
+    AIRPORT_PICKUP_SUV_DISTRICT4: "공항 픽업 SUV (9,10,11,12군)",
+    CITY_TOUR_HALF_DAY: "반일 시내 투어",
+    CITY_TOUR_FULL_DAY: "하루 시내 투어",
+    MEKONG_DELTA_TOUR: "메콩델타 투어",
+    CU_CHI_TUNNEL_TOUR: "구찌터널 투어",
+  };
+
+  return serviceMapping[serviceName] || serviceName;
+};
+
+// 통화별 포맷팅 함수
+const formatCurrency = (amount, currency = "KRW") => {
+  if (!amount && amount !== 0) return "₩0";
+
+  const numAmount = parseInt(amount);
+
+  switch (currency.toUpperCase()) {
+    case "KRW":
+      return `₩${numAmount.toLocaleString("ko-KR")}`;
+    case "USD":
+      return `$${numAmount.toLocaleString("en-US")}`;
+    case "VND":
+      return `${numAmount.toLocaleString("vi-VN")} ₫`;
+    default:
+      return `${numAmount.toLocaleString()} ${currency}`;
+  }
+};
 
 /**
  * 이메일 템플릿 로드 및 컴파일
@@ -128,20 +171,112 @@ async function previewTemplate(templateName, data = {}) {
 
 // 사전 정의된 이메일 발송 함수들
 const emailTemplates = {
-  // 비자 신청 확인
+  // 비자 신청 확인 (PDF 접수증 포함)
   async sendApplicationConfirmation(application) {
+    // 추가 서비스를 한글로 변환
+    const mappedAdditionalServices = (application.additionalServices || []).map(
+      (service) => {
+        const serviceName =
+          typeof service === "string" ? service : service.name;
+        return {
+          name: getServiceNameInKorean(serviceName),
+          originalName: serviceName,
+          price: service.price || 0,
+        };
+      },
+    );
+
+    // 가격 정보 처리
+    let pricingDetails = {};
+    if (application.totalPrice && typeof application.totalPrice === "object") {
+      pricingDetails = {
+        visaBasePrice: application.totalPrice.visa?.basePrice || 0,
+        visaVehiclePrice: application.totalPrice.visa?.vehiclePrice || 0,
+        visaTotalPrice: application.totalPrice.visa?.totalPrice || 0,
+        additionalServicesPrice:
+          application.totalPrice.additionalServices?.totalPrice || 0,
+        totalPrice: application.totalPrice.totalPrice || 0,
+        currency: application.totalPrice.currency || "KRW",
+        formatted: {
+          visaBasePrice: formatCurrency(
+            application.totalPrice.visa?.basePrice || 0,
+            application.totalPrice.currency,
+          ),
+          visaVehiclePrice: formatCurrency(
+            application.totalPrice.visa?.vehiclePrice || 0,
+            application.totalPrice.currency,
+          ),
+          visaTotalPrice: formatCurrency(
+            application.totalPrice.visa?.totalPrice || 0,
+            application.totalPrice.currency,
+          ),
+          additionalServicesPrice: formatCurrency(
+            application.totalPrice.additionalServices?.totalPrice || 0,
+            application.totalPrice.currency,
+          ),
+          totalPrice: formatCurrency(
+            application.totalPrice.totalPrice || 0,
+            application.totalPrice.currency,
+          ),
+        },
+      };
+    } else {
+      // 기본 가격 구조
+      pricingDetails = {
+        visaBasePrice: application.totalPrice || 0,
+        visaVehiclePrice: 0,
+        visaTotalPrice: application.totalPrice || 0,
+        additionalServicesPrice: 0,
+        totalPrice: application.totalPrice || 0,
+        currency: "KRW",
+        formatted: {
+          visaBasePrice: formatCurrency(application.totalPrice || 0),
+          visaVehiclePrice: formatCurrency(0),
+          visaTotalPrice: formatCurrency(application.totalPrice || 0),
+          additionalServicesPrice: formatCurrency(0),
+          totalPrice: formatCurrency(application.totalPrice || 0),
+        },
+      };
+    }
+
     return sendEmail({
       to: application.email,
-      subject: `[베트남비자24] 비자 신청 확인 - ${application.applicationNumber}`,
+      subject: `[베트남비자24] 비자 신청 접수 완료 - ${application.applicationNumber}`,
       template: "application_confirmation",
       data: {
-        customerName: application.fullName,
+        customerName: application.customerName || application.fullName,
+        fullName: application.fullName,
         applicationNumber: application.applicationNumber,
         visaType: application.visaType,
-        submittedAt: application.createdAt,
+        processingType: application.processingType,
+        submittedAt: application.submittedAt || application.createdAt,
         estimatedProcessingTime: getEstimatedProcessingTime(
           application.visa_type,
         ),
+
+        // 개인 정보
+        email: application.email,
+        phone: application.phone,
+        address: application.address,
+        phoneOfFriend: application.phoneOfFriend,
+
+        // 여행 정보
+        entryDate: application.entryDate,
+        entryPort: application.entryPort,
+        transitPeopleCount: application.transitPeopleCount,
+        transitVehicleType: application.transitVehicleType,
+
+        // 추가 서비스 (한글 매핑됨)
+        additionalServices: mappedAdditionalServices,
+        hasAdditionalServices: mappedAdditionalServices.length > 0,
+
+        // 가격 정보 (상세)
+        pricing: pricingDetails,
+        totalPrice: pricingDetails.totalPrice,
+        currency: pricingDetails.currency,
+
+        // 링크
+        trackingLink: `${process.env.CLIENT_URL}/track/${application.applicationNumber}`,
       },
     });
   },

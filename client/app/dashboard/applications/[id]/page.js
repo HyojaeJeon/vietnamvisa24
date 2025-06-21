@@ -42,6 +42,8 @@ import {
   Brain,
   Loader2,
   Upload,
+  Users,
+  Car,
 } from "lucide-react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
@@ -747,7 +749,16 @@ export default function ApplicationDetailPage() {
                       <p className="flex items-center gap-2 text-sm text-gray-700">
                         <Clock className="w-3 h-3 text-gray-500" />
                         <span className="text-gray-500">신청일:</span>
-                        <span className="font-medium text-gray-800">{new Date(application.createdAt).toLocaleDateString("ko-KR")}</span>
+                        <span className="font-medium text-gray-800">
+                          {new Date(application.createdAt).toLocaleString("ko-KR", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                          })}
+                        </span>
                       </p>
                     </div>
                   </div>
@@ -870,11 +881,11 @@ export default function ApplicationDetailPage() {
                           <div className="relative">
                             <input
                               type="text"
-                              value={editableData.personalInfo?.firstName || ""}
+                              value={editableData.personalInfo?.fullName || ""}
                               onChange={(e) =>
                                 setEditableData({
                                   ...editableData,
-                                  personalInfo: { ...editableData.personalInfo, firstName: e.target.value },
+                                  personalInfo: { ...editableData.personalInfo, fullName: e.target.value },
                                 })
                               }
                               className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white border border-gray-200 shadow-sm rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent hover:shadow-md"
@@ -1147,6 +1158,252 @@ export default function ApplicationDetailPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* 가격 정보 카드 */}
+            <Card className="bg-white border-0 shadow-lg">
+              <CardHeader className="text-white rounded-t-lg bg-gradient-to-r from-green-500 to-emerald-600">
+                <CardTitle className="flex items-center gap-3">
+                  <DollarSign className="w-5 h-5" />
+                  상세 가격 구조
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-6">
+                <div className="space-y-6">
+                  {/* 비자 기본료 */}
+                  {application.totalPrice?.visa && (
+                    <div className="p-5 border border-green-200 rounded-xl bg-gradient-to-r from-green-50 to-emerald-50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center w-8 h-8 bg-green-500 rounded-full">
+                            <FileText className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-green-900">
+                              {application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa"
+                                ? `목바이 경유 비자료 (${application.transitPeopleCount || 1}명)`
+                                : "비자 기본료"}
+                            </h4>
+                            <p className="text-sm text-green-700">기본 비자 신청 비용</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-green-900">
+                            {application.totalPrice.formatted?.visaBasePrice ||
+                              (application.totalPrice.visa.basePrice
+                                ? new Intl.NumberFormat(application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "vi-VN" : "ko-KR", {
+                                    style: "currency",
+                                    currency: application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "VND" : "KRW",
+                                    minimumFractionDigits: 0,
+                                  }).format(application.totalPrice.visa.basePrice)
+                                : "₩0")}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 차량 추가료 (경유 비자의 경우만) */}
+                  {(application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa") && application.totalPrice?.visa?.vehiclePrice > 0 && (
+                    <div className="p-5 border border-purple-200 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex items-center justify-center w-8 h-8 bg-purple-500 rounded-full">
+                            <Car className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-purple-900">차량 추가료</h4>
+                            <p className="text-sm text-purple-700">
+                              {application.transitVehicleType === "innova" ? "이노바 (7인승 SUV)" : application.transitVehicleType === "carnival" ? "카니발 (11인승 밴)" : "선택된 차량"}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-purple-900">
+                            {application.totalPrice.formatted?.visaVehiclePrice ||
+                              new Intl.NumberFormat("vi-VN", {
+                                style: "currency",
+                                currency: "VND",
+                                minimumFractionDigits: 0,
+                              }).format(application.totalPrice.visa.vehiclePrice)}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 추가 서비스 */}
+                  {application.totalPrice?.additionalServices?.services?.length > 0 && (
+                    <div className="space-y-4">
+                      <div className="p-5 border border-blue-200 rounded-xl bg-gradient-to-r from-blue-50 to-cyan-50">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="flex items-center justify-center w-8 h-8 bg-blue-500 rounded-full">
+                            <Sparkles className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-blue-900">추가 서비스</h4>
+                            <p className="text-sm text-blue-700">선택한 부가 서비스</p>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          {application.totalPrice.additionalServices.services.map((service, index) => (
+                            <div key={index} className="flex items-center justify-between p-3 bg-white border border-blue-100 rounded-lg">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span className="font-medium text-blue-900">{service.name}</span>
+                              </div>
+                              <span className="font-semibold text-blue-900">
+                                {application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa"
+                                  ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", minimumFractionDigits: 0 }).format(service.price)
+                                  : new Intl.NumberFormat("ko-KR", { style: "currency", currency: "KRW", minimumFractionDigits: 0 }).format(service.price)}
+                              </span>
+                            </div>
+                          ))}
+                          <div className="flex items-center justify-between pt-2 border-t border-blue-200">
+                            <span className="font-medium text-blue-800">추가 서비스 합계</span>
+                            <span className="font-bold text-blue-900">
+                              {application.totalPrice.formatted?.additionalServicesPrice ||
+                                new Intl.NumberFormat(application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "vi-VN" : "ko-KR", {
+                                  style: "currency",
+                                  currency: application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "VND" : "KRW",
+                                  minimumFractionDigits: 0,
+                                }).format(application.totalPrice.additionalServices.totalPrice)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 총 결제 금액 */}
+                  <div className="p-6 border-2 border-gray-300 rounded-xl bg-gradient-to-r from-gray-50 to-slate-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-10 h-10 bg-gray-600 rounded-full">
+                          <CreditCard className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-xl font-bold text-gray-900">총 결제 금액</h3>
+                          <p className="text-sm text-gray-600">
+                            {application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "베트남 동화 (VND) 기준" : "한국 원화 (KRW) 기준"}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-3xl font-bold text-gray-900">
+                          {application.totalPrice?.formatted?.totalPrice ||
+                            (application.totalPrice?.totalPrice
+                              ? new Intl.NumberFormat(application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "vi-VN" : "ko-KR", {
+                                  style: "currency",
+                                  currency: application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "VND" : "KRW",
+                                  minimumFractionDigits: 0,
+                                }).format(application.totalPrice.totalPrice)
+                              : typeof application.totalPrice === "number"
+                              ? new Intl.NumberFormat("ko-KR", { style: "currency", currency: "KRW", minimumFractionDigits: 0 }).format(application.totalPrice)
+                              : "₩0")}
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">
+                          {application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "부가세 포함" : "VAT 포함"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 가격 구조 요약 카드 */}
+                  {application.totalPrice?.visa && (
+                    <div className="p-4 border border-amber-200 rounded-xl bg-gradient-to-r from-amber-50 to-yellow-50">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="flex items-center justify-center w-6 h-6 bg-amber-500 rounded-full">
+                          <Activity className="w-3 h-3 text-white" />
+                        </div>
+                        <h4 className="font-medium text-amber-900">가격 구성</h4>
+                      </div>
+                      <div className="grid grid-cols-1 gap-2 text-sm md:grid-cols-3">
+                        {application.totalPrice.visa.basePrice > 0 && (
+                          <div className="flex items-center justify-between p-2 bg-white rounded">
+                            <span className="text-amber-800">비자료</span>
+                            <span className="font-medium text-amber-900">
+                              {application.totalPrice.formatted?.visaBasePrice ||
+                                new Intl.NumberFormat(application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "vi-VN" : "ko-KR", {
+                                  style: "currency",
+                                  currency: application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "VND" : "KRW",
+                                  minimumFractionDigits: 0,
+                                }).format(application.totalPrice.visa.basePrice)}
+                            </span>
+                          </div>
+                        )}
+                        {application.totalPrice.visa.vehiclePrice > 0 && (
+                          <div className="flex items-center justify-between p-2 bg-white rounded">
+                            <span className="text-amber-800">차량료</span>
+                            <span className="font-medium text-amber-900">
+                              {application.totalPrice.formatted?.visaVehiclePrice ||
+                                new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND", minimumFractionDigits: 0 }).format(application.totalPrice.visa.vehiclePrice)}
+                            </span>
+                          </div>
+                        )}
+                        {application.totalPrice.additionalServices?.totalPrice > 0 && (
+                          <div className="flex items-center justify-between p-2 bg-white rounded">
+                            <span className="text-amber-800">부가서비스</span>
+                            <span className="font-medium text-amber-900">
+                              {application.totalPrice.formatted?.additionalServicesPrice ||
+                                new Intl.NumberFormat(application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "vi-VN" : "ko-KR", {
+                                  style: "currency",
+                                  currency: application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa" ? "VND" : "KRW",
+                                  minimumFractionDigits: 0,
+                                }).format(application.totalPrice.additionalServices.totalPrice)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Transit Visa 정보 카드 (목바이 경유 E-VISA인 경우만 표시) */}
+            {(application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa") && (
+              <Card className="bg-white border-0 shadow-lg">
+                <CardHeader className="text-white rounded-t-lg bg-gradient-to-r from-indigo-500 to-purple-600">
+                  <CardTitle className="flex items-center gap-3">
+                    <Users className="w-5 h-5" />
+                    목바이 경유 비자 정보
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="p-6">
+                  <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div>
+                      <label className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-600">
+                        <Users className="w-4 h-4" />
+                        신청 인원수
+                      </label>
+                      <div className="p-4 border border-gray-100 bg-indigo-50 rounded-xl">
+                        <p className="flex items-center gap-2 font-semibold text-indigo-900">
+                          <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                          {application.transitPeopleCount || 1}명
+                        </p>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="flex items-center gap-2 mb-2 text-sm font-medium text-gray-600">
+                        <Car className="w-4 h-4" />
+                        선택 차량
+                      </label>
+                      <div className="p-4 border border-gray-100 bg-indigo-50 rounded-xl">
+                        <p className="flex items-center gap-2 font-semibold text-indigo-900">
+                          <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                          {application.transitVehicleType === "innova"
+                            ? "이노바 (7인승 SUV)"
+                            : application.transitVehicleType === "carnival"
+                            ? "카니발 (11인승 밴)"
+                            : application.transitVehicleType || "선택안함"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
             {/* 추가 서비스 */}
             {application.additionalServices && application.additionalServices.length > 0 && (
               <Card className="bg-white border-0 shadow-lg">
@@ -1177,148 +1434,199 @@ export default function ApplicationDetailPage() {
                   <CardTitle className="flex items-center gap-3">
                     <FileText className="w-5 h-5" />
                     제출 서류
+                    {(application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa") && (
+                      <Badge variant="secondary" className="ml-2 text-orange-100 bg-orange-400">
+                        {application.transitPeopleCount || 1}명 신청
+                      </Badge>
+                    )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
                   <div className="space-y-6">
-                    {application.documents.map((document, index) => (
-                      <div key={index} className="p-6 transition-shadow border border-gray-200 rounded-xl hover:shadow-md bg-gray-50">
-                        {/* 문서 헤더 */}
-                        <div className="flex items-center justify-between mb-6">
-                          <div>
-                            <h4 className="mb-1 text-lg font-semibold text-gray-900">
-                              {getDocumentTypeLabel(document.type)} / {document.type.toUpperCase()}
-                            </h4>
-                            <p className="text-sm text-gray-500">
-                              {document.fileName} • {(document.fileSize / 1024).toFixed(1)}KB • {document.fileType}
-                            </p>
-                            <p className="mt-1 text-xs text-gray-400">업로드: {new Date(parseInt(document.uploadedAt)).toLocaleString("ko-KR")}</p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {(document.fileUrl || document.fileData) && (
-                              <>
-                                <Button size="sm" variant="outline" onClick={() => openImagePreview(document.fileUrl || document.fileData, document.fileName)} className="hover:bg-blue-50">
-                                  <ZoomIn className="w-3 h-3 mr-1" />
-                                  미리보기
-                                </Button>
-                                {/* AI 정보 추출 버튼 - 여권 문서일 때만 표시 */}
-                                {document.type === "passport" && (
-                                  <Button size="sm" variant="outline" onClick={handleExtractPassportInfo} disabled={isExtractingPassport} className="text-green-600 border-green-200 hover:bg-green-50">
-                                    {isExtractingPassport ? (
-                                      <>
-                                        <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
-                                        추출 중...
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Brain className="w-3 h-3 mr-1" />
-                                        AI 정보 추출
-                                      </>
-                                    )}
-                                  </Button>
-                                )}
-                              </>
-                            )}
-                          </div>
-                        </div>
+                    {(() => {
+                      // 다중 인원 문서 처리를 위한 함수
+                      const groupDocumentsByPerson = (documents) => {
+                        const groups = {};
 
-                        {/* 컨텐츠 영역을 세로로 배치 */}
-                        <div className="space-y-6">
-                          {/* 이미지 섹션 */}
-                          <div>
-                            <h5 className="flex items-center gap-2 mb-3 font-medium text-gray-700">
-                              <Eye className="w-4 h-4" />
-                              문서 이미지 / Document Image
-                            </h5>
-                            {document.fileUrl || document.fileData ? (
-                              <div className="space-y-3">
-                                <div className="relative w-full max-w-md mx-auto">
-                                  <Image
-                                    src={getDocumentImageUrl(document)}
-                                    alt={document.fileName}
-                                    width={400}
-                                    height={300}
-                                    className="object-contain w-full h-auto transition-opacity bg-white border rounded-lg shadow-sm cursor-pointer hover:opacity-80"
-                                    onClick={() => openImagePreview(getDocumentImageUrl(document), document.fileName)}
-                                    style={{ maxHeight: "400px" }}
-                                  />
+                        documents.forEach((doc, index) => {
+                          // 문서 key에서 person index 추출
+                          const personMatch = doc.type.match(/_person_(\d+)$/);
+                          const personIndex = personMatch ? parseInt(personMatch[1]) : 0;
+                          const baseType = personMatch ? doc.type.replace(/_person_\d+$/, "") : doc.type;
+
+                          if (!groups[personIndex]) {
+                            groups[personIndex] = [];
+                          }
+
+                          groups[personIndex].push({
+                            ...doc,
+                            baseType,
+                            originalIndex: index,
+                          });
+                        });
+
+                        return groups;
+                      };
+
+                      const documentGroups = groupDocumentsByPerson(application.documents);
+                      const isMultiplePeople = Object.keys(documentGroups).length > 1;
+
+                      return Object.entries(documentGroups).map(([personIndex, documents]) => (
+                        <div key={`person_${personIndex}`} className="space-y-4">
+                          {/* 인원 구분 헤더 (다중 인원일 때만 표시) */}
+                          {isMultiplePeople && (
+                            <div className="pb-3 border-b border-orange-200">
+                              <div className="flex items-center space-x-3">
+                                <div className="flex items-center justify-center w-8 h-8 text-white bg-gradient-to-r from-orange-500 to-red-600 rounded-full">
+                                  <span className="text-sm font-bold">{parseInt(personIndex) + 1}</span>
                                 </div>
-                                <div className="flex justify-center gap-2">
-                                  <Button size="sm" variant="outline" onClick={() => openImagePreview(getDocumentImageUrl(document), document.fileName)} className="hover:bg-blue-50">
-                                    <Eye className="w-3 h-3 mr-1" />
-                                    확대보기
-                                  </Button>
-                                  {/* 이미지 변경 버튼 - 여권 문서일 때만 표시 */}
-                                  {document.type === "passport" && (
-                                    <Button size="sm" variant="outline" onClick={() => setShowImageUpload(true)} disabled={isUploadingImage} className="text-blue-600 border-blue-200 hover:bg-blue-50">
-                                      <Upload className="w-3 h-3 mr-1" />
-                                      이미지 변경
-                                    </Button>
+                                <h3 className="text-lg font-bold text-gray-800">{parseInt(personIndex) + 1}번째 신청자 서류</h3>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* 해당 인원의 문서들 */}
+                          {documents.map((document) => (
+                            <div key={`doc_${document.originalIndex}`} className="p-6 transition-shadow border border-gray-200 rounded-xl hover:shadow-md bg-gray-50">
+                              {/* 문서 헤더 */}
+                              <div className="flex items-center justify-between mb-6">
+                                <div>
+                                  <h4 className="mb-1 text-lg font-semibold text-gray-900">
+                                    {getDocumentTypeLabel(document.baseType)} / {document.baseType.toUpperCase()}
+                                    {isMultiplePeople && <span className="ml-2 text-sm text-orange-600">({parseInt(personIndex) + 1}번째 신청자)</span>}
+                                  </h4>
+                                  <p className="text-sm text-gray-500">
+                                    {document.fileName} • {(document.fileSize / 1024).toFixed(1)}KB • {document.fileType}
+                                  </p>
+                                  <p className="mt-1 text-xs text-gray-400">
+                                    업로드:{" "}
+                                    {new Date(parseInt(document.uploadedAt)).toLocaleString("ko-KR", {
+                                      year: "numeric",
+                                      month: "2-digit",
+                                      day: "2-digit",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                      second: "2-digit",
+                                    })}
+                                  </p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  {(document.fileUrl || document.fileData) && (
+                                    <>
+                                      <Button size="sm" variant="outline" onClick={() => openImagePreview(document.fileUrl || document.fileData, document.fileName)} className="hover:bg-blue-50">
+                                        <ZoomIn className="w-3 h-3 mr-1" />
+                                        미리보기
+                                      </Button>
+                                      {/* AI 정보 추출 버튼 - 여권 문서일 때만 표시 */}
+                                      {document.baseType === "passport" && (
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={handleExtractPassportInfo}
+                                          disabled={isExtractingPassport}
+                                          className="text-green-600 border-green-200 hover:bg-green-50"
+                                        >
+                                          {isExtractingPassport ? (
+                                            <>
+                                              <RefreshCw className="w-3 h-3 mr-1 animate-spin" />
+                                              추출 중...
+                                            </>
+                                          ) : (
+                                            <>
+                                              <Brain className="w-3 h-3 mr-1" />
+                                              AI 정보 추출
+                                            </>
+                                          )}
+                                        </Button>
+                                      )}
+                                    </>
                                   )}
                                 </div>
                               </div>
-                            ) : (
-                              <div className="flex items-center justify-center w-full h-48 bg-gray-100 border-2 border-gray-300 border-dashed rounded-lg">
-                                <p className="text-gray-500">이미지 없음</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        {/* AI 추출 정보 섹션 */}
-                        {document?.type == "passport" && (
-                          <Card className="bg-white border-0 shadow-lg mt-[24px]">
-                            <CardHeader className="text-white rounded-t-lg bg-gradient-to-r from-purple-500 to-purple-600">
-                              <CardTitle className="flex items-center justify-between gap-3">
-                                <div className="flex items-center gap-3">
-                                  <FileText className="w-5 h-5" />
-                                  여권 추출 정보
-                                </div>
-                              </CardTitle>
-                            </CardHeader>
-                            <CardContent className="p-6">
-                              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                                {(() => {
-                                  // Application 레벨 우선, 없으면 Document 레벨 사용
-                                  const extractedInfo = application.extractedInfo || application.documents.find((doc) => doc.type === "passport")?.extractedInfo;
 
-                                  return (
-                                    extractedInfo &&
-                                    Object.entries(extractedInfo)
-                                      .filter(([key, value]) => key !== "__typename" && value !== null && value !== "")
-                                      .map(([key, value]) => (
-                                        <div key={key}>
-                                          <label className="block mb-2 text-sm font-medium text-gray-600">{getKoreanFieldName(key)}</label>
-                                          {isEditing ? (
-                                            <input
-                                              type="text"
-                                              value={editableData.extractedInfo?.[key] || ""}
-                                              onChange={(e) =>
-                                                setEditableData({
-                                                  ...editableData,
-                                                  extractedInfo: {
-                                                    ...editableData.extractedInfo,
-                                                    [key]: e.target.value,
-                                                  },
-                                                })
-                                              }
-                                              className="w-full px-4 py-3 text-gray-900 placeholder-gray-400 transition-all duration-200 bg-white border border-gray-200 shadow-sm rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent hover:shadow-md"
-                                              placeholder={`${getKoreanFieldName(key)}을(를) 입력하세요`}
-                                            />
-                                          ) : (
-                                            <div className="p-4 border border-gray-100 bg-gray-50 rounded-xl">
-                                              <p className="font-medium text-gray-900">{value}</p>
-                                            </div>
-                                          )}
-                                        </div>
-                                      ))
-                                  );
-                                })()}
+                              {/* 컨텐츠 영역을 세로로 배치 */}
+                              <div className="space-y-6">
+                                {/* 이미지 섹션 */}
+                                <div>
+                                  <h5 className="flex items-center gap-2 mb-3 font-medium text-gray-700">
+                                    <Eye className="w-4 h-4" />
+                                    문서 이미지 / Document Image
+                                  </h5>
+                                  {document.fileUrl || document.fileData ? (
+                                    <div className="space-y-3">
+                                      <div className="relative w-full max-w-md mx-auto">
+                                        <Image
+                                          src={getDocumentImageUrl(document)}
+                                          alt={document.fileName}
+                                          width={400}
+                                          height={300}
+                                          className="object-contain w-full h-auto transition-opacity bg-white border rounded-lg shadow-sm cursor-pointer hover:opacity-80"
+                                          onClick={() => openImagePreview(getDocumentImageUrl(document), document.fileName)}
+                                          style={{ maxHeight: "400px" }}
+                                        />
+                                      </div>
+                                      <div className="flex justify-center gap-2">
+                                        <Button size="sm" variant="outline" onClick={() => openImagePreview(getDocumentImageUrl(document), document.fileName)} className="hover:bg-blue-50">
+                                          <Eye className="w-3 h-3 mr-1" />
+                                          확대보기
+                                        </Button>
+                                        {/* 이미지 변경 버튼 - 여권 문서일 때만 표시 */}
+                                        {document.baseType === "passport" && (
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => setShowImageUpload(true)}
+                                            disabled={isUploadingImage}
+                                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                                          >
+                                            <Upload className="w-3 h-3 mr-1" />
+                                            이미지 변경
+                                          </Button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <div className="flex items-center justify-center w-full h-48 bg-gray-100 border-2 border-gray-300 border-dashed rounded-lg">
+                                      <p className="text-gray-500">이미지 없음</p>
+                                    </div>
+                                  )}
+                                </div>
+
+                                {/* AI 추출 정보 섹션 */}
+                                {document.baseType === "passport" && (
+                                  <div>
+                                    <h5 className="flex items-center gap-2 mb-3 font-medium text-gray-700">
+                                      <Brain className="w-4 h-4" />
+                                      AI 추출 정보
+                                    </h5>
+                                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                                      {(() => {
+                                        // Application 레벨 우선, 없으면 Document 레벨 사용
+                                        const extractedInfo = application.extractedInfo || document.extractedInfo;
+
+                                        return (
+                                          extractedInfo &&
+                                          Object.entries(extractedInfo)
+                                            .filter(([key, value]) => key !== "__typename" && value !== null && value !== "")
+                                            .map(([key, value]) => (
+                                              <div key={key}>
+                                                <label className="block mb-1 text-xs font-medium text-gray-500">{getKoreanFieldName(key)}</label>
+                                                <div className="p-2 text-xs border border-gray-100 bg-gray-50 rounded-lg">
+                                                  <p className="font-medium text-gray-900">{value}</p>
+                                                </div>
+                                              </div>
+                                            ))
+                                        );
+                                      })()}
+                                    </div>
+                                  </div>
+                                )}
                               </div>
-                            </CardContent>
-                          </Card>
-                        )}
-                      </div>
-                    ))}
+                            </div>
+                          ))}
+                        </div>
+                      ));
+                    })()}
                   </div>
                 </CardContent>
               </Card>
@@ -1339,13 +1647,31 @@ export default function ApplicationDetailPage() {
                 <div>
                   <label className="block mb-1 text-sm font-medium text-gray-500">신청일</label>
                   <p className="font-medium text-gray-900">
-                    {new Date(application.createdAt).toLocaleDateString("ko-KR", {
+                    {new Date(application.createdAt).toLocaleString("ko-KR", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
                     })}
                   </p>
                 </div>
+                {application.updatedAt && application.updatedAt !== application.createdAt && (
+                  <div>
+                    <label className="block mb-1 text-sm font-medium text-gray-500">최종 수정일</label>
+                    <p className="font-medium text-gray-900">
+                      {new Date(application.updatedAt).toLocaleString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                )}
                 <div>
                   <label className="block mb-2 text-sm font-medium text-gray-500">현재 상태</label>
                   {getStatusBadge(application.status)}
@@ -1354,7 +1680,22 @@ export default function ApplicationDetailPage() {
                   <label className="block mb-1 text-sm font-medium text-gray-500">총 금액</label>
                   <p className="flex items-center gap-2 text-2xl font-bold text-green-600">
                     <DollarSign className="w-5 h-5" />
-                    {application.totalPrice?.toLocaleString()}원
+                    {(() => {
+                      // 새로운 pricing 구조 지원
+                      if (application.totalPrice?.totalPrice) {
+                        return application.totalPrice.formatted?.totalPrice || "가격 정보 없음";
+                      }
+                      // 기존 totalPrice가 number인 경우의 fallback
+                      else if (typeof application.totalPrice === "number") {
+                        return new Intl.NumberFormat("ko-KR", {
+                          style: "currency",
+                          currency: "KRW",
+                          minimumFractionDigits: 0,
+                        }).format(application.totalPrice);
+                      } else {
+                        return "가격 정보 없음";
+                      }
+                    })()}
                   </p>
                 </div>
               </CardContent>
@@ -1457,10 +1798,42 @@ export default function ApplicationDetailPage() {
                 <strong>상태:</strong> {getStatusBadge(application.status).props.children[1]}
               </p>
               <p>
-                <strong>신청일:</strong> {new Date(application.createdAt).toLocaleDateString("ko-KR")}
+                <strong>신청일:</strong>{" "}
+                {new Date(application.createdAt).toLocaleString("ko-KR", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  second: "2-digit",
+                })}
               </p>
               <p>
-                <strong>총 금액:</strong> {application.totalPrice?.toLocaleString()}원
+                <strong>총 금액:</strong>{" "}
+                {(() => {
+                  if (application.totalPrice?.totalPrice) {
+                    const totalPrice = application.totalPrice.totalPrice;
+                    const isTransit = application.travelInfo?.visaType === "E_VISA_TRANSIT" || application.travelInfo?.visaType === "transit_visa";
+
+                    if (isTransit) {
+                      return new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                        minimumFractionDigits: 0,
+                      }).format(totalPrice);
+                    } else {
+                      return new Intl.NumberFormat("ko-KR", {
+                        style: "currency",
+                        currency: "KRW",
+                        minimumFractionDigits: 0,
+                      }).format(totalPrice);
+                    }
+                  } else if (typeof application.totalPrice === "number") {
+                    return application.totalPrice?.toLocaleString() + "원";
+                  } else {
+                    return "가격 정보 없음";
+                  }
+                })()}
               </p>
             </div>
           </div>

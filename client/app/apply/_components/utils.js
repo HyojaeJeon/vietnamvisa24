@@ -1,6 +1,6 @@
 // Utility functions for the apply form
 
-import { ADDITIONAL_SERVICES } from "./types.js";
+import { ADDITIONAL_SERVICES, VISA_PRICES, VISA_TYPES, TRANSIT_VEHICLE_TYPES, PROCESSING_TYPES } from "./types.js";
 
 export const formatDate = (date) => {
   return new Date(date).toLocaleDateString("ko-KR");
@@ -25,7 +25,116 @@ export const validatePassport = (passport) => {
   return passport.length >= 6 && passport.length <= 12;
 };
 
-export const calculateVisaPrice = (visaType, processingType) => {
+/**
+ * 비자 기본 가격 계산
+ * @param {string} visaType - 비자 타입
+ * @param {string} visaDurationType - 비자 기간 타입 (SINGLE, MULTIPLE)
+ * @param {string} processingType - 처리 타입 (GENERAL, EXPRESS_1HOUR, etc.)
+ * @param {number} transitPeopleCount - 목바이 경유 시 인원 수
+ * @param {string} transitVehicleType - 목바이 경유 시 차량 타입
+ * @returns {object} { basePrice, vehiclePrice, totalVisaPrice }
+ */
+export const calculateVisaPrice = (visaType, visaDurationType, processingType, transitPeopleCount, transitVehicleType) => {
+  let basePrice = 0;
+  let vehiclePrice = 0;
+  if (visaType === VISA_TYPES.E_VISA_TRANSIT) {
+    // 목바이 경유 비자
+    const peopleCount = Math.min(Math.max(transitPeopleCount || 1, 1), 3);
+    const priceCategory = visaDurationType === "MULTIPLE_90" ? "E_VISA_TRANSIT_MULTIPLE" : "E_VISA_TRANSIT_SINGLE";
+    basePrice = VISA_PRICES[priceCategory][peopleCount] || 0;
+
+    // 차량 추가 비용
+    if (transitVehicleType) {
+      const vehicleInfo = TRANSIT_VEHICLE_TYPES.find((v) => v.id === transitVehicleType);
+      vehiclePrice = vehicleInfo?.price || 0;
+    }
+  } else {
+    // 일반 E-VISA
+    const priceCategory = visaDurationType === "MULTIPLE_90" || visaDurationType === "MULTIPLE" ? "E_VISA_MULTIPLE" : "E_VISA_SINGLE";
+    const priceKey =
+      processingType === ""
+        ? "GENERAL"
+        : processingType.replace(/\d+시간|\d+일/g, (match) => {
+            switch (match) {
+              case "1시간":
+                return "EXPRESS_1HOUR";
+              case "2시간":
+                return "EXPRESS_2HOUR";
+              case "4시간":
+                return "EXPRESS_4HOUR";
+              case "1일":
+                return "EXPRESS_1DAY";
+              case "2일":
+                return "EXPRESS_2DAY";
+              case "3일":
+                return "EXPRESS_3DAY";
+              default:
+                return "GENERAL";
+            }
+          });
+
+    basePrice = VISA_PRICES[priceCategory]?.[priceKey] || VISA_PRICES[priceCategory]?.GENERAL || 0;
+  }
+
+  return {
+    basePrice,
+    vehiclePrice,
+    totalVisaPrice: basePrice + vehiclePrice,
+  };
+};
+
+/**
+ * 추가 서비스 가격 계산
+ * @param {string[]} additionalServices - 선택된 추가 서비스 ID 배열
+ * @returns {object} { services: [{id, name, price}], totalPrice }
+ */
+export const calculateAdditionalServicesPrice = (additionalServices = []) => {
+  const services = additionalServices
+    .map((serviceId) => {
+      const service = ADDITIONAL_SERVICES.find((s) => s.id === serviceId);
+      return service
+        ? {
+            id: serviceId,
+            name: service.name,
+            price: service.price,
+          }
+        : null;
+    })
+    .filter(Boolean);
+
+  const totalPrice = services.reduce((sum, service) => sum + service.price, 0);
+
+  return {
+    services,
+    totalPrice,
+  };
+};
+
+/**
+ * 가격을 통화별로 포맷팅
+ * @param {number} price - 가격
+ * @param {string} visaType - 비자 타입 (통화 결정용)
+ * @returns {string} 포맷된 가격 문자열
+ */
+export const formatPrice = (price, visaType) => {
+  if (visaType === VISA_TYPES.E_VISA_TRANSIT) {
+    // 목바이 경유는 베트남 동화(VND)
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      minimumFractionDigits: 0,
+    }).format(price);
+  } else {
+    // 일반 E-VISA는 한국 원화(KRW)
+    return new Intl.NumberFormat("ko-KR", {
+      style: "currency",
+      currency: "KRW",
+      minimumFractionDigits: 0,
+    }).format(price);
+  }
+};
+
+export const calculateOldVisaPrice = (visaType, processingType) => {
   const basePrices = {
     general: 25000,
     business: 35000,
@@ -97,12 +206,34 @@ export const validateStep = (step, formData) => {
     case 4: {
       // 서류 업로드 단계: passport와 photo가 필수
       const documents = formData.documents || {};
-      const hasPassport = documents.passport;
-      const hasPhoto = documents.photo; // 증명사진이 있고 검증 결과가 있다면 적합한지 확인
-      const photoValidation = documents.photo?.validationResult;
-      const isPhotoSuitable = !photoValidation || (photoValidation?.result || photoValidation) === "SUITABLE";
 
-      return hasPassport && hasPhoto && isPhotoSuitable;
+      // Transit E-VISA의 경우 여러 인원 확인
+      const totalPeople = formData.visaType === "E_VISA_TRANSIT" && formData.transitPeopleCount ? formData.transitPeopleCount : 1;
+      if (totalPeople === 1) {
+        // 단일 인원
+        const hasPassport = documents.passport;
+        const hasPhoto = documents.photo;
+        const photoValidation = documents.photo?.validationResult;
+        const isPhotoSuitable = !photoValidation || (photoValidation?.result || photoValidation) === "SUITABLE";
+
+        return hasPassport && hasPhoto && isPhotoSuitable;
+      } else {
+        // 다중 인원 - 모든 인원의 서류 확인 (camelCase 형식)
+        for (let i = 0; i < totalPeople; i++) {
+          const passportKey = `passportPerson${i}`;
+          const photoKey = `photoPerson${i}`;
+
+          const hasPassport = documents[passportKey];
+          const hasPhoto = documents[photoKey];
+          const photoValidation = documents[photoKey]?.validationResult;
+          const isPhotoSuitable = !photoValidation || (photoValidation?.result || photoValidation) === "SUITABLE";
+
+          if (!hasPassport || !hasPhoto || !isPhotoSuitable) {
+            return false;
+          }
+        }
+        return true;
+      }
     }
     case 5:
       return true; // Review step
@@ -167,19 +298,38 @@ export const formatCurrency = (amount) => {
 
 // Calculate total price including base price and additional services
 export const calculateTotalPrice = (formData) => {
-  let basePrice = calculateVisaPrice(formData.visaType, formData.processingType);
+  const { visaType, visaDurationType, processingType, transitPeopleCount, transitVehicleType, additionalServices } = formData;
 
-  // Add additional services
-  if (formData.additionalServices && formData.additionalServices.length > 0) {
-    const additionalServicesPrice = formData.additionalServices.reduce((total, serviceId) => {
-      // Find service price from ADDITIONAL_SERVICES
-      const service = ADDITIONAL_SERVICES?.find((s) => s.id === serviceId);
-      return total + (service?.price || 0);
-    }, 0);
-    basePrice += additionalServicesPrice;
-  }
+  // 비자 기본 가격 계산
+  const visaPricing = calculateVisaPrice(visaType, visaDurationType, processingType, transitPeopleCount, transitVehicleType);
 
-  return basePrice;
+  // 추가 서비스 가격 계산
+  const additionalServicesPricing = calculateAdditionalServicesPrice(additionalServices);
+
+  // 전체 가격
+  const totalPrice = visaPricing.totalVisaPrice + additionalServicesPricing.totalPrice;
+
+  // Transit E-VISA인지 확인 (VND 가격인지 KRW 가격인지)
+  const isTransitVisa = visaType === VISA_TYPES.E_VISA_TRANSIT;
+
+  return {
+    visa: {
+      basePrice: visaPricing.basePrice,
+      vehiclePrice: visaPricing.vehiclePrice,
+      totalPrice: visaPricing.totalVisaPrice,
+    },
+    additionalServices: additionalServicesPricing,
+    totalPrice,
+    currency: isTransitVisa ? "VND" : "KRW", // 기본 통화 정보 추가
+    // 가격 표시를 위한 포맷된 문자열
+    formatted: {
+      visaBasePrice: formatPrice(visaPricing.basePrice, visaType),
+      visaVehiclePrice: formatPrice(visaPricing.vehiclePrice, visaType),
+      visaTotalPrice: formatPrice(visaPricing.totalVisaPrice, visaType),
+      additionalServicesPrice: formatPrice(additionalServicesPricing.totalPrice, visaType),
+      totalPrice: formatPrice(totalPrice, visaType),
+    },
+  };
 };
 
 // Validation helper functions
@@ -318,4 +468,84 @@ export const uploadAllDocuments = async (documents, applicationId) => {
 
   await Promise.all(uploadPromises);
   return documentUrls;
+};
+
+/**
+ * 비자 서비스 세부 정보 반환
+ * @param {object} formData - 폼 데이터
+ * @returns {object} 비자 서비스 세부 정보
+ */
+export const getVisaServiceDetails = (formData) => {
+  const { visaType, visaDurationType, processingType, transitPeopleCount, transitVehicleType } = formData;
+
+  const details = {
+    visaTypeInfo: {},
+    durationInfo: {},
+    processingInfo: {},
+    transitInfo: {},
+  };
+
+  // 비자 타입 정보
+  switch (visaType) {
+    case VISA_TYPES.E_VISA_GENERAL:
+      details.visaTypeInfo = {
+        name: "E-VISA(전자비자) - 일반",
+        description: "표준 처리 속도로 안정적인 발급",
+        processingTime: "4-5일 소요",
+      };
+      break;
+    case VISA_TYPES.E_VISA_URGENT:
+      details.visaTypeInfo = {
+        name: "E-VISA(전자비자) - 급행",
+        description: "빠른 처리가 필요한 경우",
+        processingTime: "선택한 처리 속도에 따름",
+      };
+      break;
+    case VISA_TYPES.E_VISA_TRANSIT:
+      details.visaTypeInfo = {
+        name: "목바이 경유 E-VISA(전자비자)",
+        description: "목바이 경유를 통한 당일 발급",
+        processingTime: "당일 발급",
+      };
+      break;
+  }
+
+  // 기간 정보
+  switch (visaDurationType) {
+    case "SINGLE_90":
+      details.durationInfo = {
+        name: "단수 입국 (90일)",
+        description: "90일간 1회 입국 후 재입국 불가",
+      };
+      break;
+    case "MULTIPLE_90":
+      details.durationInfo = {
+        name: "복수 입국 (90일)",
+        description: "90일간 자유로운 출입국 가능",
+      };
+      break;
+  }
+
+  // 처리 속도 정보 (급행 비자만)
+  if (visaType === VISA_TYPES.E_VISA_URGENT && processingType) {
+    const processingOptions = {
+      [PROCESSING_TYPES.EXPRESS_1HOUR]: { name: "1시간 처리", description: "최우선 처리" },
+      [PROCESSING_TYPES.EXPRESS_2HOUR]: { name: "2시간 처리", description: "우선 처리" },
+      [PROCESSING_TYPES.EXPRESS_4HOUR]: { name: "4시간 처리", description: "빠른 처리" },
+      [PROCESSING_TYPES.EXPRESS_1DAY]: { name: "1일 처리", description: "당일 처리" },
+      [PROCESSING_TYPES.EXPRESS_2DAY]: { name: "2일 처리", description: "2일 처리" },
+      [PROCESSING_TYPES.EXPRESS_3DAY]: { name: "3일 처리", description: "3일 처리" },
+    };
+    details.processingInfo = processingOptions[processingType] || {};
+  }
+
+  // 목바이 경유 정보
+  if (visaType === VISA_TYPES.E_VISA_TRANSIT) {
+    details.transitInfo = {
+      peopleCount: transitPeopleCount,
+      vehicleType: transitVehicleType ? TRANSIT_VEHICLE_TYPES.find((v) => v.id === transitVehicleType) : null,
+    };
+  }
+
+  return details;
 };

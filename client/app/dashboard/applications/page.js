@@ -416,7 +416,7 @@ export default function ApplicationsPage() {
                             <div className="flex items-center gap-2">
                               <Phone className="w-4 h-4 text-gray-400" />
                               <span>{app.personalInfo?.phone}</span>
-                            </div>
+                            </div>{" "}
                             <div className="flex items-center gap-2">
                               <Calendar className="w-4 h-4 text-gray-400" />
                               <span>
@@ -451,11 +451,47 @@ export default function ApplicationsPage() {
                               </span>
                             )}
                           </div>
-                        </div>
-
+                        </div>{" "}
                         <div className="flex items-center justify-between lg:flex-col lg:items-end lg:gap-2">
                           <div className="text-right">
-                            <div className="text-lg font-semibold text-gray-900">₩{app.totalPrice?.toLocaleString()}</div>
+                            {" "}
+                            <div className="text-lg font-semibold text-gray-900">
+                              {(() => {
+                                // 새로운 pricing 구조 지원 - 포맷된 가격 우선 사용
+                                if (app.totalPrice?.formatted?.totalPrice) {
+                                  return app.totalPrice.formatted.totalPrice;
+                                }
+                                // 새로운 pricing 구조 지원 - raw 값 사용
+                                else if (app.totalPrice?.totalPrice) {
+                                  const totalPrice = app.totalPrice.totalPrice;
+                                  const isTransit = app.travelInfo?.visaType === "E_VISA_TRANSIT" || app.travelInfo?.visaType === "transit_visa";
+
+                                  if (isTransit) {
+                                    return new Intl.NumberFormat("vi-VN", {
+                                      style: "currency",
+                                      currency: "VND",
+                                      minimumFractionDigits: 0,
+                                    }).format(totalPrice);
+                                  } else {
+                                    return new Intl.NumberFormat("ko-KR", {
+                                      style: "currency",
+                                      currency: "KRW",
+                                      minimumFractionDigits: 0,
+                                    }).format(totalPrice);
+                                  }
+                                }
+                                // 기존 totalPrice가 number인 경우의 fallback
+                                else if (typeof app.totalPrice === "number") {
+                                  return new Intl.NumberFormat("ko-KR", {
+                                    style: "currency",
+                                    currency: "KRW",
+                                    minimumFractionDigits: 0,
+                                  }).format(app.totalPrice);
+                                } else {
+                                  return "가격 미정";
+                                }
+                              })()}
+                            </div>
                             <div className="text-xs text-gray-500">{app.travelInfo?.entryDate && `입국: ${new Date(app.travelInfo.entryDate).toLocaleDateString("ko-KR")}`}</div>
                           </div>
                           <Button

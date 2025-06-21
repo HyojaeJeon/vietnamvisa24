@@ -2,6 +2,6 @@
   "/_not-found/page": "app/_not-found/page.js",
   "/apply/page": "app/apply/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/dashboard/applications/page": "app/dashboard/applications/page.js",
-  "/dashboard/applications/[id]/page": "app/dashboard/applications/[id]/page.js"
+  "/dashboard/applications/[id]/page": "app/dashboard/applications/[id]/page.js",
+  "/dashboard/applications/page": "app/dashboard/applications/page.js"
 }

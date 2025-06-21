@@ -9,21 +9,16 @@ import { Progress } from "../../src/components/ui/progress";
 import { Alert, AlertDescription } from "../../src/components/ui/alert";
 import { FileText, Upload, CheckCircle, AlertCircle, Camera, ArrowRight, ArrowLeft, X, Eye, RefreshCw, Info } from "lucide-react";
 import { validateStep } from "./utils";
+import { VISA_TYPES } from "./types";
 
 const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
   const [uploadingFiles, setUploadingFiles] = useState({});
   const [previewFile, setPreviewFile] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
   const [toastType, setToastType] = useState("success");
-  // 파일을 base64로 변환하는 함수
-  const fileToBase64 = (file) => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = (error) => reject(error);
-    });
-  };
+
+  // 목바이 경유 E-VISA의 인원수 확인
+  const totalPeople = formData.visaType === VISA_TYPES.E_VISA_TRANSIT && formData.transitPeopleCount ? formData.transitPeopleCount : 1;
 
   const uploadedDocuments = formData.documents || {};
 
@@ -62,6 +57,16 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
     },
   ];
 
+  // 파일을 base64로 변환하는 함수
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   // 이미지 압축 함수
   const compressImage = useCallback(
     async (file, documentType) => {
@@ -73,11 +78,11 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
       // 이미지 파일만 압축
       if (file.type.startsWith("image/")) {
         const options = {
-          maxSizeMB: documentType === "passport" ? 2 : 1, // 여권은 2MB, 증명사진은 1MB로 압축
-          maxWidthOrHeight: documentType === "passport" ? 1920 : 1024, // 여권은 더 큰 해상도 유지
+          maxSizeMB: documentType === "passport" ? 2 : 1,
+          maxWidthOrHeight: documentType === "passport" ? 1920 : 1024,
           useWebWorker: true,
-          fileType: file.type, // 원본 파일 타입 유지
-          initialQuality: 0.8, // 초기 품질 80%
+          fileType: file.type,
+          initialQuality: 0.8,
         };
 
         try {
@@ -99,7 +104,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
   );
 
   const handleFileUpload = useCallback(
-    async (documentType, file) => {
+    async (documentType, file, personIndex = 0) => {
       if (!file) return;
       const maxSize = { passport: 10, photo: 5 }[documentType] * 1024 * 1024;
       if (file.size > maxSize) {
@@ -111,32 +116,29 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
         return;
       }
       try {
-        // 이미지 압축 처리
         const processedFile = await compressImage(file, documentType);
+        const base64Data = await fileToBase64(processedFile);
 
-        // 파일을 base64로 변환
-        const base64Data = await fileToBase64(processedFile); // 업로드 진행 상태 시작
-        setUploadingFiles((p) => ({ ...p, [documentType]: 0 }));
+        const uploadKey = `${documentType}_${personIndex}`;
+        setUploadingFiles((p) => ({ ...p, [uploadKey]: 0 }));
 
-        // 파일 업로드 완료 메시지
-        if (documentType === "passport") {
-          showToast("여권 사본이 업로드되었습니다", "success");
-        } else if (documentType === "photo") {
-          showToast("증명사진이 업로드되었습니다", "success");
-        }
+        const messagePrefix = totalPeople > 1 ? `${personIndex + 1}번째 신청자의 ` : "";
+        const documentName = documentType === "passport" ? "여권 사본" : "증명사진";
+        showToast(`${messagePrefix}${documentName}이 업로드되었습니다`, "success");
 
-        setUploadingFiles((p) => ({ ...p, [documentType]: 100 }));
+        setUploadingFiles((p) => ({ ...p, [uploadKey]: 100 }));
         setTimeout(() => {
           setUploadingFiles((p) => {
             const q = { ...p };
-            delete q[documentType];
+            delete q[uploadKey];
             return q;
           });
         }, 300);
 
-        // 문서 정보 저장
         const docs = { ...(formData.documents || {}) };
-        docs[documentType] = {
+        const docKey = totalPeople > 1 ? `${documentType}Person${personIndex}` : documentType;
+
+        docs[docKey] = {
           fileName: processedFile.name || file.name,
           fileSize: processedFile.size,
           fileType: processedFile.type,
@@ -144,44 +146,218 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           isTemporary: true,
           originalSize: file.size,
           compressionRatio: file.size > 0 ? (((file.size - processedFile.size) / file.size) * 100).toFixed(1) : 0,
-          file: base64Data, // base64 인코딩된 파일 데이터 저장
+          file: base64Data,
+          personIndex: personIndex,
         };
 
         onUpdate({ documents: docs });
       } catch (e) {
         console.error(e);
+        const uploadKey = `${documentType}_${personIndex}`;
         setUploadingFiles((p) => {
           const q = { ...p };
-          delete q[documentType];
+          delete q[uploadKey];
           return q;
         });
         showToast("파일 업로드 중 오류가 발생했습니다", "error");
       }
     },
-    [formData.documents, onUpdate, showToast, compressImage]
+    [formData.documents, onUpdate, showToast, compressImage, totalPeople]
   );
 
   const handleFileRemove = useCallback(
-    (type) => {
+    (documentType, personIndex = 0) => {
       const docs = { ...formData.documents };
-      delete docs[type];
+      const docKey = totalPeople > 1 ? `${documentType}Person${personIndex}` : documentType;
+      delete docs[docKey];
       onUpdate({ documents: docs });
     },
-    [formData.documents, onUpdate]
+    [formData.documents, onUpdate, totalPeople]
   );
 
   const handlePreview = useCallback(
-    (type) => {
-      const doc = formData.documents?.[type];
-      if (doc) setPreviewFile({ type, ...doc });
+    (documentType, personIndex = 0) => {
+      const docKey = totalPeople > 1 ? `${documentType}Person${personIndex}` : documentType;
+      const doc = formData.documents?.[docKey];
+      if (doc) setPreviewFile({ type: docKey, ...doc });
     },
-    [formData.documents]
+    [formData.documents, totalPeople]
   );
+
   const isValid = validateStep(4, formData);
-  const uploaded = formData.documents || {};
-  const required = documentRequirements.filter((d) => d.required);
-  const done = required.filter((d) => uploaded[d.type]).length;
-  const completionRate = Math.round((done / required.length) * 100);
+
+  // 여러 인원을 고려한 완료율 계산
+  const getCompletionRate = () => {
+    const required = documentRequirements.filter((d) => d.required);
+    if (totalPeople === 1) {
+      const done = required.filter((d) => uploadedDocuments[d.type]).length;
+      return Math.round((done / required.length) * 100);
+    } else {
+      let totalRequired = 0;
+      let totalCompleted = 0;
+      for (let i = 0; i < totalPeople; i++) {
+        for (const req of required) {
+          totalRequired++;
+          const docKey = `${req.type}Person${i}`;
+          if (uploadedDocuments[docKey]) {
+            totalCompleted++;
+          }
+        }
+      }
+      return totalRequired > 0 ? Math.round((totalCompleted / totalRequired) * 100) : 0;
+    }
+  };
+
+  const completionRate = getCompletionRate();
+
+  // 파일 업로드 처리 함수
+  const handleFileChange = useCallback(
+    (documentType, personIndex) => (e) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        handleFileUpload(documentType, file, personIndex);
+      }
+    },
+    [handleFileUpload]
+  );
+
+  // 상태 클래스 계산 함수들
+  const getIconBgClass = (isUploaded, isRequired) => {
+    if (isUploaded) return "bg-green-500 text-white";
+    if (isRequired) return "bg-orange-500 text-white";
+    return "bg-gray-400 text-white";
+  };
+
+  const getCardBorderClass = (isUploaded, isRequired) => {
+    if (isUploaded) return "border-green-500 bg-green-50";
+    if (isRequired) return "border-orange-300 bg-orange-50";
+    return "border-gray-200 bg-white";
+  };
+
+  // 업로드 상태 렌더링 함수들
+  const renderUploadingState = (doc, personIndex) => (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 text-sm text-blue-600">
+        <RefreshCw className="w-4 h-4 animate-spin" />
+        <span>업로드 중...</span>
+      </div>
+      <Progress value={uploadingFiles[`${doc.type}_${personIndex}`]} className="h-2" />
+    </div>
+  );
+
+  const renderUploadedState = (doc, docKey, personIndex) => {
+    const document = uploadedDocuments[docKey];
+    const hasCompressionRatio = document.compressionRatio && parseFloat(document.compressionRatio) > 0;
+    const isTemporary = document.isTemporary;
+
+    return (
+      <div className="flex flex-col items-center justify-between p-3 bg-white border rounded-lg md:flex-row">
+        <div className="flex items-center gap-3">
+          <CheckCircle className="w-5 h-5 text-green-500" />
+          <div className="flex-1">
+            <p className="text-sm font-medium text-gray-800">{document.fileName}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs text-gray-500">{Math.round(document.fileSize / 1024)} KB</p>
+              {hasCompressionRatio && <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full">{document.compressionRatio}% 압축</span>}
+              {isTemporary && <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded-full">임시저장됨</span>}
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 mt-3 md:mt-0">
+          <Button variant="outline" size="sm" onClick={() => handlePreview(doc.type, personIndex)} className="px-3 py-1">
+            <Eye className="w-4 h-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => handleFileRemove(doc.type, personIndex)} className="px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50">
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
+  const renderUploadArea = (doc, personIndex) => {
+    const acceptFileTypes = doc.type === "passport" ? ".jpg,.jpeg,.png,.pdf" : ".jpg,.jpeg,.png";
+    const fileInputId = `file-${doc.type}-${personIndex}`;
+
+    return (
+      <div className="space-y-3">
+        <input type="file" accept={acceptFileTypes} onChange={handleFileChange(doc.type, personIndex)} className="hidden" id={fileInputId} />
+        <label
+          htmlFor={fileInputId}
+          className="flex flex-col items-center justify-center w-full h-32 transition-all duration-200 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
+        >
+          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+            <Upload className="w-8 h-8 mb-2 text-gray-400" />
+            <p className="mb-2 text-sm text-center text-gray-500">
+              <span className="font-semibold">클릭하여 업로드</span> 또는 드래그 앤 드롭
+            </p>
+            <p className="text-xs text-gray-500">
+              {doc.formats.join(", ")} (최대 {doc.maxSize})
+            </p>
+          </div>
+        </label>
+      </div>
+    );
+  };
+
+  // 문서 카드 렌더링 함수
+  const renderDocumentCard = (doc, personIndex) => {
+    const docKey = totalPeople > 1 ? `${doc.type}Person${personIndex}` : doc.type;
+    const isUploaded = uploadedDocuments[docKey];
+    const isUploading = uploadingFiles[`${doc.type}_${personIndex}`] !== undefined;
+    const cardKey = `${doc.type}-${personIndex}-${totalPeople}`;
+
+    const iconBgClass = getIconBgClass(isUploaded, doc.required);
+    const cardBorderClass = getCardBorderClass(isUploaded, doc.required);
+    const iconComponent = isUploaded ? <CheckCircle className="w-6 h-6" /> : doc.icon;
+
+    return (
+      <Card key={cardKey} className={`border-2 transition-all duration-300 ${cardBorderClass}`}>
+        <CardContent className="p-4 md:p-6">
+          <div className="flex items-start gap-4">
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${iconBgClass}`}>{iconComponent}</div>
+
+            <div className="flex-1 space-y-3">
+              <div className="flex flex-col items-start justify-between md:flex-row md:items-center">
+                <div>
+                  <h3 className="flex items-center gap-2 text-lg font-bold text-gray-800">
+                    <span>{doc.title}</span>
+                    {totalPeople > 1 && <span className="text-sm text-blue-600">({personIndex + 1}번째 신청자)</span>}
+                    {doc.required && <span className="text-sm text-red-500">*필수</span>}
+                  </h3>
+                  <p className="mt-1 text-sm text-gray-600">{doc.description}</p>
+                </div>
+
+                <div className="flex items-center gap-2 mt-2 md:mt-0">
+                  <span className="text-xs text-gray-500">
+                    최대 {doc.maxSize} | {doc.formats.join(", ")}
+                  </span>
+                </div>
+              </div>
+
+              {/* 가이드라인 */}
+              <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+                {doc.guidelines.map((guideline, guidelineIndex) => {
+                  const guidelineKey = `guideline-${personIndex}-${doc.type}-${guidelineIndex}`;
+                  return (
+                    <div key={guidelineKey} className="flex items-start gap-2 text-xs text-gray-600">
+                      <div className="flex-shrink-0 w-1 h-1 mt-2 bg-gray-400 rounded-full"></div>
+                      <span>{guideline}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* 업로드 상태 */}
+              {isUploading && renderUploadingState(doc, personIndex)}
+              {isUploaded && renderUploadedState(doc, docKey, personIndex)}
+              {!isUploading && !isUploaded && renderUploadArea(doc, personIndex)}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   return (
     <Card className="overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-white via-slate-50 to-blue-50/30">
@@ -193,7 +369,7 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
           </div>
           <div className="flex-1">
             <CardTitle className="mb-2 text-3xl font-bold">서류 업로드</CardTitle>
-            <p className="text-lg text-amber-100">필요한 서류들을 업로드해주세요</p>
+            <p className="text-lg text-amber-100">{totalPeople > 1 ? `총 ${totalPeople}명의 서류를 업로드해주세요` : "필요한 서류들을 업로드해주세요"}</p>
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1 text-sm">
                 <span>완료율</span>
@@ -220,238 +396,29 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             • 업로드된 파일은 임시저장되며, 최종 제출 시 서버에 저장됩니다
             <br />• 개인정보가 포함된 서류이므로 안전하게 관리됩니다
           </AlertDescription>
-        </Alert>{" "}
-        {/* 서류 업로드 섹션 */}
+        </Alert>
+
+        {/* 서류 업로드 섹션 - 다중 인원 지원 */}
         <div className="space-y-6">
-          {/* 여권 사본 업로드 */}
-          {(() => {
-            const doc = documentRequirements.find((d) => d.type === "passport");
-            const isUploaded = uploadedDocuments[doc.type];
-            const isUploading = uploadingFiles[doc.type] !== undefined;
+          {Array.from({ length: totalPeople }).map((_, personIndex) => {
+            const personKey = `person-${personIndex}-${totalPeople}`;
 
             return (
-              <Card className={`border-2 transition-all duration-300 ${isUploaded ? "border-green-500 bg-green-50" : doc.required ? "border-orange-300 bg-orange-50" : "border-gray-200 bg-white"}`}>
-                <CardContent className="p-4 md:p-6">
-                  <div className="flex items-start gap-4">
-                    <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        isUploaded ? "bg-green-500 text-white" : doc.required ? "bg-orange-500 text-white" : "bg-gray-400 text-white"
-                      }`}
-                    >
-                      {isUploaded ? <CheckCircle className="w-6 h-6" /> : doc.icon}
-                    </div>
-
-                    <div className="flex-1 space-y-3">
-                      <div className="flex flex-col items-start justify-between md:flex-row md:items-center">
-                        <div>
-                          <h3 className="flex items-center gap-2 text-lg font-bold text-gray-800">
-                            {doc.title}
-                            {doc.required && <span className="text-sm text-red-500">*필수</span>}
-                          </h3>
-                          <p className="mt-1 text-sm text-gray-600">{doc.description}</p>
-                        </div>
-
-                        <div className="flex items-center gap-2 mt-2 md:mt-0">
-                          <span className="text-xs text-gray-500">
-                            최대 {doc.maxSize} | {doc.formats.join(", ")}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* 가이드라인 */}
-                      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                        {doc.guidelines.map((guideline, index) => (
-                          <div key={index} className="flex items-start gap-2 text-xs text-gray-600">
-                            <div className="flex-shrink-0 w-1 h-1 mt-2 bg-gray-400 rounded-full"></div>
-                            <span>{guideline}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* 업로드 상태 */}
-                      {isUploading ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm text-blue-600">
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                            <span>업로드 중...</span>
-                          </div>
-                          <Progress value={uploadingFiles[doc.type]} className="h-2" />
-                        </div>
-                      ) : isUploaded ? (
-                        <div className="flex flex-col items-center justify-between p-3 bg-white border rounded-lg md:flex-row">
-                          <div className="flex items-center gap-3">
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-800">{uploadedDocuments[doc.type].fileName}</p>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <p className="text-xs text-gray-500">{Math.round(uploadedDocuments[doc.type].fileSize / 1024)} KB</p>
-                                {uploadedDocuments[doc.type].compressionRatio && parseFloat(uploadedDocuments[doc.type].compressionRatio) > 0 && (
-                                  <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full">{uploadedDocuments[doc.type].compressionRatio}% 압축</span>
-                                )}{" "}
-                                {uploadedDocuments[doc.type].isTemporary && <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded-full">임시저장됨</span>}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 mt-3 md:mt-0">
-                            <Button variant="outline" size="sm" onClick={() => handlePreview(doc.type)} className="px-3 py-1">
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleFileRemove(doc.type)} className="px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50">
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          <input
-                            type="file"
-                            accept=".jpg,.jpeg,.png,.pdf"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                handleFileUpload(doc.type, file);
-                              }
-                            }}
-                            className="hidden"
-                            id={`file-${doc.type}`}
-                          />
-                          <label
-                            htmlFor={`file-${doc.type}`}
-                            className="flex flex-col items-center justify-center w-full h-32 transition-all duration-200 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                          >
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                              <p className="mb-2 text-sm text-center text-gray-500">
-                                <span className="font-semibold">클릭하여 업로드</span> 또는 드래그 앤 드롭
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {doc.formats.join(", ")} (최대 {doc.maxSize})
-                              </p>
-                            </div>
-                          </label>
-                        </div>
-                      )}
-                    </div>
+              <div key={personKey} className="space-y-4">
+                {/* 인원 구분 헤더 (여러 명인 경우에만 표시) */}
+                {totalPeople > 1 && (
+                  <div className="pb-2 border-b border-gray-200">
+                    <h3 className="text-xl font-bold text-gray-800">{personIndex + 1}번째 신청자 서류</h3>
                   </div>
-                </CardContent>{" "}
-              </Card>
+                )}
+
+                {/* 각 인원별 문서 유형 렌더링 */}
+                {documentRequirements.map((doc) => renderDocumentCard(doc, personIndex))}
+              </div>
             );
-          })()}{" "}
-          {/* 증명사진 업로드 */}
-          {(() => {
-            const doc = documentRequirements.find((d) => d.type === "photo");
-            const isUploaded = uploadedDocuments[doc.type];
-            const isUploading = uploadingFiles[doc.type] !== undefined;
-
-            return (
-              <Card className={`border-2 transition-all duration-300 ${isUploaded ? "border-green-500 bg-green-50" : doc.required ? "border-orange-300 bg-orange-50" : "border-gray-200 bg-white"}`}>
-                <CardContent className="p-4 md:p-6">
-                  <div className="flex items-start gap-4">
-                    <div
-                      className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                        isUploaded ? "bg-green-500 text-white" : doc.required ? "bg-orange-500 text-white" : "bg-gray-400 text-white"
-                      }`}
-                    >
-                      {isUploaded ? <CheckCircle className="w-6 h-6" /> : doc.icon}
-                    </div>
-
-                    <div className="flex-1 space-y-3">
-                      <div className="flex flex-col items-start justify-between md:flex-row md:items-center">
-                        <div>
-                          <h3 className="flex items-center gap-2 text-lg font-bold text-gray-800">
-                            {doc.title}
-                            {doc.required && <span className="text-sm text-red-500">*필수</span>}
-                          </h3>
-                          <p className="mt-1 text-sm text-gray-600">{doc.description}</p>
-                        </div>
-
-                        <div className="flex items-center gap-2 mt-2 md:mt-0">
-                          <span className="text-xs text-gray-500">
-                            최대 {doc.maxSize} | {doc.formats.join(", ")}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* 가이드라인 */}
-                      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-                        {doc.guidelines.map((guideline, index) => (
-                          <div key={index} className="flex items-start gap-2 text-xs text-gray-600">
-                            <div className="flex-shrink-0 w-1 h-1 mt-2 bg-gray-400 rounded-full"></div>
-                            <span>{guideline}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* 업로드 상태 */}
-                      {isUploading ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm text-blue-600">
-                            <RefreshCw className="w-4 h-4 animate-spin" />
-                            <span>업로드 중...</span>
-                          </div>
-                          <Progress value={uploadingFiles[doc.type]} className="h-2" />
-                        </div>
-                      ) : isUploaded ? (
-                        <div className="flex flex-col items-center justify-between p-3 bg-white border rounded-lg md:flex-row">
-                          <div className="flex items-center gap-3">
-                            <CheckCircle className="w-5 h-5 text-green-500" />
-                            <div className="flex-1">
-                              <p className="text-sm font-medium text-gray-800">{uploadedDocuments[doc.type].fileName}</p>
-                              <div className="flex flex-wrap items-center gap-2">
-                                <p className="text-xs text-gray-500">{Math.round(uploadedDocuments[doc.type].fileSize / 1024)} KB</p>
-                                {uploadedDocuments[doc.type].compressionRatio && parseFloat(uploadedDocuments[doc.type].compressionRatio) > 0 && (
-                                  <span className="px-2 py-1 text-xs text-purple-700 bg-purple-100 rounded-full">{uploadedDocuments[doc.type].compressionRatio}% 압축</span>
-                                )}
-                                {uploadedDocuments[doc.type].isTemporary && <span className="px-2 py-1 text-xs text-blue-700 bg-blue-100 rounded-full">임시저장됨</span>}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 mt-3 md:mt-0">
-                            <Button variant="outline" size="sm" onClick={() => handlePreview(doc.type)} className="px-3 py-1">
-                              <Eye className="w-4 h-4" />
-                            </Button>
-                            <Button variant="outline" size="sm" onClick={() => handleFileRemove(doc.type)} className="px-3 py-1 text-red-600 hover:text-red-700 hover:bg-red-50">
-                              <X className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-3">
-                          <input
-                            type="file"
-                            accept=".jpg,.jpeg,.png"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                handleFileUpload(doc.type, file);
-                              }
-                            }}
-                            className="hidden"
-                            id={`file-${doc.type}`}
-                          />
-                          <label
-                            htmlFor={`file-${doc.type}`}
-                            className="flex flex-col items-center justify-center w-full h-32 transition-all duration-200 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100"
-                          >
-                            <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                              <Upload className="w-8 h-8 mb-2 text-gray-400" />
-                              <p className="mb-2 text-sm text-center text-gray-500">
-                                <span className="font-semibold">클릭하여 업로드</span> 또는 드래그 앤 드롭
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {doc.formats.join(", ")} (최대 {doc.maxSize})
-                              </p>
-                            </div>
-                          </label>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })()}
+          })}
         </div>
+
         {/* 네비게이션 버튼 */}
         <div className="flex justify-between pt-6 border-t border-gray-200 md:pt-8">
           <Button
@@ -496,30 +463,33 @@ const DocumentUploadStep = ({ formData, onUpdate, onNext, onPrevious }) => {
             </div>
           </div>
         </div>
-      )}
+      )}{" "}
       {/* 토스트 알림 */}
       {toastMessage && (
         <div className="fixed z-50 duration-300 top-4 right-4 animate-in slide-in-from-right-full">
-          <div
-            className={`
-            max-w-md p-4 rounded-lg shadow-lg border-l-4
-            ${toastType === "success" ? "bg-green-50 border-green-400 text-green-800" : toastType === "error" ? "bg-red-50 border-red-400 text-red-800" : "bg-blue-50 border-blue-400 text-blue-800"}
-          `}
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0">
-                {toastType === "success" && <CheckCircle className="w-5 h-5 text-green-600" />}
-                {toastType === "error" && <AlertCircle className="w-5 h-5 text-red-600" />}
-                {toastType === "info" && <Info className="w-5 h-5 text-blue-600" />}
+          {(() => {
+            let toastBgClass = "bg-blue-50 border-blue-400 text-blue-800";
+            if (toastType === "success") toastBgClass = "bg-green-50 border-green-400 text-green-800";
+            if (toastType === "error") toastBgClass = "bg-red-50 border-red-400 text-red-800";
+
+            return (
+              <div className={`max-w-md p-4 rounded-lg shadow-lg border-l-4 ${toastBgClass}`}>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0">
+                    {toastType === "success" && <CheckCircle className="w-5 h-5 text-green-600" />}
+                    {toastType === "error" && <AlertCircle className="w-5 h-5 text-red-600" />}
+                    {toastType === "info" && <Info className="w-5 h-5 text-blue-600" />}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{toastMessage}</p>
+                  </div>
+                  <button onClick={() => setToastMessage(null)} className="flex-shrink-0 text-gray-400 hover:text-gray-600">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">{toastMessage}</p>
-              </div>
-              <button onClick={() => setToastMessage(null)} className="flex-shrink-0 text-gray-400 hover:text-gray-600">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>{" "}
+            );
+          })()}
         </div>
       )}
     </Card>

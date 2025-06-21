@@ -262,10 +262,18 @@ module.exports = (sequelize) => {
       phoneOfFriend: {
         type: DataTypes.STRING(20),
         allowNull: true,
-      },
-      // Travel info additional fields
+      }, // Travel info additional fields
       entryPort: {
         type: DataTypes.STRING(100),
+        allowNull: true,
+      },
+      // Transit visa specific fields
+      transitPeopleCount: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
+      transitVehicleType: {
+        type: DataTypes.STRING(50),
         allowNull: true,
       },
     },

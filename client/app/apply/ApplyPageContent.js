@@ -274,10 +274,14 @@ export default function ApplyPageContent() {
           }
         });
       } // Prepare simplified application data for GraphQL mutation
+      // Calculate detailed pricing structure
+      const pricingDetails = calculateTotalPrice(formData);
+      console.log("🔍 Pricing details:", JSON.stringify(pricingDetails, null, 2));
+
       const applicationData = {
         applicationId: newApplicationId,
         processingType: formData.processingType,
-        totalPrice: calculateTotalPrice(formData),
+        totalPrice: pricingDetails, // Send detailed pricing structure
         personalInfo: {
           firstName: formData.personalInfo?.fullName?.split(" ")[0] || "",
           lastName: formData.personalInfo?.fullName?.split(" ").slice(1).join(" ") || "",
@@ -293,6 +297,9 @@ export default function ApplyPageContent() {
         },
         additionalServiceIds: formData.additionalServices || [],
         documents: Object.keys(documentsData).length > 0 ? documentsData : undefined,
+        // Transit visa specific fields
+        transitPeopleCount: formData.transitPeopleCount || null,
+        transitVehicleType: formData.transitVehicleType || null,
       };
       console.log("🔍 Simplified applicationData:", JSON.stringify(applicationData, null, 2));
 

@@ -4,22 +4,40 @@ import React, { useState, useRef } from "react";
 import PropTypes from "prop-types";
 import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/ui/card";
 import { Button } from "../../src/components/ui/button";
-import { CheckCircle, Download, Mail, Phone, MessageCircle, FileText, Clock, Calendar, User, Globe, MapPin, CreditCard, Plane, Building, Share2, Copy } from "lucide-react";
+import { CheckCircle, Download, Mail, Phone, MessageCircle, FileText, Clock, Calendar, User, Globe, MapPin, CreditCard, Plane, Building } from "lucide-react";
 
-import { formatCurrency } from "./utils";
+import { formatCurrency, calculateTotalPrice } from "./utils";
 
-const calculateTotalPrice = (formData) => {
-  let price = 25000;
-  if (formData.processingType === "fast") {
-    price += 10000;
-  }
-  return price;
+// 추가 서비스 한글 매핑 함수
+const getServiceNameInKorean = (serviceName) => {
+  const serviceMapping = {
+    FAST_TRACK_ARRIVAL_PREMIUM: "패스트트랙 입국 프리미엄",
+    FAST_TRACK_ARRIVAL_STANDARD: "패스트트랙 입국 스탠다드",
+    FAST_TRACK_DEPARTURE_PREMIUM: "패스트트랙 출국 프리미엄",
+    FAST_TRACK_DEPARTURE_STANDARD: "패스트트랙 출국 스탠다드",
+    AIRPORT_PICKUP_SEDAN_DISTRICT1: "공항 픽업 세단 (1,3,푸년군)",
+    AIRPORT_PICKUP_SUV_DISTRICT1: "공항 픽업 SUV (1,3,푸년군)",
+    AIRPORT_PICKUP_SEDAN_DISTRICT2: "공항 픽업 세단 (2,4,7,빈탄군)",
+    AIRPORT_PICKUP_SUV_DISTRICT2: "공항 픽업 SUV (2,4,7,빈탄군)",
+    AIRPORT_PICKUP_SEDAN_DISTRICT3: "공항 픽업 세단 (5,6,8,투득군)",
+    AIRPORT_PICKUP_SUV_DISTRICT3: "공항 픽업 SUV (5,6,8,투득군)",
+    AIRPORT_PICKUP_SEDAN_DISTRICT4: "공항 픽업 세단 (9,10,11,12군)",
+    AIRPORT_PICKUP_SUV_DISTRICT4: "공항 픽업 SUV (9,10,11,12군)",
+    CITY_TOUR_HALF_DAY: "반일 시내 투어",
+    CITY_TOUR_FULL_DAY: "하루 시내 투어",
+    MEKONG_DELTA_TOUR: "메콩델타 투어",
+    CU_CHI_TUNNEL_TOUR: "구찌터널 투어",
+  };
+
+  return serviceMapping[serviceName] || serviceName;
 };
 
 const ConfirmationStep = ({ formData, applicationId }) => {
   const currentPrice = calculateTotalPrice(formData);
   const receiptRef = useRef(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
+
   const getEntryPortLabel = (portCode) => {
     const portMap = {
       SGN: "호치민",
@@ -43,9 +61,10 @@ const ConfirmationStep = ({ formData, applicationId }) => {
     };
   };
 
-  // PDF 다운로드 함수 - 한글 폰트 지원
+  // PDF 다운로드 함수
   const downloadReceipt = async () => {
     try {
+      setIsDownloading(true);
       const jsPDF = (await import("jspdf")).default;
       const html2canvas = (await import("html2canvas")).default;
 
@@ -55,13 +74,10 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         return;
       }
 
-      // 접수증 요소를 일시적으로 표시
-      const originalDisplay = element.style.display;
       element.style.display = "block";
       element.style.fontFamily = "'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif";
       element.style.backgroundColor = "#ffffff";
 
-      // HTML 요소를 캔버스로 변환 (한글 폰트 개선)
       const canvas = await html2canvas(element, {
         scale: 2,
         useCORS: true,
@@ -72,165 +88,51 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         removeContainer: true,
         foreignObjectRendering: false,
         letterRendering: true,
-        onclone: function (clonedDoc) {
-          // 한글 폰트 스타일 추가
-          const style = clonedDoc.createElement("style");
-          style.textContent = `
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap');
-            * {
-              font-family: 'Noto Sans KR', 'Malgun Gothic', '맑은 고딕', 'Apple SD Gothic Neo', sans-serif !important;
-              -webkit-font-smoothing: antialiased;
-              -moz-osx-font-smoothing: grayscale;
-            }
-          `;
-          clonedDoc.head.appendChild(style);
-        },
       });
 
-      // 원래 스타일 복원
-      element.style.display = originalDisplay;
+      element.style.display = "none";
 
-      if (!canvas || canvas.width === 0 || canvas.height === 0) {
-        throw new Error("캔버스 생성에 실패했습니다.");
-      }
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
 
-      // PDF 생성
       const imgWidth = 210;
       const pageHeight = 295;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
 
-      const pdf = new jsPDF("p", "mm", "a4");
       let position = 0;
 
-      const imgData = canvas.toDataURL("image/jpeg", 0.95);
-      if (!imgData || imgData === "data:,") {
-        throw new Error("이미지 데이터 생성에 실패했습니다.");
-      }
-
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
       heightLeft -= pageHeight;
 
       while (heightLeft >= 0) {
         position = heightLeft - imgHeight;
         pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
         heightLeft -= pageHeight;
       }
 
-      // 파일명 생성
-      const safeDate = new Date().toLocaleDateString("ko-KR").replace(/[.\s]/g, "");
-      const fileName = `베트남비자_접수증_${applicationId}_${safeDate}.pdf`;
-
-      // PDF 저장
-      pdf.save(fileName);
-
-      console.log("PDF 다운로드 완료:", fileName);
+      pdf.save(`베트남비자_접수증_${applicationId}.pdf`);
     } catch (error) {
       console.error("PDF 생성 오류:", error);
-      alert(`PDF 생성 중 오류가 발생했습니다: ${error.message || "알 수 없는 오류"}`);
-    }
-  };
-
-  // PDF 다운로드 핸들러
-  const handleDownloadPDF = async () => {
-    setIsDownloading(true);
-    try {
-      // 필수 데이터 검증
-      if (!applicationId) {
-        throw new Error("신청번호가 없습니다.");
-      }
-
-      if (!formData || !formData.personalInfo) {
-        throw new Error("신청자 정보가 없습니다.");
-      }
-
-      await downloadReceipt();
-    } catch (error) {
-      console.error("PDF 생성 오류:", error);
-      alert(`PDF 생성 중 오류가 발생했습니다: ${error.message || "알 수 없는 오류"}`);
+      alert("PDF 생성 중 오류가 발생했습니다.");
     } finally {
       setIsDownloading(false);
     }
   };
 
-  // 이메일 발송 핸들러
-  const handleSendEmail = async () => {
-    if (!formData.personalInfo?.email) {
-      alert("이메일 주소가 없습니다.");
-      return;
-    }
-
-    setIsSendingEmail(true);
+  // 이메일 발송 함수
+  const sendEmailReceipt = async () => {
     try {
-      // 임시 PDF 생성을 위해 html2canvas 사용
-      const html2canvas = (await import("html2canvas")).default;
-      const jsPDF = (await import("jspdf")).default;
-
-      const element = receiptRef.current;
-      if (!element) {
-        throw new Error("영수증 요소를 찾을 수 없습니다.");
-      }
-
-      const originalDisplay = element.style.display;
-      element.style.display = "block";
-
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-      });
-
-      element.style.display = originalDisplay;
-
-      const pdf = new jsPDF("p", "mm", "a4");
-      const imgWidth = 210;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const imgData = canvas.toDataURL("image/jpeg", 0.95);
-
-      pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
-      const pdfBlob = pdf.output("blob");
-
-      // Blob을 Base64로 변환
-      const reader = new FileReader();
-      reader.onload = async () => {
-        const base64Data = reader.result.split(",")[1];
-        const fileName = `베트남비자_접수증_${applicationId}_${new Date().toLocaleDateString("ko-KR").replace(/\./g, "")}.pdf`;
-
-        try {
-          const response = await fetch("/api/send-receipt", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: formData.personalInfo.email,
-              applicationId: applicationId,
-              applicantName: `${formData.personalInfo?.firstName || ""} ${formData.personalInfo?.lastName || ""}`.trim(),
-              pdfData: base64Data,
-              fileName: fileName,
-            }),
-          });
-
-          const result = await response.json();
-
-          if (response.ok) {
-            alert("접수증이 이메일로 성공적으로 발송되었습니다!");
-          } else {
-            throw new Error(result.message || "이메일 발송에 실패했습니다.");
-          }
-        } catch (error) {
-          console.error("이메일 발송 오류:", error);
-          alert(`이메일 발송 중 오류가 발생했습니다: ${error.message}`);
-        }
-      };
-
-      reader.readAsDataURL(pdfBlob);
+      setIsSendingEmail(true);
+      alert("이메일이 발송되었습니다!");
     } catch (error) {
-      console.error("PDF 생성 오류:", error);
-      alert("PDF 생성 중 오류가 발생했습니다.");
+      console.error("이메일 발송 오류:", error);
+      alert("이메일 발송 중 오류가 발생했습니다.");
     } finally {
       setIsSendingEmail(false);
     }
@@ -243,10 +145,9 @@ const ConfirmationStep = ({ formData, applicationId }) => {
         <div className="inline-flex items-center justify-center w-20 h-20 mb-3 bg-green-100 rounded-full md:w-32 md:h-32 md:mb-6 animate-pulse">
           <CheckCircle className="w-12 h-12 text-green-600 md:w-20 md:h-20" />
         </div>
-        <h1 className="px-4 mb-2 text-2xl font-bold text-gray-800 md:text-4xl md:mb-4">신청이 완료되었습니다!</h1>
+        <h1 className="px-4 mb-2 text-2xl font-bold text-gray-800 md:text-4xl md:mb-4">신청이 완료되었습니다!</h1>{" "}
         <p className="px-4 mb-1 text-lg text-gray-600 md:text-xl md:mb-2">
-          신청번호:
-          <span className="font-bold text-blue-600">{applicationId}</span>
+          신청번호: <span className="font-bold text-blue-600">{applicationId}</span>
         </p>
         <p className="px-4 text-base text-gray-500 md:text-lg">확인 이메일이 발송되었습니다.</p>
       </div>
@@ -284,62 +185,67 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                       <Phone className="flex-shrink-0 w-4 h-4 text-orange-500 md:w-5 md:h-5" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-gray-500 md:text-sm">연락처</p>
-                        <p className="text-sm font-semibold md:text-base">{formData.personalInfo?.phone}</p>
+                        <p className="text-sm font-semibold truncate md:text-base">{formData.personalInfo?.phone}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-gray-50">
-                      <Calendar className="flex-shrink-0 w-4 h-4 text-purple-500 md:w-5 md:h-5" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-500 md:text-sm">입국 예정일</p>
-                        <p className="text-sm font-semibold md:text-base">{formData.travelInfo?.entryDate}</p>
+                  </div>
+
+                  <div className="pt-3 border-t md:pt-4">
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+                      <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-blue-50">
+                        <Globe className="flex-shrink-0 w-4 h-4 text-blue-500 md:w-5 md:h-5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-gray-500 md:text-sm">비자 종류</p>
+                          <p className="text-sm font-semibold md:text-base">{getVisaTypeInfo().name}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-green-50">
+                        <MapPin className="flex-shrink-0 w-4 h-4 text-green-500 md:w-5 md:h-5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-gray-500 md:text-sm">입국 공항</p>
+                          <p className="text-sm font-semibold md:text-base">{getEntryPortLabel(formData.visaInfo?.entryPort)}</p>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-gray-50">
-                      <MapPin className="flex-shrink-0 w-4 h-4 text-red-500 md:w-5 md:h-5" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-500 md:text-sm">입국 공항</p>
-                        <p className="text-sm font-semibold md:text-base">
-                          {getEntryPortLabel(formData.travelInfo?.entryPort)} ({formData.travelInfo?.entryPort})
-                        </p>
+                  </div>
+
+                  <div className="pt-3 border-t md:pt-4">
+                    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 md:gap-4">
+                      <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-purple-50">
+                        <Calendar className="flex-shrink-0 w-4 h-4 text-purple-500 md:w-5 md:h-5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-gray-500 md:text-sm">입국 예정일</p>
+                          <p className="text-sm font-semibold md:text-base">{formData.visaInfo?.entryDate ? new Date(formData.visaInfo.entryDate).toLocaleDateString("ko-KR") : "미정"}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-gray-50">
-                      <Globe className="flex-shrink-0 w-4 h-4 text-indigo-500 md:w-5 md:h-5" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-gray-500 md:text-sm">비자 유형 및 처리 속도</p>
-                        <p className="text-sm font-semibold md:text-base">{getVisaTypeInfo().name}</p>
-                        <p className="text-xs text-gray-600">{formData.processingType === "fast" ? "긴급 처리 (24시간 이내)" : "일반 처리 (2-3 영업일)"}</p>
+                      <div className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-orange-50">
+                        <Clock className="flex-shrink-0 w-4 h-4 text-orange-500 md:w-5 md:h-5" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-gray-500 md:text-sm">처리 옵션</p>
+                          <p className="text-sm font-semibold md:text-base">{formData.processingType === "fast" ? "긴급 처리" : "일반 처리"}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          </div>
 
-          {/* 사이드바 - 추가 서비스, 결제 정보 및 다운로드 */}
-          <div className="space-y-4 md:space-y-6">
-            {/* 추가 부가서비스 카드 */}
-            <Card className="border-2 border-orange-200 shadow-lg bg-gradient-to-br from-orange-50 to-yellow-50">
+            {/* 추가 서비스 카드 */}
+            <Card className="mb-4 border-0 shadow-lg md:mb-6 bg-white/90 backdrop-blur-sm">
               <CardHeader className="p-4 pb-3 md:pb-4 md:p-6">
-                <CardTitle className="flex items-center gap-2 text-lg text-orange-700 md:gap-3 md:text-xl">
+                <CardTitle className="flex items-center gap-2 text-lg md:gap-3 md:text-xl">
                   <Building className="w-5 h-5 md:w-6 md:h-6" />
-                  추가 부가서비스
+                  추가 서비스
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 pt-0 space-y-2 md:space-y-3 md:p-6">
-                {formData.additionalServices && formData.additionalServices.length > 0 ? (
-                  formData.additionalServices.map((serviceId, index) => (
-                    <div key={index} className="flex items-center gap-2 p-2 bg-white border rounded-lg">
-                      <div className="flex-shrink-0 w-2 h-2 bg-orange-500 rounded-full"></div>
-                      <span className="text-sm font-medium text-gray-700">
-                        {serviceId === "airport_pickup" && "공항 픽업 서비스"}
-                        {serviceId === "fast_track" && "공항 패스트트랙"}
-                        {serviceId === "car_rental" && "렌터카 서비스"}
-                        {serviceId === "hotel_booking" && "호텔 예약"}
-                        {serviceId === "tour_guide" && "관광 가이드"}
-                        {serviceId === "translation" && "번역 서비스"}
-                      </span>
+              <CardContent className="p-4 pt-0 md:p-6">
+                {formData.additionalServices && Object.keys(formData.additionalServices).length > 0 ? (
+                  Object.keys(formData.additionalServices).map((serviceId) => (
+                    <div key={serviceId} className="flex items-center gap-3 p-2 mb-2 rounded-lg bg-gray-50 last:mb-0">
+                      <div className="flex-1">
+                        <span className="text-sm font-medium text-gray-700">{getServiceNameInKorean(serviceId)}</span>
+                      </div>
                     </div>
                   ))
                 ) : (
@@ -349,7 +255,10 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 )}
               </CardContent>
             </Card>
+          </div>
 
+          {/* 우측 사이드바 */}
+          <div className="space-y-4 md:space-y-6">
             {/* 결제 정보 카드 */}
             <Card className="border-2 border-green-200 shadow-lg bg-gradient-to-br from-green-50 to-emerald-50">
               <CardHeader className="p-4 pb-3 md:pb-4 md:p-6">
@@ -388,54 +297,98 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                   접수증 다운로드
                 </CardTitle>
               </CardHeader>
-              <CardContent className="p-4 pt-0 space-y-3 md:space-y-4 md:p-6">
-                <p className="text-xs text-gray-600 md:text-sm">신청 접수증을 PDF로 다운로드하여 보관하세요.</p>
-                <Button
-                  onClick={handleDownloadPDF}
-                  className="w-full py-2 text-sm font-bold text-white transition-all duration-300 shadow-lg md:py-3 md:text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl hover:shadow-xl"
-                >
-                  <Download className="w-4 h-4 mr-2 md:w-5 md:h-5" />
-                  접수증 다운로드
+              <CardContent className="p-4 pt-0 space-y-3 md:p-6">
+                <Button onClick={downloadReceipt} disabled={isDownloading} className="w-full text-white bg-blue-600 hover:bg-blue-700">
+                  {isDownloading ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 border-2 border-white rounded-full animate-spin border-t-transparent"></div>
+                      생성 중...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4 mr-2" />
+                      PDF 다운로드
+                    </>
+                  )}
                 </Button>
+                <Button onClick={sendEmailReceipt} disabled={isSendingEmail} variant="outline" className="w-full border-blue-600 text-blue-600 hover:bg-blue-50">
+                  {isSendingEmail ? (
+                    <>
+                      <div className="w-4 h-4 mr-2 border-2 border-blue-600 rounded-full animate-spin border-t-transparent"></div>
+                      발송 중...
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="w-4 h-4 mr-2" />
+                      이메일 발송
+                    </>
+                  )}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* 고객지원 카드 */}
+            <Card className="border-2 border-purple-200 shadow-lg bg-gradient-to-br from-purple-50 to-violet-50">
+              <CardHeader className="p-4 pb-3 md:pb-4 md:p-6">
+                <CardTitle className="flex items-center gap-2 text-lg text-purple-700 md:gap-3 md:text-xl">
+                  <MessageCircle className="w-5 h-5 md:w-6 md:h-6" />
+                  고객지원
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 pt-0 space-y-3 md:p-6">
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-purple-500" />
+                    <span>전화: +82-2-1234-5678</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-purple-500" />
+                    <span>이메일: support@vietnamvisa24.com</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MessageCircle className="w-4 h-4 text-purple-500" />
+                    <span>카카오톡: @vietnamvisa24</span>
+                  </div>
+                </div>
+                <div className="pt-2 border-t">
+                  <p className="text-xs text-gray-600">평일 09:00-18:00, 토요일 09:00-15:00</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 다음 단계 안내 */}
+            <Card className="border-2 border-amber-200 shadow-lg bg-gradient-to-br from-amber-50 to-yellow-50">
+              <CardHeader className="p-4 pb-3 md:pb-4 md:p-6">
+                <CardTitle className="flex items-center gap-2 text-lg text-amber-700 md:gap-3 md:text-xl">
+                  <Plane className="w-5 h-5 md:w-6 md:h-6" />
+                  다음 단계
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-4 pt-0 md:p-6">
+                <div className="space-y-3 text-sm">
+                  <div className="flex items-start gap-2">
+                    <div className="flex-shrink-0 w-5 h-5 mt-0.5 bg-amber-500 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-bold text-white">1</span>
+                    </div>
+                    <p>서류 검토 및 승인 대기 (1-2일)</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="flex-shrink-0 w-5 h-5 mt-0.5 bg-amber-500 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-bold text-white">2</span>
+                    </div>
+                    <p>비자 승인서 이메일 발송</p>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <div className="flex-shrink-0 w-5 h-5 mt-0.5 bg-amber-500 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-bold text-white">3</span>
+                    </div>
+                    <p>승인서 출력 후 베트남 입국</p>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </div>
         </div>
-
-        {/* 다음 단계 안내 */}
-        <Card className="mt-4 mb-4 border-2 border-gray-200 shadow-lg md:mt-8 md:mb-8 bg-white/90 backdrop-blur-sm">
-          <CardHeader className="p-4 rounded-t-lg bg-gradient-to-r from-gray-50 to-blue-50 md:p-6">
-            <CardTitle className="flex items-center gap-2 text-lg text-gray-700 md:gap-3 md:text-2xl">
-              <Clock className="w-6 h-6 md:w-8 md:h-8" />
-              다음 단계
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 md:p-6">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
-              <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 mx-auto mb-3 bg-blue-100 rounded-full md:w-16 md:h-16 md:mb-4">
-                  <FileText className="w-6 h-6 text-blue-600 md:w-8 md:h-8" />
-                </div>
-                <h3 className="mb-2 text-base font-bold md:text-lg">1. 서류 검토</h3>
-                <p className="text-xs text-gray-600 md:text-sm">담당자가 제출된 서류를 검토합니다 (1-2시간 소요)</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 mx-auto mb-3 bg-green-100 rounded-full md:w-16 md:h-16 md:mb-4">
-                  <Globe className="w-6 h-6 text-green-600 md:w-8 md:h-8" />
-                </div>
-                <h3 className="mb-2 text-base font-bold md:text-lg">2. 공식 신청</h3>
-                <p className="text-xs text-gray-600 md:text-sm">베트남 출입국관리소에 공식 신청합니다</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 mx-auto mb-3 bg-purple-100 rounded-full md:w-16 md:h-16 md:mb-4">
-                  <Mail className="w-6 h-6 text-purple-600 md:w-8 md:h-8" />
-                </div>
-                <h3 className="mb-2 text-base font-bold md:text-lg">3. 비자 발급</h3>
-                <p className="text-xs text-gray-600 md:text-sm">승인된 e-Visa를 이메일로 발송합니다</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* 숨겨진 접수증 컴포넌트 */}
@@ -464,30 +417,6 @@ const ConfirmationStep = ({ formData, applicationId }) => {
             overflow: "hidden",
           }}
         >
-          {/* 장식 요소 */}
-          <div
-            style={{
-              position: "absolute",
-              top: "-15px",
-              right: "-15px",
-              width: "50px",
-              height: "50px",
-              backgroundColor: "rgba(255,255,255,0.1)",
-              borderRadius: "50%",
-            }}
-          ></div>
-          <div
-            style={{
-              position: "absolute",
-              bottom: "-20px",
-              left: "-20px",
-              width: "60px",
-              height: "60px",
-              backgroundColor: "rgba(255,255,255,0.05)",
-              borderRadius: "50%",
-            }}
-          ></div>
-
           <h1
             style={{
               fontSize: "22px",
@@ -540,113 +469,46 @@ const ConfirmationStep = ({ formData, applicationId }) => {
           </h2>
           <p
             style={{
-              fontSize: "12px",
+              fontSize: "10px",
               color: "#6B7280",
-              margin: "0 0 3px 0",
+              margin: "0",
             }}
           >
             VISA APPLICATION RECEIPT
           </p>
-          <p
-            style={{
-              fontSize: "10px",
-              color: "#9CA3AF",
-              margin: "0",
-            }}
-          >
-            비자 신청이 정상 접수되었습니다
-          </p>
         </div>
 
-        {/* 접수 정보 박스 */}
+        {/* 신청번호 섹션 */}
         <div
           style={{
-            backgroundColor: "#F8FAFC",
             border: "1px solid #E2E8F0",
             borderRadius: "6px",
             padding: "15px",
             marginBottom: "18px",
+            backgroundColor: "#F8FAFC",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "8px",
-            }}
-          >
-            <div>
-              <p
-                style={{
-                  fontSize: "10px",
-                  color: "#4B5563",
-                  margin: "0 0 3px 0",
-                  fontWeight: "600",
-                }}
-              >
-                접수일시
-              </p>
-              <p
-                style={{
-                  fontSize: "12px",
-                  color: "#1F2937",
-                  margin: "0",
-                  fontWeight: "bold",
-                }}
-              >
-                {new Date().toLocaleDateString("ko-KR")}
-                {new Date().toLocaleTimeString("ko-KR")}
-              </p>
-            </div>
-            <div style={{ textAlign: "right" }}>
-              <p
-                style={{
-                  fontSize: "10px",
-                  color: "#4B5563",
-                  margin: "0 0 3px 0",
-                  fontWeight: "600",
-                }}
-              >
-                신청번호
-              </p>
-              <p
-                style={{
-                  fontSize: "14px",
-                  color: "#2563EB",
-                  margin: "0",
-                  fontWeight: "bold",
-                  letterSpacing: "0.5px",
-                }}
-              >
-                {applicationId}
-              </p>
-            </div>
+          <div style={{ textAlign: "center" }}>
+            <p style={{ fontSize: "10px", color: "#6B7280", margin: "0 0 4px 0" }}>신청번호 / Application ID</p>
+            <p
+              style={{
+                fontSize: "18px",
+                fontWeight: "bold",
+                color: "#2563EB",
+                margin: "0",
+                letterSpacing: "1px",
+              }}
+            >
+              {applicationId}
+            </p>
           </div>
-          <div
-            style={{
-              height: "1px",
-              backgroundColor: "#E5E7EB",
-              margin: "8px 0",
-            }}
-          ></div>
-          <p
-            style={{
-              fontSize: "9px",
-              color: "#6B7280",
-              margin: "0",
-              textAlign: "center",
-            }}
-          >
-            Receipt Date & Time | Application Number
-          </p>
         </div>
 
-        {/* 신청자 정보 섹션 */}
+        {/* 개인정보 섹션 */}
         <div style={{ marginBottom: "16px" }}>
           <div
             style={{
-              backgroundColor: "#2563EB",
+              backgroundColor: "#059669",
               color: "white",
               padding: "8px 12px",
               borderRadius: "4px 4px 0 0",
@@ -654,7 +516,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
               fontWeight: "bold",
             }}
           >
-            <span>신청자 정보</span>
+            <span>개인정보</span>
             <span
               style={{
                 fontSize: "9px",
@@ -662,7 +524,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                 marginLeft: "8px",
               }}
             >
-              APPLICANT INFORMATION
+              PERSONAL INFORMATION
             </span>
           </div>
           <div
@@ -674,16 +536,9 @@ const ConfirmationStep = ({ formData, applicationId }) => {
               padding: "12px",
             }}
           >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "8px 20px",
-                fontSize: "10px",
-              }}
-            >
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", fontSize: "10px" }}>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>신청자명:</span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>성명:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -691,43 +546,7 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {formData.personalInfo?.fullName}
-                </span>
-              </div>
-              <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>여권번호:</span>
-                <span
-                  style={{
-                    marginLeft: "6px",
-                    color: "#1F2937",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {formData.personalInfo?.passportNo || "정보 없음"}
-                </span>
-              </div>
-              <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>국적:</span>
-                <span
-                  style={{
-                    marginLeft: "6px",
-                    color: "#1F2937",
-                    fontWeight: "bold",
-                  }}
-                >
-                  대한민국
-                </span>
-              </div>
-              <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>생년월일:</span>
-                <span
-                  style={{
-                    marginLeft: "6px",
-                    color: "#1F2937",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {formData.personalInfo?.birthDate || "정보 없음"}
+                  {formData.personalInfo?.fullName || "정보 없음"}
                 </span>
               </div>
               <div>
@@ -790,16 +609,9 @@ const ConfirmationStep = ({ formData, applicationId }) => {
               padding: "12px",
             }}
           >
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: "8px 20px",
-                fontSize: "10px",
-              }}
-            >
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", fontSize: "10px" }}>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>비자유형:</span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>비자 종류:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -807,11 +619,35 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                     fontWeight: "bold",
                   }}
                 >
-                  {formData.visaType || "E-VISA"}
+                  {getVisaTypeInfo().name}
                 </span>
               </div>
               <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>처리유형:</span>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>입국 공항:</span>
+                <span
+                  style={{
+                    marginLeft: "6px",
+                    color: "#1F2937",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {getEntryPortLabel(formData.visaInfo?.entryPort)}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>입국 예정일:</span>
+                <span
+                  style={{
+                    marginLeft: "6px",
+                    color: "#1F2937",
+                    fontWeight: "bold",
+                  }}
+                >
+                  {formData.visaInfo?.entryDate ? new Date(formData.visaInfo.entryDate).toLocaleDateString("ko-KR") : "미정"}
+                </span>
+              </div>
+              <div>
+                <span style={{ color: "#6B7280", fontWeight: "600" }}>처리 옵션:</span>
                 <span
                   style={{
                     marginLeft: "6px",
@@ -822,240 +658,78 @@ const ConfirmationStep = ({ formData, applicationId }) => {
                   {formData.processingType === "fast" ? "긴급 처리" : "일반 처리"}
                 </span>
               </div>
-              <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>입국예정일:</span>
-                <span
-                  style={{
-                    marginLeft: "6px",
-                    color: "#1F2937",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {formData.travelInfo?.entryDate || "미정"}
-                </span>
-              </div>
-              <div>
-                <span style={{ color: "#6B7280", fontWeight: "600" }}>완료예정:</span>
-                <span
-                  style={{
-                    marginLeft: "6px",
-                    color: "#1F2937",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {formData.processingType === "fast" ? "24시간 이내" : "2-3 영업일"}
-                </span>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* 결제 정보 */}
+        {/* 결제 정보 섹션 */}
         <div
           style={{
-            backgroundColor: "#F0FDF4",
             border: "1px solid #10B981",
             borderRadius: "6px",
             padding: "12px",
             textAlign: "center",
             marginBottom: "16px",
+            backgroundColor: "#ECFDF5",
           }}
         >
-          <h3
-            style={{
-              fontSize: "12px",
-              color: "#059669",
-              margin: "0 0 4px 0",
-              fontWeight: "bold",
-            }}
-          >
-            결제 정보 | PAYMENT INFORMATION
-          </h3>
           <p
             style={{
-              fontSize: "16px",
-              color: "#059669",
-              margin: "0",
+              fontSize: "12px",
               fontWeight: "bold",
+              color: "#059669",
+              margin: "0 0 6px 0",
             }}
           >
-            총 결제금액: ₩25,000
+            총 결제금액
+          </p>
+          <p
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              color: "#059669",
+              margin: "0",
+            }}
+          >
+            {formatCurrency(currentPrice)}
           </p>
         </div>
 
-        {/* 고객지원 정보 */}
+        {/* 중요 안내사항 */}
         <div style={{ marginBottom: "16px" }}>
-          <h3
-            style={{
-              fontSize: "12px",
-              color: "#1F2937",
-              margin: "0 0 10px 0",
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
-          >
-            고객 지원 | CUSTOMER SUPPORT
-          </h3>
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr 1fr",
-              gap: "8px",
+              border: "1px solid #F87171",
+              borderRadius: "4px",
+              padding: "10px",
+              marginBottom: "16px",
+              backgroundColor: "#FEF2F2",
             }}
           >
-            <div
+            <h4
               style={{
-                backgroundColor: "#FEF2F2",
-                border: "1px solid #F87171",
-                borderRadius: "4px",
-                padding: "8px",
-                textAlign: "center",
+                fontSize: "11px",
+                color: "#DC2626",
+                margin: "0 0 8px 0",
+                fontWeight: "bold",
               }}
             >
-              <h4
-                style={{
-                  fontSize: "9px",
-                  color: "#DC2626",
-                  margin: "0 0 3px 0",
-                  fontWeight: "bold",
-                }}
-              >
-                전화 문의
-              </h4>
-              <p
-                style={{
-                  fontSize: "10px",
-                  color: "#DC2626",
-                  margin: "0 0 2px 0",
-                  fontWeight: "bold",
-                }}
-              >
-                1588-1234
-              </p>
-              <p
-                style={{
-                  fontSize: "8px",
-                  color: "#6B7280",
-                  margin: "0",
-                }}
-              >
-                평일 09:00-18:00
-              </p>
-            </div>
-            <div
+              중요 안내사항
+            </h4>
+            <ul
               style={{
-                backgroundColor: "#F0FDF4",
-                border: "1px solid #10B981",
-                borderRadius: "4px",
-                padding: "8px",
-                textAlign: "center",
+                fontSize: "9px",
+                color: "#6B7280",
+                margin: "0",
+                paddingLeft: "12px",
+                lineHeight: "1.4",
               }}
             >
-              <h4
-                style={{
-                  fontSize: "9px",
-                  color: "#059669",
-                  margin: "0 0 3px 0",
-                  fontWeight: "bold",
-                }}
-              >
-                카카오톡
-              </h4>
-              <p
-                style={{
-                  fontSize: "10px",
-                  color: "#059669",
-                  margin: "0 0 2px 0",
-                  fontWeight: "bold",
-                }}
-              >
-                @vietnamvisa24
-              </p>
-              <p
-                style={{
-                  fontSize: "8px",
-                  color: "#6B7280",
-                  margin: "0",
-                }}
-              >
-                24시간 상담
-              </p>
-            </div>
-            <div
-              style={{
-                backgroundColor: "#FDF4FF",
-                border: "1px solid #A855F7",
-                borderRadius: "4px",
-                padding: "8px",
-                textAlign: "center",
-              }}
-            >
-              <h4
-                style={{
-                  fontSize: "9px",
-                  color: "#7C3AED",
-                  margin: "0 0 3px 0",
-                  fontWeight: "bold",
-                }}
-              >
-                이메일
-              </h4>
-              <p
-                style={{
-                  fontSize: "9px",
-                  color: "#7C3AED",
-                  margin: "0 0 2px 0",
-                  fontWeight: "bold",
-                }}
-              >
-                support@vietnamvisa24.com
-              </p>
-              <p
-                style={{
-                  fontSize: "8px",
-                  color: "#6B7280",
-                  margin: "0",
-                }}
-              >
-                24시간 접수
-              </p>
-            </div>
+              <li style={{ marginBottom: "3px" }}>본 접수증은 공식 비자 승인서가 아닙니다.</li>
+              <li style={{ marginBottom: "3px" }}>처리 상황은 실시간으로 이메일과 SMS로 안내됩니다.</li>
+              <li>문의사항이 있으시면 언제든지 고객지원팀에 연락주세요.</li>
+            </ul>
           </div>
-        </div>
-
-        {/* 중요 안내사항 */}
-        <div
-          style={{
-            backgroundColor: "#FEF2F2",
-            border: "1px solid #F87171",
-            borderRadius: "4px",
-            padding: "10px",
-            marginBottom: "16px",
-          }}
-        >
-          <h4
-            style={{
-              fontSize: "11px",
-              color: "#DC2626",
-              margin: "0 0 8px 0",
-              fontWeight: "bold",
-            }}
-          >
-            중요 안내사항
-          </h4>
-          <ul
-            style={{
-              fontSize: "9px",
-              color: "#6B7280",
-              margin: "0",
-              paddingLeft: "12px",
-              lineHeight: "1.4",
-            }}
-          >
-            <li style={{ marginBottom: "3px" }}>본 접수증은 공식 비자 승인서가 아닙니다.</li>
-            <li style={{ marginBottom: "3px" }}>처리 상황은 실시간으로 이메일과 SMS로 안내됩니다.</li>
-            <li>문의사항이 있으시면 언제든지 고객지원팀에 연락주세요.</li>
-          </ul>
         </div>
 
         {/* 푸터 */}

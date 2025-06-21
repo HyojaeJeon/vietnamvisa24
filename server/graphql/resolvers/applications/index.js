@@ -54,6 +54,162 @@ const normalizeStatus = (status) => {
   return status.toUpperCase();
 };
 
+// 비자 타입 표시명 변환 함수
+const getVisaTypeDisplayName = (visaType) => {
+  const typeMap = {
+    E_VISA_GENERAL: "E-VISA 일반 (4-5일)",
+    E_VISA_URGENT: "E-VISA 긴급 (24시간)",
+    E_VISA_TRANSIT: "목바이 경유 비자",
+    tourist: "관광 비자",
+    business: "비즈니스 비자",
+    transit: "경유 비자",
+  };
+  return typeMap[visaType] || visaType;
+};
+
+// 가격 구조 포맷팅 함수
+const formatPricingDetails = (application) => {
+  try {
+    // 저장된 notes에서 가격 상세 정보 추출 시도
+    let pricingDetails = null;
+    if (application.notes && application.notes.includes("가격상세:")) {
+      const match = application.notes.match(/가격상세:\s*({.*})/);
+      if (match) {
+        try {
+          pricingDetails = JSON.parse(match[1]);
+        } catch (parseError) {
+          console.warn("가격 상세 정보 파싱 실패:", parseError.message);
+        }
+      }
+    }
+
+    // 상세 가격 정보가 있는 경우
+    if (pricingDetails && pricingDetails.totalPrice) {
+      const currency = pricingDetails.currency || "KRW";
+      const isTransit = application.visaType === "E_VISA_TRANSIT";
+
+      return {
+        visa: {
+          basePrice: pricingDetails.visa?.basePrice || 0,
+          vehiclePrice: pricingDetails.visa?.vehiclePrice || 0,
+          totalPrice: pricingDetails.visa?.totalPrice || 0,
+        },
+        additionalServices: {
+          services: (pricingDetails.additionalServices?.services || []).map(
+            (service) => ({
+              ...service,
+              name: getServiceNameInKorean(service.id || service.name),
+            }),
+          ),
+          totalPrice: pricingDetails.additionalServices?.totalPrice || 0,
+        },
+        totalPrice: pricingDetails.totalPrice,
+        currency: currency,
+        formatted: {
+          visaBasePrice: formatCurrency(
+            pricingDetails.visa?.basePrice || 0,
+            currency,
+          ),
+          visaVehiclePrice: formatCurrency(
+            pricingDetails.visa?.vehiclePrice || 0,
+            currency,
+          ),
+          visaTotalPrice: formatCurrency(
+            pricingDetails.visa?.totalPrice || 0,
+            currency,
+          ),
+          additionalServicesPrice: formatCurrency(
+            pricingDetails.additionalServices?.totalPrice || 0,
+            currency,
+          ),
+          totalPrice: formatCurrency(pricingDetails.totalPrice, currency),
+        },
+      };
+    }
+
+    // 기본 가격만 있는 경우
+    return {
+      visa: {
+        basePrice: application.totalPrice || 0,
+        vehiclePrice: 0,
+        totalPrice: application.totalPrice || 0,
+      },
+      additionalServices: {
+        services: [],
+        totalPrice: 0,
+      },
+      totalPrice: application.totalPrice || 0,
+      currency: "KRW",
+      formatted: {
+        visaBasePrice: formatCurrency(application.totalPrice || 0, "KRW"),
+        visaVehiclePrice: formatCurrency(0, "KRW"),
+        visaTotalPrice: formatCurrency(application.totalPrice || 0, "KRW"),
+        additionalServicesPrice: formatCurrency(0, "KRW"),
+        totalPrice: formatCurrency(application.totalPrice || 0, "KRW"),
+      },
+    };
+  } catch (error) {
+    console.error("가격 구조 포맷팅 오류:", error);
+    // 오류 시 기본 구조 반환
+    return {
+      visa: { basePrice: 0, vehiclePrice: 0, totalPrice: 0 },
+      additionalServices: { services: [], totalPrice: 0 },
+      totalPrice: 0,
+      currency: "KRW",
+      formatted: {
+        visaBasePrice: "₩0",
+        visaVehiclePrice: "₩0",
+        visaTotalPrice: "₩0",
+        additionalServicesPrice: "₩0",
+        totalPrice: "₩0",
+      },
+    };
+  }
+};
+
+// 통화 포맷팅 함수
+const formatCurrency = (amount, currency = "KRW") => {
+  if (!amount) return currency === "VND" ? "₫0" : "₩0";
+
+  if (currency === "VND") {
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      minimumFractionDigits: 0,
+    }).format(amount);
+  } else {
+    return new Intl.NumberFormat("ko-KR", {
+      style: "currency",
+      currency: "KRW",
+      minimumFractionDigits: 0,
+    }).format(amount);
+  }
+};
+
+// 추가 서비스 한글 매핑 함수
+const getServiceNameInKorean = (serviceName) => {
+  const serviceMapping = {
+    FAST_TRACK_ARRIVAL_PREMIUM: "패스트트랙 입국 프리미엄",
+    FAST_TRACK_ARRIVAL_STANDARD: "패스트트랙 입국 스탠다드",
+    FAST_TRACK_DEPARTURE_PREMIUM: "패스트트랙 출국 프리미엄",
+    FAST_TRACK_DEPARTURE_STANDARD: "패스트트랙 출국 스탠다드",
+    AIRPORT_PICKUP_SEDAN_DISTRICT1: "공항 픽업 세단 (1,3,푸년군)",
+    AIRPORT_PICKUP_SUV_DISTRICT1: "공항 픽업 SUV (1,3,푸년군)",
+    AIRPORT_PICKUP_SEDAN_DISTRICT2: "공항 픽업 세단 (2,4,7,빈탄군)",
+    AIRPORT_PICKUP_SUV_DISTRICT2: "공항 픽업 SUV (2,4,7,빈탄군)",
+    AIRPORT_PICKUP_SEDAN_DISTRICT3: "공항 픽업 세단 (5,6,8,투득군)",
+    AIRPORT_PICKUP_SUV_DISTRICT3: "공항 픽업 SUV (5,6,8,투득군)",
+    AIRPORT_PICKUP_SEDAN_DISTRICT4: "공항 픽업 세단 (9,10,11,12군)",
+    AIRPORT_PICKUP_SUV_DISTRICT4: "공항 픽업 SUV (9,10,11,12군)",
+    CITY_TOUR_HALF_DAY: "반일 시내 투어",
+    CITY_TOUR_FULL_DAY: "하루 시내 투어",
+    MEKONG_DELTA_TOUR: "메콩델타 투어",
+    CU_CHI_TUNNEL_TOUR: "구찌터널 투어",
+  };
+
+  return serviceMapping[serviceName] || serviceName;
+};
+
 const resolvers = {
   Query: {
     // applications 쿼리: 새로운 대시보드와 호환되는 형식 (페이지네이션 및 필터 지원)
@@ -471,13 +627,16 @@ const resolvers = {
             applicationExtractedInfo = null;
           }
         }
-
         return {
           id: application.id.toString(),
           applicationId: application.applicationId || `APP-${application.id}`,
           processingType: application.processingType || "STANDARD",
-          totalPrice: application.totalPrice || 0,
+          totalPrice: formatPricingDetails(application),
           createdAt: application.createdAt,
+          updatedAt: application.updatedAt || application.createdAt,
+          // Transit visa specific fields
+          transitPeopleCount: application.transitPeopleCount || null,
+          transitVehicleType: application.transitVehicleType || null,
           status: dbToGraphQLStatus(application.status),
           personalInfo: {
             id: application.id.toString(),
@@ -598,13 +757,32 @@ const resolvers = {
 
         try {
           // 1. 신청서 데이터 생성 - 모든 ENUM 값을 대문자로 정규화
+          // totalPrice 구조 분석 및 추출
+          let finalTotalPrice = 0;
+          let pricingDetails = null;
+
+          if (input.totalPrice) {
+            if (typeof input.totalPrice === "number") {
+              // 기존 방식 (단순 숫자)
+              finalTotalPrice = input.totalPrice;
+            } else if (
+              typeof input.totalPrice === "object" &&
+              input.totalPrice.totalPrice
+            ) {
+              // 새로운 방식 (상세 가격 정보)
+              finalTotalPrice = input.totalPrice.totalPrice;
+              pricingDetails = input.totalPrice;
+              console.log("📊 상세 가격 정보 감지:", pricingDetails);
+            }
+          }
+
           const applicationData = {
             userId: user?.id || null,
             applicationId: input.applicationId || `VN${Date.now()}`,
             processingType: normalizeProcessingType(
               input.processingType || "STANDARD",
             ),
-            totalPrice: input.totalPrice || 0,
+            totalPrice: finalTotalPrice,
             status: "PENDING", // 대문자로 고정
 
             // Personal Info 매핑
@@ -624,8 +802,12 @@ const resolvers = {
             arrivalDate: input.travelInfo?.entryDate, // 호환성을 위해
             entryPort: input.travelInfo?.entryPort,
 
-            // 기타 필드
-            notes: `신청 타입: ${input.processingType}, 총 가격: ${input.totalPrice}원`,
+            // Transit visa specific fields
+            transitPeopleCount: input.transitPeopleCount || null,
+            transitVehicleType: input.transitVehicleType || null,
+
+            // 기타 필드 - 상세 가격 정보가 있으면 추가
+            notes: `신청 타입: ${input.processingType}, 총 가격: ${finalTotalPrice}원${input.transitPeopleCount ? `, 경유 인원수: ${input.transitPeopleCount}명` : ""}${input.transitVehicleType ? `, 차량: ${input.transitVehicleType}` : ""}${pricingDetails ? `, 가격상세: ${JSON.stringify(pricingDetails)}` : ""}`,
           };
 
           console.log("💾 저장할 신청서 데이터:", applicationData);
@@ -930,6 +1112,67 @@ const resolvers = {
               pubsubError,
             );
             // Subscription 실패는 주 프로세스를 중단시키지 않음
+          } // 🎉 이메일 발송 기능 추가
+          try {
+            const { emailTemplates } = require("../../../utils/emailService");
+
+            // 가격 정보를 올바른 형식으로 포맷팅
+            const pricingDetails = formatPricingDetails(newApplication);
+
+            // 신청자에게 접수 확인 이메일 발송
+            const emailData = {
+              // 기본 정보
+              email: response.personalInfo.email,
+              customerName:
+                response.personalInfo.fullName ||
+                `${response.personalInfo.firstName} ${response.personalInfo.lastName}`.trim(),
+              fullName:
+                response.personalInfo.fullName ||
+                `${response.personalInfo.firstName} ${response.personalInfo.lastName}`.trim(),
+              applicationNumber: response.applicationId,
+
+              // 비자 정보
+              visaType: getVisaTypeDisplayName(response.travelInfo.visaType),
+              processingType:
+                response.processingType === "URGENT"
+                  ? "긴급 처리"
+                  : "일반 처리",
+              createdAt: response.createdAt,
+              submittedAt: response.createdAt,
+              visa_type: response.travelInfo.visaType,
+
+              // 개인 정보
+              phone: response.personalInfo.phone,
+              address: response.personalInfo.address,
+              phoneOfFriend: response.personalInfo.phoneOfFriend,
+
+              // 여행 정보
+              entryDate: response.travelInfo.entryDate,
+              entryPort: response.travelInfo.entryPort,
+              transitPeopleCount: newApplication.transitPeopleCount,
+              transitVehicleType: newApplication.transitVehicleType,
+
+              // 추가 서비스 (이름만 전달, 한글 매핑은 emailService에서 처리)
+              additionalServices: response.additionalServices,
+
+              // 비용 정보 (상세 구조)
+              totalPrice: pricingDetails,
+              currency: pricingDetails.currency,
+            };
+
+            console.log("📧 이메일 발송 시도:", {
+              ...emailData,
+              totalPrice: "가격 정보 구조 확인됨",
+            });
+
+            await emailTemplates.sendApplicationConfirmation(emailData);
+            console.log("✅ 신청 접수 확인 이메일 발송 완료");
+          } catch (emailError) {
+            console.error("❌ 이메일 발송 실패:", emailError.message);
+            // 이메일 발송 실패는 주 프로세스를 중단시키지 않음
+            console.warn(
+              "⚠️ 이메일 발송은 실패했지만 신청서는 정상적으로 생성되었습니다.",
+            );
           }
 
           return response;
@@ -1480,6 +1723,13 @@ ${customMessage || "비자 발급이 완료되었습니다. 첨부된 비자를 
           },
         });
       }
+    },
+  },
+
+  // Application type resolver - totalPrice 필드를 새로운 구조로 처리
+  Application: {
+    totalPrice: (parent) => {
+      return formatPricingDetails(parent);
     },
   },
 

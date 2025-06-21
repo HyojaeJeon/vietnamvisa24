@@ -17,14 +17,51 @@ const typeDefs = gql`
     id: ID
     applicationId: String
     processingType: String
-    totalPrice: Float
+    totalPrice: PricingDetails
     status: ApplicationStatus
     createdAt: DateTime
+    updatedAt: DateTime
+    # Transit visa specific fields
+    transitPeopleCount: Int
+    transitVehicleType: String
     documents: [Document]
     personalInfo: PersonalInfo
     travelInfo: TravelInfo
     additionalServices: [AdditionalService]
     extractedInfo: ExtractedInfo
+  }
+
+  type PricingDetails {
+    visa: VisaPricing
+    additionalServices: AdditionalServicesPricing
+    totalPrice: Float
+    currency: String
+    formatted: FormattedPrices
+  }
+
+  type VisaPricing {
+    basePrice: Float
+    vehiclePrice: Float
+    totalPrice: Float
+  }
+
+  type AdditionalServicesPricing {
+    services: [ServicePrice]
+    totalPrice: Float
+  }
+
+  type ServicePrice {
+    id: String
+    name: String
+    price: Float
+  }
+
+  type FormattedPrices {
+    visaBasePrice: String
+    visaVehiclePrice: String
+    visaTotalPrice: String
+    additionalServicesPrice: String
+    totalPrice: String
   }
 
   extend type Document {
@@ -125,11 +162,47 @@ const typeDefs = gql`
   input CreateApplicationInput {
     applicationId: String
     processingType: String
-    totalPrice: Float
+    totalPrice: PricingDetailsInput
     personalInfo: PersonalInfoInput
     travelInfo: TravelInfoInput
     additionalServiceIds: [ID]
     documents: DocumentsInput
+    # Transit visa specific fields
+    transitPeopleCount: Int
+    transitVehicleType: String
+  }
+
+  input PricingDetailsInput {
+    visa: VisaPricingInput
+    additionalServices: AdditionalServicesPricingInput
+    totalPrice: Float
+    currency: String
+    formatted: FormattedPricesInput
+  }
+
+  input VisaPricingInput {
+    basePrice: Float
+    vehiclePrice: Float
+    totalPrice: Float
+  }
+
+  input AdditionalServicesPricingInput {
+    services: [ServicePriceInput]
+    totalPrice: Float
+  }
+
+  input ServicePriceInput {
+    id: String
+    name: String
+    price: Float
+  }
+
+  input FormattedPricesInput {
+    visaBasePrice: String
+    visaVehiclePrice: String
+    visaTotalPrice: String
+    additionalServicesPrice: String
+    totalPrice: String
   }
 
   input UpdateApplicationInput {
@@ -155,7 +228,6 @@ const typeDefs = gql`
     authority: String
     koreanName: String
   }
-
   input DocumentsInput {
     passport: DocumentFileInput
     photo: DocumentFileInput
@@ -163,6 +235,13 @@ const typeDefs = gql`
     bankStatement: DocumentFileInput
     invitationLetter: DocumentFileInput
     businessRegistration: DocumentFileInput
+    # Multi-person document support for transit visas (camelCase naming)
+    passportPerson0: DocumentFileInput
+    photoPerson0: DocumentFileInput
+    passportPerson1: DocumentFileInput
+    photoPerson1: DocumentFileInput
+    passportPerson2: DocumentFileInput
+    photoPerson2: DocumentFileInput
   }
 
   input DocumentFileInput {

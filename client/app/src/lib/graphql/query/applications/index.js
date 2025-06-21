@@ -7,18 +7,20 @@ export const GET_APPLICATIONS = gql`
         id
         applicationId
         processingType
-        totalPrice
+        totalPrice {
+          totalPrice
+          currency
+          formatted {
+            totalPrice
+          }
+        }
         status
         createdAt
         personalInfo {
           id
-          firstName
-          lastName
           fullName
           email
           phone
-          address
-          phoneOfFriend
         }
         travelInfo {
           id
@@ -26,35 +28,7 @@ export const GET_APPLICATIONS = gql`
           entryPort
           visaType
         }
-        additionalServices {
-          id
-          name
-        }
-        documents {
-          id
-          type
-          fileName
-          fileSize
-          fileType
-          uploadedAt
-          fileUrl
-          fileData
-          extractedInfo {
-            type
-            issuingCountry
-            passportNo
-            surname
-            givenNames
-            dateOfBirth
-            dateOfIssue
-            dateOfExpiry
-            sex
-            nationality
-            personalNo
-            authority
-            koreanName
-          }
-        }
+        # 목록에서는 문서와 추가 서비스는 제외하여 성능 최적화
       }
       totalCount
       totalPages
@@ -82,9 +56,36 @@ export const GET_APPLICATION = gql`
       id
       applicationId
       processingType
-      totalPrice
+      totalPrice {
+        visa {
+          basePrice
+          vehiclePrice
+          totalPrice
+        }
+        additionalServices {
+          services {
+            id
+            name
+            price
+          }
+          totalPrice
+        }
+        totalPrice
+        currency
+        formatted {
+          visaBasePrice
+          visaVehiclePrice
+          visaTotalPrice
+          additionalServicesPrice
+          totalPrice
+        }
+      }
       status
       createdAt
+      updatedAt
+      # Transit visa specific fields
+      transitPeopleCount
+      transitVehicleType
       personalInfo {
         id
         firstName
@@ -129,6 +130,21 @@ export const GET_APPLICATION = gql`
           authority
           koreanName
         }
+      }
+      extractedInfo {
+        type
+        issuingCountry
+        passportNo
+        surname
+        givenNames
+        dateOfBirth
+        dateOfIssue
+        dateOfExpiry
+        sex
+        nationality
+        personalNo
+        authority
+        koreanName
       }
     }
   }
@@ -224,7 +240,13 @@ export const APPLICATION_CREATED_SUBSCRIPTION = gql`
       id
       applicationId
       processingType
-      totalPrice
+      totalPrice {
+        totalPrice
+        currency
+        formatted {
+          totalPrice
+        }
+      }
       status
       createdAt
       personalInfo {
@@ -266,7 +288,13 @@ export const APPLICATION_UPDATED_SUBSCRIPTION = gql`
       id
       applicationId
       processingType
-      totalPrice
+      totalPrice {
+        totalPrice
+        currency
+        formatted {
+          totalPrice
+        }
+      }
       status
       createdAt
       personalInfo {

@@ -6,65 +6,78 @@ import { Card, CardContent, CardHeader, CardTitle } from "../../src/components/u
 import { Button } from "../../src/components/ui/button";
 import { Badge } from "../../src/components/ui/badge";
 import { Checkbox } from "../../src/components/ui/checkbox";
-import { Eye, Edit, ArrowLeft, CheckCircle, User, Mail, Phone, Home, Calendar, MapPin, FileText, CreditCard, AlertCircle, Globe, Plane, Clock, Shield, X } from "lucide-react";
-import { formatCurrency, calculateTotalPrice } from "./utils";
+import { Eye, Edit, ArrowLeft, CheckCircle, User, Mail, Phone, Home, Calendar, MapPin, FileText, CreditCard, AlertCircle, Globe, Plane, Clock, Shield, X, Users, Car } from "lucide-react";
+import { calculateTotalPrice, getVisaServiceDetails } from "./utils";
 import { VISA_TYPES, PROCESSING_TYPES } from "./types";
 
 const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, updateFormData }) => {
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(null);
-  const [isEditingPassport, setIsEditingPassport] = useState(false);
-  const [editedPassportInfo, setEditedPassportInfo] = useState(null);
+
+  // 비자 타입에 따라 기본 통화 설정
+  const defaultCurrency = formData.visaType === VISA_TYPES.E_VISA_TRANSIT ? "VND" : "KRW";
+  const [selectedCurrency, setSelectedCurrency] = useState(defaultCurrency);
 
   const currentPrice = calculateTotalPrice(formData);
-  // 여권 정보 수정 시작
-  const startEditingPassport = () => {
-    setEditedPassportInfo({
-      passportNo: formData.personalInfo?.passportNo || "",
-      surname: formData.personalInfo?.lastName || "",
-      givenNames: formData.personalInfo?.firstName || "",
-      koreanName: formData.personalInfo?.koreanName || formData.personalInfo?.fullName || "",
-      authority: formData.personalInfo?.authority || "",
-      nationality: formData.personalInfo?.nationality || "",
-      issuingCountry: formData.personalInfo?.issuingCountry || "",
-      sex: formData.personalInfo?.gender || "",
-      dateOfBirth: formData.personalInfo?.birthDate || "",
-      dateOfIssue: formData.personalInfo?.passportIssueDate || "",
-      dateOfExpiry: formData.personalInfo?.passportExpiryDate || "",
-      type: formData.personalInfo?.passportType || "",
-      personalNo: formData.personalInfo?.personalNo || "",
-    });
-    setIsEditingPassport(true);
+  const serviceDetails = getVisaServiceDetails(formData);
+  // 통화별 환율 (2024년 기준 대략적인 환율)
+  const exchangeRates = {
+    KRW: 1, // 기준 통화
+    VND: 18.5, // 1 KRW = 18.5 VND
+    USD: 0.00074, // 1 KRW = 0.00074 USD
   };
 
-  // 여권 정보 수정 저장
-  const savePassportInfo = () => {
-    updateFormData({
-      personalInfo: {
-        ...formData.personalInfo,
-        passportNo: editedPassportInfo.passportNo,
-        lastName: editedPassportInfo.surname,
-        firstName: editedPassportInfo.givenNames,
-        koreanName: editedPassportInfo.koreanName,
-        nationality: editedPassportInfo.nationality,
-        issuingCountry: editedPassportInfo.issuingCountry,
-        gender: editedPassportInfo.sex,
-        birthDate: editedPassportInfo.dateOfBirth,
-        passportIssueDate: editedPassportInfo.dateOfIssue,
-        passportExpiryDate: editedPassportInfo.dateOfExpiry,
-        passportType: editedPassportInfo.type,
-        authority: editedPassportInfo.authority,
-        personalNo: editedPassportInfo.personalNo,
-      },
-    });
-    setIsEditingPassport(false);
-    setEditedPassportInfo(null);
+  // 가격을 선택된 통화로 변환
+  const convertPrice = (price) => {
+    // 현재 가격의 원본 통화 확인 (Transit E-VISA는 VND, 나머지는 KRW)
+    const sourceCurrency = currentPrice.currency || "KRW";
+
+    if (sourceCurrency === selectedCurrency) {
+      // 같은 통화면 변환 없이 반환
+      return price;
+    }
+
+    if (sourceCurrency === "VND" && selectedCurrency === "KRW") {
+      // VND에서 KRW로 변환
+      return Math.round(price / exchangeRates.VND);
+    } else if (sourceCurrency === "VND" && selectedCurrency === "USD") {
+      // VND에서 USD로 변환 (VND -> KRW -> USD)
+      const krwPrice = price / exchangeRates.VND;
+      return Math.round(krwPrice * exchangeRates.USD * 100) / 100; // USD는 소수점 2자리
+    } else if (sourceCurrency === "KRW" && selectedCurrency === "VND") {
+      // KRW에서 VND로 변환
+      return Math.round(price * exchangeRates.VND);
+    } else if (sourceCurrency === "KRW" && selectedCurrency === "USD") {
+      // KRW에서 USD로 변환
+      return Math.round(price * exchangeRates.USD * 100) / 100; // USD는 소수점 2자리
+    }
+
+    return price;
   };
 
-  // 여권 정보 수정 취소
-  const cancelEditingPassport = () => {
-    setIsEditingPassport(false);
-    setEditedPassportInfo(null);
+  // 통화별 포맷팅
+  const formatCurrencyPrice = (price) => {
+    const convertedPrice = convertPrice(price);
+    switch (selectedCurrency) {
+      case "VND":
+        return new Intl.NumberFormat("vi-VN", {
+          style: "currency",
+          currency: "VND",
+          minimumFractionDigits: 0,
+        }).format(convertedPrice);
+      case "USD":
+        return new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+          minimumFractionDigits: 2,
+        }).format(convertedPrice);
+      default: // KRW
+        return new Intl.NumberFormat("ko-KR", {
+          style: "currency",
+          currency: "KRW",
+          minimumFractionDigits: 0,
+        }).format(convertedPrice);
+    }
   };
 
   // 서류 프리뷰 모달
@@ -75,12 +88,13 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
   const closeImagePreview = () => {
     setShowImagePreview(null);
   };
+
   // 비자 타입 정보
   const getVisaTypeInfo = () => {
     const visaTypes = {
       [VISA_TYPES.E_VISA_GENERAL]: {
         id: VISA_TYPES.E_VISA_GENERAL,
-        name: "E-VISA (전자비자) / 일반 (3-4일 소요)",
+        name: "E-VISA (전자비자) / 일반 (4-5일 소요)",
       },
       [VISA_TYPES.E_VISA_URGENT]: {
         id: VISA_TYPES.E_VISA_URGENT,
@@ -98,9 +112,16 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
       }
     );
   };
-
   // 처리 속도 정보
   const getProcessingTypeInfo = () => {
+    // Transit E-VISA의 경우 항상 당일발급
+    if (formData.visaType === VISA_TYPES.E_VISA_TRANSIT) {
+      return {
+        id: "SAME_DAY",
+        name: "당일발급",
+      };
+    }
+
     const processingTypes = {
       [PROCESSING_TYPES.NORMAL]: {
         id: PROCESSING_TYPES.NORMAL,
@@ -154,13 +175,16 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
       OTHER: "기타",
     };
     return ports[code] || code;
-  };
-
-  // 업로드된 서류 목록
-  const uploadedDocuments = formData.documents || {};
+  }; // 업로드된 서류 라벨 매핑
   const documentLabels = {
-    passport: "여권 사본",
+    passport: "여권 정보면",
     photo: "증명사진",
+    passportPerson0: "여권 정보면 (1인)",
+    photoPerson0: "증명사진 (1인)",
+    passportPerson1: "여권 정보면 (2인)",
+    photoPerson1: "증명사진 (2인)",
+    passportPerson2: "여권 정보면 (3인)",
+    photoPerson2: "증명사진 (3인)",
     flight_ticket: "항공권 예약 확인서",
     bank_statement: "은행 잔고 증명서",
     invitation_letter: "초청장",
@@ -284,7 +308,7 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                   수정
                 </Button>
               </div>
-            </CardHeader>
+            </CardHeader>{" "}
             <CardContent className="pt-3 md:pt-4">
               <div className="grid grid-cols-1 gap-3 text-sm md:grid-cols-2 md:gap-4">
                 <div className="p-2 rounded-lg md:p3 bg-gray-50">
@@ -300,9 +324,84 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                     <Badge className="text-green-800 bg-green-100 hover:bg-green-100">{getProcessingTypeInfo().name}</Badge>
                   </div>
                 </div>
+
+                {/* Transit E-VISA 추가 정보 */}
+                {formData.visaType === VISA_TYPES.E_VISA_TRANSIT && (
+                  <>
+                    <div className="p-2 rounded-lg md:p-3 bg-orange-50">
+                      <p className="mb-1 text-xs text-gray-500">경유 인원수</p>
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4 text-orange-500" />
+                        <Badge className="text-orange-800 bg-orange-100 hover:bg-orange-100">{formData.transitPeopleCount || 1}명</Badge>
+                      </div>
+                    </div>
+                    <div className="p-2 rounded-lg md:p-3 bg-purple-50">
+                      <p className="mb-1 text-xs text-gray-500">차량 유형</p>{" "}
+                      <div className="flex items-center gap-2">
+                        <Car className="w-4 h-4 text-purple-500" />
+                        <Badge className="text-purple-800 bg-purple-100 hover:bg-purple-100">
+                          {(() => {
+                            if (!formData.transitVehicleType) return "미선택";
+                            if (formData.transitVehicleType === "INNOVA") return "이노바 (7인승)";
+                            if (formData.transitVehicleType === "CARNIVAL") return "카니발 (11인승)";
+                            return formData.transitVehicleType;
+                          })()}
+                        </Badge>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
-            </CardContent>
+            </CardContent>{" "}
           </Card>
+
+          {/* 추가 서비스 섹션 */}
+          {formData.additionalServices && formData.additionalServices.length > 0 && (
+            <Card className="transition-colors border-2 border-green-100 hover:border-green-200">
+              <CardHeader className="pb-3 bg-gradient-to-r from-green-50 to-emerald-50 md:pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 md:gap-3">
+                    <CreditCard className="w-5 h-5 text-green-600 md:w-6 md:h-6" />
+                    <CardTitle className="text-lg text-green-700 md:text-xl">추가 서비스</CardTitle>
+                  </div>
+                  <Button variant="outline" size="sm" onClick={() => onEdit(1)} className="px-2 text-xs h-7 md:h-8 md:px-3 md:text-sm">
+                    <Edit className="w-3 h-3 mr-1 md:w-4 md:h-4" />
+                    수정
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-3 md:pt-4">
+                <div className="space-y-2 md:space-y-3">
+                  {formData.additionalServices.map((serviceId) => {
+                    // 서비스 이름 매핑
+                    const getServiceName = (id) => {
+                      const serviceMap = {
+                        FAST_TRACK_ARRIVAL: "공항 패스트트랙 - 입국",
+                        FAST_TRACK_ARRIVAL_PREMIUM: "공항 패스트트랙 - 프리미엄 입국",
+                        AIRPORT_PICKUP_SEDAN_DISTRICT1: "공항 픽업 서비스 - 4인승 세단 (1,3,푸년군)",
+                        AIRPORT_PICKUP_SEDAN_DISTRICT2: "공항 픽업 서비스 - 4인승 세단 (2,7,빈탄군)",
+                        AIRPORT_PICKUP_SUV_DISTRICT1: "공항 픽업 서비스 - 7인승 SUV (1,3,푸년군)",
+                        AIRPORT_PICKUP_SUV_DISTRICT2: "공항 픽업 서비스 - 7인승 SUV (2,7,빈탄군)",
+                        FAST_TRACK: "공항 패스트트랙",
+                        TRANSLATION: "번역 서비스",
+                        HOTEL_BOOKING: "호텔 예약 서비스",
+                      };
+                      return serviceMap[id] || id;
+                    };
+
+                    return (
+                      <div key={serviceId} className="flex items-center gap-2 p-2 rounded-lg md:gap-3 md:p-3 bg-gray-50">
+                        <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full"></div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 md:text-base">{getServiceName(serviceId)}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* 업로드된 서류 섹션 */}
           <Card className="transition-colors border-2 border-orange-100 hover:border-orange-200">
@@ -317,31 +416,62 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                   수정
                 </Button>
               </div>
-            </CardHeader>
+            </CardHeader>{" "}
             <CardContent className="pt-3 md:pt-4">
+              {" "}
               <div className="space-y-2 md:space-y-3">
-                {formData.documents &&
-                  Object.entries(formData.documents).map(([docType, docData]) => (
-                    <div key={docType} className="flex items-center justify-between p-2 rounded-lg md:p-3 bg-gray-50">
-                      <div className="flex items-center flex-1 min-w-0 gap-2 md:gap-3">
-                        <FileText className="flex-shrink-0 w-4 h-4 text-gray-500 md:w-5 md:h-5" />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs font-semibold text-gray-900 md:text-sm">{docType === "passport" ? "여권 정보면" : "증명사진"}</p>
-                          <p className="text-xs text-gray-500 truncate">
-                            {docData.fileName} ({(docData.fileSize / 1024 / 1024).toFixed(2)}MB)
-                          </p>
+                {formData.documents && Object.keys(formData.documents).length > 0 ? (
+                  Object.entries(formData.documents)
+                    .filter(([docType, docData]) => {
+                      // 유효한 문서만 필터링 - 더 안전한 검증
+                      return docData && docData.fileName && (docData.file || docData.fileData) && docData.fileSize > 0;
+                    })
+                    .map(([docType, docData], index) => {
+                      // 서류 타입별 라벨 결정
+                      const getDocumentLabel = (type) => {
+                        // 다중 인원용 키 처리 (예: passportPerson0, photoPerson1)
+                        if (type.includes("Person")) {
+                          const baseType = type.replace(/Person\d+/, "");
+                          const personNumber = type.match(/Person(\d+)/)?.[1];
+                          if (baseType === "passport") return `여권 정보면 (${parseInt(personNumber) + 1}인)`;
+                          if (baseType === "photo") return `증명사진 (${parseInt(personNumber) + 1}인)`;
+                        }
+
+                        // 기본 타입 처리
+                        if (type === "passport") return "여권 정보면";
+                        if (type === "photo") return "증명사진";
+
+                        // documentLabels에서 찾기
+                        return documentLabels[type] || type;
+                      };
+
+                      const label = getDocumentLabel(docType);
+                      const displayFile = docData.file || docData.fileData;
+                      const fileSize = docData.fileSize || 0;
+                      const fileSizeMB = (fileSize / 1024 / 1024).toFixed(2);
+
+                      return (
+                        <div key={`${docType}-${index}`} className="flex items-center justify-between p-2 rounded-lg md:p-3 bg-gray-50">
+                          <div className="flex items-center flex-1 min-w-0 gap-2 md:gap-3">
+                            <FileText className="flex-shrink-0 w-4 h-4 text-gray-500 md:w-5 md:h-5" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-gray-900 md:text-sm">{label}</p>
+                              <p className="text-xs text-gray-500 truncate">
+                                {docData.fileName} ({fileSizeMB}MB)
+                              </p>
+                            </div>
+                          </div>
+                          {displayFile && (
+                            <Button variant="outline" size="sm" onClick={() => handleImagePreview(displayFile, label)} className="flex-shrink-0 px-2 h-7 md:h-8 md:px-3">
+                              <Eye className="w-3 h-3 md:w-4 md:h-4" />
+                            </Button>
+                          )}
                         </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleImagePreview(docData.file, docType === "passport" ? "여권 정보면" : "증명사진")}
-                        className="flex-shrink-0 px-2 h-7 md:h-8 md:px-3"
-                      >
-                        <Eye className="w-3 h-3 md:w-4 md:h-4" />
-                      </Button>
-                    </div>
-                  ))}
+                      );
+                    })
+                ) : (
+                  <p className="text-sm text-gray-500">업로드된 서류가 없습니다.</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -356,25 +486,85 @@ const ReviewStep = ({ formData, onNext, onPrevious, onEdit, isSubmitting, update
                 <CreditCard className="w-5 h-5 text-green-600 md:w-6 md:h-6" />
                 <CardTitle className="text-lg text-green-700 md:text-xl">결제 정보</CardTitle>
               </div>
-            </CardHeader>
+            </CardHeader>{" "}
             <CardContent className="space-y-3 md:space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">기본 서비스</span>
-                  <span className="font-semibold">{formatCurrency(25000)}</span>
+              {/* 통화 선택 */}
+              <div className="p-3 mb-4 rounded-lg bg-gray-50">
+                <h4 className="mb-2 text-sm font-semibold text-gray-800">결제 통화 선택</h4>
+                <div className="flex gap-2">
+                  {[
+                    { code: "KRW", name: "원화", symbol: "₩" },
+                    { code: "VND", name: "베트남 동", symbol: "₫" },
+                    { code: "USD", name: "미국 달러", symbol: "$" },
+                  ].map((currency) => (
+                    <button
+                      key={currency.code}
+                      onClick={() => setSelectedCurrency(currency.code)}
+                      className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                        selectedCurrency === currency.code ? "bg-blue-100 border-blue-300 text-blue-700" : "bg-white border-gray-300 text-gray-600 hover:bg-gray-50"
+                      }`}
+                    >
+                      {currency.symbol} {currency.name}
+                    </button>
+                  ))}
                 </div>
-                {formData.processingType === "fast" && (
+              </div>
+              {/* 선택한 서비스 세부 정보 */}
+              <div className="p-3 mb-4 rounded-lg bg-blue-50">
+                <h4 className="mb-2 text-sm font-semibold text-blue-800">선택한 서비스</h4>
+                <div className="space-y-1 text-xs text-blue-700">
+                  <div>• {serviceDetails.visaTypeInfo.name}</div>
+                  <div>• {serviceDetails.durationInfo.name}</div>
+                  {serviceDetails.processingInfo.name && <div>• 처리 속도: {serviceDetails.processingInfo.name}</div>}
+                  {formData.visaType === VISA_TYPES.E_VISA_TRANSIT && (
+                    <>
+                      <div>• 인원수: {formData.transitPeopleCount}명</div>
+                      {serviceDetails.transitInfo.vehicleType && <div>• 차량: {serviceDetails.transitInfo.vehicleType.name}</div>}
+                    </>
+                  )}
+                </div>
+              </div>{" "}
+              <div className="space-y-2">
+                {/* 비자 기본 가격 */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-600">
+                    {formData.visaType === VISA_TYPES.E_VISA_TRANSIT ? `비자료 (${formData.transitPeopleCount}명)` : `비자료 (${serviceDetails.durationInfo.name})`}
+                  </span>
+                  <span className="font-semibold">{formatCurrencyPrice(currentPrice.visa.basePrice)}</span>
+                </div>
+
+                {/* 차량 추가 비용 (목바이 경유 시) */}
+                {formData.visaType === VISA_TYPES.E_VISA_TRANSIT && currentPrice.visa.vehiclePrice > 0 && (
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">긴급 처리</span>
-                    <span className="font-semibold text-orange-600">+{formatCurrency(10000)}</span>
+                    <span className="text-gray-600">차량 추가료 ({serviceDetails.transitInfo.vehicleType?.name})</span>
+                    <span className="font-semibold text-purple-600">{formatCurrencyPrice(currentPrice.visa.vehiclePrice)}</span>
                   </div>
+                )}
+
+                {/* 추가 서비스 */}
+                {currentPrice.additionalServices.services.length > 0 && (
+                  <>
+                    {currentPrice.additionalServices.services.map((service) => (
+                      <div key={service.id} className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">{service.name}</span>
+                        <span className="font-semibold text-blue-600">{formatCurrencyPrice(service.price)}</span>
+                      </div>
+                    ))}
+                  </>
                 )}
               </div>
               <div className="pt-2 border-t md:pt-3">
                 <div className="flex items-center justify-between">
                   <span className="text-base font-bold text-gray-900 md:text-lg">총 결제금액</span>
-                  <span className="text-xl font-bold text-green-600 md:text-2xl">{formatCurrency(currentPrice)}</span>
-                </div>
+                  <span className="text-xl font-bold text-green-600 md:text-2xl">{formatCurrencyPrice(currentPrice.totalPrice)}</span>
+                </div>{" "}
+                <p className="mt-1 text-xs text-gray-500">
+                  {selectedCurrency === "KRW" && currentPrice.currency === "KRW" && "부가세 포함"}
+                  {selectedCurrency === "VND" && currentPrice.currency === "VND" && "베트남 동화 원가"}
+                  {selectedCurrency === "VND" && currentPrice.currency === "KRW" && "베트남 동화 기준 (환율 적용)"}
+                  {selectedCurrency === "KRW" && currentPrice.currency === "VND" && "한국 원화 기준 (환율 적용)"}
+                  {selectedCurrency === "USD" && "미국 달러 기준 (환율 적용)"}
+                </p>
               </div>
             </CardContent>
           </Card>
